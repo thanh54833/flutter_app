@@ -8,19 +8,22 @@ void main() => runApp(LearnApp());
 
 class LearnApp extends StatelessWidget {
   build(BuildContext context) {
-    final wordPair = WordPair.random();
+    //final wordPair = WordPair.random();
     return MaterialApp(
       title: "title",
+      theme: ThemeData(          // Add the 3 lines from here...
+        primaryColor: Colors.white,
+      ),
       home: Scaffold(
-          appBar: AppBar(
-            title: Text("Text"),
-          ),
+          // appBar: AppBar(
+          //   title: Text("Text"),
+          // ),
           body: Center(
-            // child: const Text("child"),
-            //child: Text(wordPair.asPascalCase)),
+        // child: const Text("child"),
+        //child: Text(wordPair.asPascalCase)),
 
-            child: RandomWord(),
-          )),
+        child: RandomWord(),
+      )),
     );
   }
 }
@@ -40,9 +43,38 @@ class _RandomWordState extends State<RandomWord> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Startup Name Generator'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.list),
+            onPressed: () {
+              pushSave();
+            },
+          )
+        ],
       ),
       body: _buildSuggestions(),
     );
+  }
+
+  pushSave() {
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (context) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Saved Suggestions'),
+          ),
+          body: ListView.builder(
+            itemCount: _saved.length,
+            itemBuilder: (context, index) {
+              return Container(
+                height: 50,
+                child: _buildRow(_saved.elementAt(index)),
+              );
+            },
+          ),
+        );
+      },
+    ));
   }
 
   Widget _buildSuggestions() {
@@ -92,7 +124,7 @@ class _RandomWordState extends State<RandomWord> {
       ),
       onTap: () {
         setState(() {
-          if (alreadySaved == true) {
+          if (alreadySaved != true) {
             _saved.add(pair);
           } else {
             _saved.remove(pair);
