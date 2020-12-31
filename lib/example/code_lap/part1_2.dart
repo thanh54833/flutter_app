@@ -11,7 +11,8 @@ class LearnApp extends StatelessWidget {
     //final wordPair = WordPair.random();
     return MaterialApp(
       title: "title",
-      theme: ThemeData(          // Add the 3 lines from here...
+      theme: ThemeData(
+        // Add the 3 lines from here...
         primaryColor: Colors.white,
       ),
       home: Scaffold(
@@ -21,7 +22,6 @@ class LearnApp extends StatelessWidget {
           body: Center(
         // child: const Text("child"),
         //child: Text(wordPair.asPascalCase)),
-
         child: RandomWord(),
       )),
     );
