@@ -100,14 +100,24 @@ class Part2 extends StatelessWidget {
           padding: EdgeInsets.all(10),
           sliver: SliverList(
               delegate: SliverChildListDelegate(<Widget>[
-            Text("item scroll view : 1"),
-            Text("item scroll view : 2"),
-            Text("item scroll view : 3")
+            Container(
+              height: 500,
+              child: Text("item scroll view : 1"),
+              color: Colors.red,
+            ),
+            Container(
+              height: 500,
+              child: Text("item scroll view : 2"),
+              color: Colors.green,
+            ),
+            Container(
+              height: 500,
+              child: Text("item scroll view : 3"),
+              color: Colors.yellow,
+            )
           ])),
         )
       ],
     );
   }
-
-
 }

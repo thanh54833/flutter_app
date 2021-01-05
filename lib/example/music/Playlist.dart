@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'Utils.dart';
 
 /// thanh chưa làm xong bài này ...
-///thanh : Building beautiful UIs with Flutter , https://codelabs.developers.google.com/codelabs/flutter#0
+/// thanh : Building beautiful UIs with Flutter , https://codelabs.developers.google.com/codelabs/flutter#0
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -39,9 +39,14 @@ class _MainPage extends State<MainPage> {
       _selectedIndex = index;
     });
   }
+
   build(BuildContext context) {
     return Scaffold(
-        body: HomePage(title: "HomePage"),
+        resizeToAvoidBottomPadding: false,
+        body: SingleChildScrollView(
+          child: HomePage(title: "HomePage"),
+          scrollDirection: Axis.vertical,
+        ), //HomePage(title: "HomePage"),//
         bottomNavigationBar: BottomNavigationBar(
           items: [
             BottomNavigationBarItem(
@@ -492,11 +497,11 @@ class _HomePage extends State<HomePage> {
           ],
         ),
         Container(
-          height: 20,
+          height: 50,
           margin: EdgeInsets.all(8),
-          color: Colors.blue,
+          color: Colors.transparent,
         ),
-        Expanded(child: Container())
+        //Expanded(child: Container())
       ],
     );
   }
