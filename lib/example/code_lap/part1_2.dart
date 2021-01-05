@@ -16,14 +16,14 @@ class LearnApp extends StatelessWidget {
         primaryColor: Colors.white,
       ),
       home: Scaffold(
-          // appBar: AppBar(
-          //   title: Text("Text"),
-          // ),
+        // appBar: AppBar(
+        //   title: Text("Text"),
+        // ),
           body: Center(
-        // child: const Text("child"),
-        //child: Text(wordPair.asPascalCase)),
-        child: RandomWord(),
-      )),
+            // child: const Text("child"),
+            //child: Text(wordPair.asPascalCase)),
+            child: RandomWord(),
+          )),
     );
   }
 }
