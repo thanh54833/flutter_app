@@ -95,6 +95,21 @@ class _HomePage extends State<HomePage> {
 
   _HomePage({this.onTextChange});
 
+  List<MusicModel> musicData = [
+    MusicModel(
+        "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg",
+        "November Rain",
+        "Guns n Roses"),
+    MusicModel(
+        "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg",
+        "Chop Suey",
+        "System of a down"),
+    MusicModel(
+        "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg",
+        "The Troopers",
+        "Iron Maiden")
+  ];
+
   build(BuildContext context) {
     return Column(
       children: <Widget>[
@@ -129,22 +144,23 @@ class _HomePage extends State<HomePage> {
           ]),
         ),
         Container(
-          padding: EdgeInsets.fromLTRB(15, 25, 15, 30),
+          padding: EdgeInsets.fromLTRB(20, 25, 20, 25),
           child: Wrap(
             children: <Widget>[
               TextField(
-                  onChanged: onTextChange,
-                  decoration: InputDecoration(
-                      fillColor: HexColor("#D7D7D7"),
-                      hoverColor: HexColor("#707070"),
-                      focusColor: Colors.black,
-                      filled: true,
-                      prefixIcon: Icon(Icons.search).build(context),
-                      hintText: 'Search in store ...',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(100),
-                          borderSide: BorderSide.none),
-                      contentPadding: EdgeInsets.zero)),
+                onChanged: onTextChange,
+                decoration: InputDecoration(
+                    fillColor: HexColor("#50D8D8D8"),
+                    hoverColor: HexColor("#707070"),
+                    focusColor: Colors.black,
+                    filled: true,
+                    prefixIcon: Icon(Icons.search).build(context),
+                    hintText: 'Search in store ...',
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(100),
+                        borderSide: BorderSide.none),
+                    contentPadding: EdgeInsets.zero),
+              ),
             ],
           ),
           color: Colors.transparent,
@@ -177,153 +193,91 @@ class _HomePage extends State<HomePage> {
           child: Divider(height: 0.5, color: HexColor("#979797")),
           margin: EdgeInsets.fromLTRB(25, 0, 25, 0),
         ),
+
         Container(
-          child: Column(
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Container(
-                    child: Image.network(
-                      "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg",
-                      height: 85,
-                      width: 85,
-                    ),
-                    margin: EdgeInsets.fromLTRB(25, 16, 0, 0),
-                  ),
-                  Expanded(
-                    child: Column(
+          child: ListView.builder(
+            itemCount: musicData.length,
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            physics: const ClampingScrollPhysics(),
+            itemBuilder: (context, index) {
+              return Container(
+                child: Column(
+                  children: <Widget>[
+                    Row(
                       children: <Widget>[
                         Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.only(top: 8, bottom: 8, left: 15),
-                          child: Text(
-                            "November Rain",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 19),
+                          child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: Image.network(
+                                musicData[index].url,
+                                height: 85,
+                                width: 85,
+                              )),
+                          margin: EdgeInsets.fromLTRB(25, 15, 0, 0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(50),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 5,
+                                blurRadius: 7,
+                                offset:
+                                    Offset(0, 3), // changes position of shadow
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.only(
+                                    top: 8, bottom: 8, left: 15),
+                                child: Text(
+                                  musicData[index].name, //"November Rain",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 19),
+                                ),
+                              ),
+                              Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.only(left: 15),
+                                child: Text(
+                                  musicData[index].description,
+                                  //"Guns n Roses",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 15),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.only(left: 15),
-                          child: Text(
-                            "Guns n Roses",
-                            style: TextStyle(
-                                fontWeight: FontWeight.normal, fontSize: 15),
-                          ),
+                          child: RaisedButton(
+                              padding: EdgeInsets.all(0),
+                              color: Colors.red,
+                              textColor: Colors.white,
+                              child: Text("GET"),
+                              onPressed: () {},
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      new BorderRadius.circular(30.0))),
+                          padding: EdgeInsets.only(right: 25),
                         ),
                       ],
                     ),
-                  ),
-                  Container(
-                    child: RaisedButton(
-                        padding: EdgeInsets.all(0),
-                        color: Colors.red,
-                        textColor: Colors.white,
-                        child: Text("GET"),
-                        onPressed: () {},
-                        shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0))),
-                    padding: EdgeInsets.only(right: 25),
-                  ),
-                ],
-              ),
-              Row(
-                children: <Widget>[
-                  Container(
-                    child: Image.network(
-                      "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg",
-                      height: 85,
-                      width: 85,
-                    ),
-                    margin: EdgeInsets.fromLTRB(25, 16, 0, 0),
-                  ),
-                  Expanded(
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.only(top: 8, bottom: 8, left: 15),
-                          child: Text(
-                            "November Rain",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 19),
-                          ),
-                        ),
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.only(left: 15),
-                          child: Text(
-                            "Guns n Roses",
-                            style: TextStyle(
-                                fontWeight: FontWeight.normal, fontSize: 15),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    child: RaisedButton(
-                        padding: EdgeInsets.all(0),
-                        color: Colors.red,
-                        textColor: Colors.white,
-                        child: Text("GET"),
-                        onPressed: () {},
-                        shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0))),
-                    padding: EdgeInsets.only(right: 25),
-                  ),
-                ],
-              ),
-              Row(
-                children: <Widget>[
-                  Container(
-                    child: Image.network(
-                      "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg",
-                      height: 85,
-                      width: 85,
-                    ),
-                    margin: EdgeInsets.fromLTRB(25, 16, 0, 0),
-                  ),
-                  Expanded(
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.only(top: 8, bottom: 8, left: 15),
-                          child: Text(
-                            "November Rain",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 19),
-                          ),
-                        ),
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.only(left: 15),
-                          child: Text(
-                            "Guns n Roses",
-                            style: TextStyle(
-                                fontWeight: FontWeight.normal, fontSize: 15),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    child: RaisedButton(
-                        padding: EdgeInsets.all(0),
-                        color: Colors.red,
-                        textColor: Colors.white,
-                        child: Text("GET"),
-                        onPressed: () {},
-                        shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0))),
-                    padding: EdgeInsets.only(right: 25),
-                  ),
-                ],
-              )
-            ],
+                  ],
+                ),
+              );
+            },
           ),
         ),
+
         Container(
           child: Row(
             children: <Widget>[
@@ -347,155 +301,96 @@ class _HomePage extends State<HomePage> {
           ),
           margin: EdgeInsets.fromLTRB(25, 25, 25, 5),
         ),
+
         Container(
           child: Divider(height: 0.5, color: HexColor("#979797")),
           margin: EdgeInsets.fromLTRB(25, 0, 25, 0),
         ),
-        Column(
-          children: [
-            Row(
-              children: <Widget>[
-                Container(
-                  child: Image.network(
-                    "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg",
-                    height: 85,
-                    width: 85,
-                  ),
-                  margin: EdgeInsets.fromLTRB(25, 16, 0, 0),
-                ),
-                Expanded(
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.only(top: 8, bottom: 8, left: 15),
-                        child: Text(
-                          "November Rain",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 19),
+
+        Container(
+          child: ListView.builder(
+            itemCount: musicData.length,
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            physics: const ClampingScrollPhysics(),
+            itemBuilder: (context, index) {
+              return Container(
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Container(
+                          child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: Image.network(
+                                musicData[index].url,
+                                height: 85,
+                                width: 85,
+                              )),
+                          margin: EdgeInsets.fromLTRB(25, 15, 0, 0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(50),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 5,
+                                blurRadius: 7,
+                                offset:
+                                    Offset(0, 3), // changes position of shadow
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.only(left: 15),
-                        child: Text(
-                          "Guns n Roses",
-                          style: TextStyle(
-                              fontWeight: FontWeight.normal, fontSize: 15),
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.only(
+                                    top: 8, bottom: 8, left: 15),
+                                child: Text(
+                                  musicData[index].name, //"November Rain",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 19),
+                                ),
+                              ),
+                              Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.only(left: 15),
+                                child: Text(
+                                  musicData[index].description,
+                                  //"Guns n Roses",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 15),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  child: RaisedButton(
-                      padding: EdgeInsets.all(0),
-                      color: Colors.red,
-                      textColor: Colors.white,
-                      child: Text("GET"),
-                      onPressed: () {},
-                      shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0))),
-                  padding: EdgeInsets.only(right: 25),
-                ),
-              ],
-            ),
-            Row(
-              children: <Widget>[
-                Container(
-                  child: Image.network(
-                    "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg",
-                    height: 85,
-                    width: 85,
-                  ),
-                  margin: EdgeInsets.fromLTRB(25, 16, 0, 0),
-                ),
-                Expanded(
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.only(top: 8, bottom: 8, left: 15),
-                        child: Text(
-                          "November Rain",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 19),
+                        Container(
+                          child: RaisedButton(
+                              padding: EdgeInsets.all(0),
+                              color: Colors.red,
+                              textColor: Colors.white,
+                              child: Text("GET"),
+                              onPressed: () {},
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      new BorderRadius.circular(30.0))),
+                          padding: EdgeInsets.only(right: 25),
                         ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.only(left: 15),
-                        child: Text(
-                          "Guns n Roses",
-                          style: TextStyle(
-                              fontWeight: FontWeight.normal, fontSize: 15),
-                        ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ),
-                Container(
-                  child: RaisedButton(
-                      padding: EdgeInsets.all(0),
-                      color: Colors.red,
-                      textColor: Colors.white,
-                      child: Text("GET"),
-                      onPressed: () {},
-                      shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0))),
-                  padding: EdgeInsets.only(right: 25),
-                ),
-              ],
-            ),
-            Row(
-              children: <Widget>[
-                Container(
-                  child: Image.network(
-                    "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg",
-                    height: 85,
-                    width: 85,
-                  ),
-                  margin: EdgeInsets.fromLTRB(25, 16, 0, 0),
-                ),
-                Expanded(
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.only(top: 8, bottom: 8, left: 15),
-                        child: Text(
-                          "November Rain",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 19),
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.only(left: 15),
-                        child: Text(
-                          "Guns n Roses",
-                          style: TextStyle(
-                              fontWeight: FontWeight.normal, fontSize: 15),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  child: RaisedButton(
-                      padding: EdgeInsets.all(0),
-                      color: Colors.red,
-                      textColor: Colors.white,
-                      child: Text("GET"),
-                      onPressed: () {},
-                      shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0))),
-                  padding: EdgeInsets.only(right: 25),
-                ),
-              ],
-            )
-          ],
+              );
+            },
+          ),
         ),
+
         Container(
           height: 50,
           margin: EdgeInsets.all(8),
@@ -505,4 +400,12 @@ class _HomePage extends State<HomePage> {
       ],
     );
   }
+}
+
+class MusicModel {
+  String url;
+  String name;
+  String description;
+
+  MusicModel(this.url, this.name, this.description);
 }
