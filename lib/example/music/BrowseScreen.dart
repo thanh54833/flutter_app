@@ -1,7 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/example/main/common/FilesUtils.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:id3/id3.dart';
 
-import 'Utils.dart';
+import '../main/common/Utils.dart';
+import 'PlaylistsScreen.dart';
 
 /// thanh chưa làm xong bài này ...
 /// thanh : Building beautiful UIs with Flutter , https://codelabs.developers.google.com/codelabs/flutter#0
@@ -32,6 +39,25 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPage extends State<MainPage> {
+  build(BuildContext context) {
+    return Scaffold(
+        resizeToAvoidBottomPadding: false,
+        body: SingleChildScrollView(
+          child: HomePage(title: "HomePage"),
+          scrollDirection: Axis.vertical,
+        ), //HomePage(title: "HomePage"),//
+        bottomNavigationBar: BottomBar());
+  }
+}
+
+class BottomBar extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _BottomBar();
+  }
+}
+
+class _BottomBar extends State<BottomBar> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
@@ -41,52 +67,42 @@ class _MainPage extends State<MainPage> {
   }
 
   build(BuildContext context) {
-    return Scaffold(
-        resizeToAvoidBottomPadding: false,
-        body: SingleChildScrollView(
-          child: HomePage(title: "HomePage"),
-          scrollDirection: Axis.vertical,
-        ), //HomePage(title: "HomePage"),//
-        bottomNavigationBar: BottomNavigationBar(
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.open_in_browser_sharp,
-                color:
-                    _selectedIndex != 0 ? HexColor("#707070") : Colors.red[800],
-              ),
-              label: 'Browse',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.audiotrack,
-                color:
-                    _selectedIndex != 1 ? HexColor("#707070") : Colors.red[800],
-              ),
-              label: 'All track',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.playlist_play,
-                color:
-                    _selectedIndex != 2 ? HexColor("#707070") : Colors.red[800],
-              ),
-              label: 'Playlists',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.search,
-                color:
-                    _selectedIndex != 3 ? HexColor("#707070") : Colors.red[800],
-              ),
-              label: 'Search',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          selectedItemColor: Colors.red[800],
-          type: BottomNavigationBarType.fixed,
-          onTap: _onItemTapped,
-        ));
+    return BottomNavigationBar(
+      items: [
+        BottomNavigationBarItem(
+          icon: Icon(
+            Icons.open_in_browser_sharp,
+            color: _selectedIndex != 0 ? HexColor("#707070") : Colors.red[800],
+          ),
+          label: 'Browse',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(
+            Icons.audiotrack,
+            color: _selectedIndex != 1 ? HexColor("#707070") : Colors.red[800],
+          ),
+          label: 'All track',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(
+            Icons.playlist_play,
+            color: _selectedIndex != 2 ? HexColor("#707070") : Colors.red[800],
+          ),
+          label: 'Playlists',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(
+            Icons.search,
+            color: _selectedIndex != 3 ? HexColor("#707070") : Colors.red[800],
+          ),
+          label: 'Search',
+        ),
+      ],
+      currentIndex: _selectedIndex,
+      selectedItemColor: Colors.red[800],
+      type: BottomNavigationBarType.fixed,
+      onTap: _onItemTapped,
+    );
   }
 }
 
@@ -94,6 +110,47 @@ class _HomePage extends State<HomePage> {
   final void Function(String) onTextChange;
 
   _HomePage({this.onTextChange});
+
+  String normalizeString(String s) {
+    var encoded = ascii.encode(s.toString());
+    List<int> normalized = new List.from(encoded.map((e) => (e < 32) ? 32 : e));
+    return ascii.decode(normalized);
+  }
+
+  _musicData() async {
+    List<MusicModel> musics = [];
+    List<File> data = await FileUtils.internal().filterFiles(["mp3"]);
+    data.asMap().forEach((index, element) {
+      var music = MusicModel("url", "name", "description");
+      var path = element.absolute.path;
+
+      var mp3instance = new MP3Instance(path);
+
+      if (mp3instance.parseTagsSync()) {
+        //var infoFile = mp3instance.getMetaTags();
+
+        //var normal =normalizeString(mp3instance.getMetaTags().toString());
+
+        var title = mp3instance.metaTags["Title"];
+        var artist = mp3instance.metaTags["Artist"];
+        var album = mp3instance.metaTags["Album"];
+        var apic = mp3instance.metaTags["APIC"];
+
+//print("normal :.. ${normal}");
+
+        music.url = "";
+        music.name = "";
+        music.description = "";
+
+        music.title = title;
+        music.artist = artist;
+        music.album = album;
+      }
+
+      musics.add(music);
+    });
+    return musics;
+  }
 
   List<MusicModel> musicData = [
     MusicModel(
@@ -110,7 +167,47 @@ class _HomePage extends State<HomePage> {
         "Iron Maiden")
   ];
 
+  Future<void> _showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('AlertDialog Title'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('This is a demo alert dialog.'),
+                Text('Would you like to approve of this message?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Approve'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   build(BuildContext context) {
+    _musicData().then((data) {
+      List<MusicModel> convert = data;
+      convert.asMap().forEach((index, element) {
+
+        print("convert :.. ${index} :.. ${element.title}");
+
+      });
+      //print("ss.length :... ${convert.length} ");
+    });
+
+    //print("data :... ${data.} ");
+
     return Column(
       children: <Widget>[
         Container(
@@ -118,23 +215,29 @@ class _HomePage extends State<HomePage> {
             Container(
               child: Row(
                 children: <Widget>[
-                  Container(
+                  Expanded(
+                      child: Container(
                     child: Text(
                       "Browse",
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline5
-                          .copyWith(color: Colors.black),
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 32,
+                      ),
                     ),
-                    width: MediaQuery.of(context).size.width - 50,
-                    padding: EdgeInsets.fromLTRB(25, 0, 25, 0),
+                    padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                     color: Colors.transparent,
-                  ),
+                  )),
                   Container(
-                    child: Icon(
-                      Icons.people_outline_sharp,
-                      size: 30,
+                    child: CircleAvatar(
+                      child: Icon(
+                        Icons.person_outline_rounded,
+                        size: 30,
+                        color: Colors.white,
+                      ),
+                      radius: 20,
+                      backgroundColor: Colors.black12,
                     ),
+                    margin: EdgeInsets.only(right: 20),
                   )
                 ],
               ),
@@ -144,7 +247,7 @@ class _HomePage extends State<HomePage> {
           ]),
         ),
         Container(
-          padding: EdgeInsets.fromLTRB(20, 25, 20, 25),
+          padding: EdgeInsets.fromLTRB(19, 25, 19, 25),
           child: Wrap(
             children: <Widget>[
               TextField(
@@ -164,7 +267,6 @@ class _HomePage extends State<HomePage> {
             ],
           ),
           color: Colors.transparent,
-          //margin: EdgeInsets.fromLTRB(8, 15, 8, 15),
         ),
         Container(
           child: Row(
@@ -187,13 +289,12 @@ class _HomePage extends State<HomePage> {
               )
             ],
           ),
-          margin: EdgeInsets.fromLTRB(25, 0, 25, 5),
+          margin: EdgeInsets.fromLTRB(20, 0, 20, 5),
         ),
         Container(
-          child: Divider(height: 0.5, color: HexColor("#979797")),
-          margin: EdgeInsets.fromLTRB(25, 0, 25, 0),
+          child: Divider(height: 0.75, color: HexColor("#80979797")),
+          margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
         ),
-
         Container(
           child: ListView.builder(
             itemCount: musicData.length,
@@ -214,7 +315,7 @@ class _HomePage extends State<HomePage> {
                                 height: 85,
                                 width: 85,
                               )),
-                          margin: EdgeInsets.fromLTRB(25, 15, 0, 0),
+                          margin: EdgeInsets.fromLTRB(20, 15, 0, 0),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(50),
@@ -263,7 +364,11 @@ class _HomePage extends State<HomePage> {
                               color: Colors.red,
                               textColor: Colors.white,
                               child: Text("GET"),
-                              onPressed: () {},
+                              onPressed: () {
+                                // Todo :
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => PlaylistsScreen()));
+                              },
                               shape: RoundedRectangleBorder(
                                   borderRadius:
                                       new BorderRadius.circular(30.0))),
@@ -276,6 +381,7 @@ class _HomePage extends State<HomePage> {
               );
             },
           ),
+          color: Colors.transparent,
         ),
 
         Container(
@@ -299,12 +405,12 @@ class _HomePage extends State<HomePage> {
               )
             ],
           ),
-          margin: EdgeInsets.fromLTRB(25, 25, 25, 5),
+          margin: EdgeInsets.fromLTRB(20, 25, 20, 5),
         ),
 
         Container(
-          child: Divider(height: 0.5, color: HexColor("#979797")),
-          margin: EdgeInsets.fromLTRB(25, 0, 25, 0),
+          child: Divider(height: 0.75, color: HexColor("#80979797")),
+          margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
         ),
 
         Container(
@@ -403,9 +509,17 @@ class _HomePage extends State<HomePage> {
 }
 
 class MusicModel {
-  String url;
-  String name;
-  String description;
+  String url = "";
+  String name = "";
+
+  String title = "";
+  String artist = "";
+  String album = "";
+  String mime = "";
+  String textEncoding = "";
+  String picType = "";
+  String description = "";
+  String base64 = "";
 
   MusicModel(this.url, this.name, this.description);
 }
