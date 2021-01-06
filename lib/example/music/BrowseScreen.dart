@@ -10,6 +10,8 @@ import 'package:id3/id3.dart';
 import '../main/common/Utils.dart';
 import 'PlaylistsScreen.dart';
 
+
+
 /// thanh chưa làm xong bài này ...
 /// thanh : Building beautiful UIs with Flutter , https://codelabs.developers.google.com/codelabs/flutter#0
 void main() => runApp(MyApp());
@@ -124,11 +126,15 @@ class _HomePage extends State<HomePage> {
       var music = MusicModel("url", "name", "description");
       var path = element.absolute.path;
 
-      var mp3instance = new MP3Instance(path);
+      var mp3instance =  MP3Instance(path);
+      //mp3instance.parseTags();
+
+      MP3Instance mp3instances = new MP3Instance(path);
+      mp3instances.parseTagsSync();
+
 
       if (mp3instance.parseTagsSync()) {
         //var infoFile = mp3instance.getMetaTags();
-
         //var normal =normalizeString(mp3instance.getMetaTags().toString());
 
         var title = mp3instance.metaTags["Title"];
@@ -136,7 +142,7 @@ class _HomePage extends State<HomePage> {
         var album = mp3instance.metaTags["Album"];
         var apic = mp3instance.metaTags["APIC"];
 
-//print("normal :.. ${normal}");
+        print("title :.. ${title}");
 
         music.url = "";
         music.name = "";
@@ -199,9 +205,7 @@ class _HomePage extends State<HomePage> {
     _musicData().then((data) {
       List<MusicModel> convert = data;
       convert.asMap().forEach((index, element) {
-
         print("convert :.. ${index} :.. ${element.title}");
-
       });
       //print("ss.length :... ${convert.length} ");
     });
