@@ -1,16 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dart_tags/dart_tags.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_app/example/main/common/FilesUtils.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_app/example/main/common/LogCatUtils.dart';
 import 'package:id3/id3.dart';
+import 'package:media_metadata_plugin/media_metadata_plugin.dart';
 
 import '../main/common/Utils.dart';
-import 'PlaylistsScreen.dart';
-
-
 
 /// thanh chưa làm xong bài này ...
 /// thanh : Building beautiful UIs with Flutter , https://codelabs.developers.google.com/codelabs/flutter#0
@@ -119,40 +120,66 @@ class _HomePage extends State<HomePage> {
     return ascii.decode(normalized);
   }
 
+  logPrint(Object object) async {
+    int defaultPrintLength = 1020;
+    if (object == null || object.toString().length <= defaultPrintLength) {
+      print(object);
+    } else {
+      String log = object.toString();
+      int start = 0;
+      int endIndex = defaultPrintLength;
+      int logLength = log.length;
+      int tmpLogLength = log.length;
+      while (endIndex < logLength) {
+        print(log.substring(start, endIndex));
+        endIndex += defaultPrintLength;
+        start += defaultPrintLength;
+        tmpLogLength -= defaultPrintLength;
+      }
+      if (tmpLogLength > 0) {
+        print("ss" + log.substring(start, logLength));
+      }
+    }
+  }
+
   _musicData() async {
     List<MusicModel> musics = [];
     List<File> data = await FileUtils.internal().filterFiles(["mp3"]);
-    data.asMap().forEach((index, element) {
+
+    data.asMap().forEach((index, element) async {
       var music = MusicModel("url", "name", "description");
       var path = element.absolute.path;
 
-      var mp3instance =  MP3Instance(path);
-      //mp3instance.parseTags();
-
+      var mp3instance = MP3Instance(path);
       MP3Instance mp3instances = new MP3Instance(path);
       mp3instances.parseTagsSync();
 
-
       if (mp3instance.parseTagsSync()) {
-        //var infoFile = mp3instance.getMetaTags();
-        //var normal =normalizeString(mp3instance.getMetaTags().toString());
-
         var title = mp3instance.metaTags["Title"];
         var artist = mp3instance.metaTags["Artist"];
         var album = mp3instance.metaTags["Album"];
         var apic = mp3instance.metaTags["APIC"];
 
-        print("title :.. ${title}");
+        if (index == 10) {
+          var ss = await MediaMetadataPlugin.getMediaMetaData(path);
+          " ss.album :... ${ss.album} ".Log("");
+        }
 
-        music.url = "";
+        music.url = path;
         music.name = "";
         music.description = "";
-
         music.title = title;
         music.artist = artist;
         music.album = album;
+        if (apic != null) {
+          if (index == 10) {
+            //"music.logo:.... ${music.logo}".Log("");
+            //"apic :... ${apic} ".Log("");
+            "mp3instance :... ${mp3instance.metaTags} ".Log("");
+          }
+          music.logo = apic["base64"].toString();
+        }
       }
-
       musics.add(music);
     });
     return musics;
@@ -205,12 +232,9 @@ class _HomePage extends State<HomePage> {
     _musicData().then((data) {
       List<MusicModel> convert = data;
       convert.asMap().forEach((index, element) {
-        print("convert :.. ${index} :.. ${element.title}");
+        //print("convert :.. ${index} :.. ${element.title}");
       });
-      //print("ss.length :... ${convert.length} ");
     });
-
-    //print("data :... ${data.} ");
 
     return Column(
       children: <Widget>[
@@ -300,89 +324,139 @@ class _HomePage extends State<HomePage> {
           margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
         ),
         Container(
-          child: ListView.builder(
-            itemCount: musicData.length,
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            physics: const ClampingScrollPhysics(),
-            itemBuilder: (context, index) {
-              return Container(
-                child: Column(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Container(
-                          child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Image.network(
-                                musicData[index].url,
-                                height: 85,
-                                width: 85,
-                              )),
-                          margin: EdgeInsets.fromLTRB(20, 15, 0, 0),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(50),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset:
-                                    Offset(0, 3), // changes position of shadow
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
+          child: FutureBuilder(
+            future: _musicData(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              //"snapshot :... ${snapshot.data.length} :... ${snapshot.data[10].title}",
+
+              "${snapshot.data.length} :... ${snapshot.data[10].title}"
+                  .Log("length");
+
+              // List<MusicModel> listValid = snapshot.data
+              //     .where((MusicModel music) => (music.title != null))
+              //     .toList();
+
+              List<MusicModel> listValid = snapshot.data
+                  .where((element) => (element.title != null))
+                  .toList();
+
+              //"${listValid.length}  :... ${listValid[10].logo}".Log("listValid.logo");
+
+              getByteBase64(String _base64) {
+                var base64s = base64.decode(_base64); //.split(',').last);
+                //"base64s :... ${_base64} ".Log("");
+                return base64s;
+              }
+
+              getTitle(String message, int maxLength) {
+                message = message.toLowerCase().characters.toString();
+                if (message.length <= maxLength) {
+                  return message + "...";
+                } else {
+                  return message.substring(0, maxLength) + "...";
+                }
+              }
+
+              return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: listValid.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    return Container(
+                      child: Column(
+                        children: <Widget>[
+                          Row(
                             children: <Widget>[
                               Container(
-                                width: double.infinity,
-                                padding: EdgeInsets.only(
-                                    top: 8, bottom: 8, left: 15),
-                                child: Text(
-                                  musicData[index].name, //"November Rain",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 19),
+                                child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: listValid[index].logo != null
+                                        ? Image.network(
+                                            "https://cdn.timviec365.vn/pictures/images/cover-la-gi.png",
+                                            height: 85,
+                                            width: 85,
+                                          ) //Image.file(File(listValid[index].url))//base64.decode(listValid[index].logo)
+                                        : Image.network(
+                                            "https://homepages.cae.wisc.edu/~ece533/images/airplane.png",
+                                            height: 85,
+                                            width: 85,
+                                          )),
+                                margin: EdgeInsets.fromLTRB(25, 15, 0, 0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(50),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 5,
+                                      blurRadius: 7,
+                                      offset: Offset(
+                                          0, 3), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  children: <Widget>[
+                                    // Container(
+                                    //   child: TextField(
+                                    //     decoration: InputDecoration(
+                                    //       border: InputBorder.none,
+                                    //     ),
+                                    //   )
+                                    // ),
+                                    Container(
+                                      width: double.infinity,
+                                      padding: EdgeInsets.only(
+                                          top: 8, bottom: 8, left: 15),
+                                      child: Text(
+                                        getTitle(
+                                            listValid[index].title != null
+                                                ? listValid[index].title
+                                                : "null",
+                                            35),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Container(
+                                      width: double.infinity,
+                                      padding: EdgeInsets.only(left: 15),
+                                      child: Text(
+                                        listValid[index].artist != null
+                                            ? listValid[index].artist
+                                            : "null",
+                                        //"Guns n Roses",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.normal,
+                                            fontSize: 15),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               Container(
-                                width: double.infinity,
-                                padding: EdgeInsets.only(left: 15),
-                                child: Text(
-                                  musicData[index].description,
-                                  //"Guns n Roses",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.normal,
-                                      fontSize: 15),
-                                ),
+                                child: RaisedButton(
+                                    padding: EdgeInsets.all(0),
+                                    color: Colors.red,
+                                    textColor: Colors.white,
+                                    child: Text("GET"),
+                                    onPressed: () {},
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            new BorderRadius.circular(30.0))),
+                                padding: EdgeInsets.only(right: 25),
                               ),
                             ],
                           ),
-                        ),
-                        Container(
-                          child: RaisedButton(
-                              padding: EdgeInsets.all(0),
-                              color: Colors.red,
-                              textColor: Colors.white,
-                              child: Text("GET"),
-                              onPressed: () {
-                                // Todo :
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => PlaylistsScreen()));
-                              },
-                              shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      new BorderRadius.circular(30.0))),
-                          padding: EdgeInsets.only(right: 25),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
+                        ],
+                      ),
+                    );
+                    return Text("Text");
+                  });
             },
           ),
           color: Colors.transparent,
@@ -524,6 +598,7 @@ class MusicModel {
   String picType = "";
   String description = "";
   String base64 = "";
+  String logo = "";
 
   MusicModel(this.url, this.name, this.description);
 }
