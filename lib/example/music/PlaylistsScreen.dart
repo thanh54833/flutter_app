@@ -1,37 +1,61 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/example/music/MusicModel.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:flutter_app/example/main/common/LogCatUtils.dart';
 
 import 'BrowseScreen.dart';
-
-main() => runApp(MaterialApp(
-      home: PlaylistsScreen(),
-    ));
+//main(MusicModel musicModel) => runApp(MaterialApp(home: PlaylistsScreen(musicModel)));
 
 class PlaylistsScreen extends StatelessWidget {
+  MusicModel musicModel = null;
+
+  PlaylistsScreen({Key key, musicModel}) : super(key: key) {
+    this.musicModel = musicModel;
+  }
+
+  //({Key key,MusicModel musicModel}) : super(Key: key);
   build(BuildContext context) {
+    musicModel.url.toString().Logs("musicModel :...");
     return Scaffold(
         resizeToAvoidBottomPadding: false,
-        body: SingleChildScrollView(
-          child: Column(
-            // child: Text("PlaylistsScreen :.."),
-            children: [
-              Container(
-                child: NowScreen(),
-                height: 200,
-              ),
-              // Expanded(
-              //     child: Container(
-              //       height: 100,
-              //       color: Colors.yellow,
-              //     ))
-            ],
+        body: Container(
+          child: RefreshIndicator(
+            onRefresh: () async {
+              print('onRefresh called');
+            },
+            child: PageView(
+              scrollDirection: Axis.vertical,
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: <Widget>[
+                Center(
+                  child: NowScreen(), //Text('hello'),
+                )
+              ],
+            ),
           ),
-          scrollDirection: Axis.vertical,
         ),
         bottomNavigationBar: BottomBar());
+  }
+}
+
+class _Button extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+  final double size;
+
+  _Button({Key key, this.icon, this.onPressed, this.size}) : super(key: key);
+
+  build(BuildContext context) {
+    return InkWell(
+      child: Icon(
+        icon,
+        size: size,
+      ),
+      onTap: onPressed,
+    );
   }
 }
 
@@ -42,6 +66,9 @@ class NowScreen extends StatefulWidget {
 class _NowScreen extends State<NowScreen> {
   var isRenew = true;
   var isRandom = true;
+
+  //var advancedPlayer = AudioPlayer();
+  _playAudio() {}
 
   build(BuildContext context) {
     return Scaffold(
@@ -76,7 +103,7 @@ class _NowScreen extends State<NowScreen> {
                             textAlign: TextAlign.left,
                           ),
                           onTap: () {
-                            print("print :...Playlists");
+                            "print :...Playlists".Log();
                           },
                         ),
                         color: Colors.transparent,
@@ -99,13 +126,19 @@ class _NowScreen extends State<NowScreen> {
                   ],
                 ),
                 Container(
-                  child: ClipRRect(
-                      borderRadius: BorderRadius.circular(150.0),
-                      child: Image.network(
-                        "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg",
-                        height: 250,
-                        width: 250,
-                      )),
+                  child: InkWell(
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(150.0),
+                        child: Image.network(
+                          "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg",
+                          height: 250,
+                          width: 250,
+                        )),
+                    onTap: () {
+                      "onTap :...".Log();
+                      print("onTap :...");
+                    },
+                  ),
                   margin: EdgeInsets.only(top: 45),
                 ),
                 Container(
@@ -129,12 +162,17 @@ class _NowScreen extends State<NowScreen> {
                   margin: EdgeInsets.only(top: 5),
                 ),
                 Container(
-                  child: Text(
-                    "Eluveitie",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.normal),
+                  child: InkWell(
+                    child: Text(
+                      "Eluveitie",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.normal),
+                    ),
+                    onTap: () {
+                      "Eluveitie :...".Log();
+                    },
                   ),
                   margin: EdgeInsets.only(top: 25),
                 ),
@@ -182,6 +220,8 @@ class _NowScreen extends State<NowScreen> {
                         onPressed: () {
                           Fluttertoast.showToast(msg: "Fluttertoast :...");
                           print("print :...");
+
+                          "IconButton :...".Log();
                         },
                       )),
                       Expanded(child: Text("")),
@@ -224,12 +264,17 @@ class _NowScreen extends State<NowScreen> {
                           child: Container(
                         child: Row(
                           children: [
-                            Icon(
-                              Icons.skip_previous_sharp,
+                            _Button(
+                              // Icons.skip_previous_sharp,
+                              // size: 40,
+                              icon: Icons.skip_previous_sharp,
                               size: 40,
+                              onPressed: () {
+                                "onPressed :... next :...".Log();
+                              },
                             ),
-                            Container(
-                              child: GestureDetector(
+                            InkWell(
+                              child: Container(
                                 child: Center(
                                     child: CircleAvatar(
                                   radius: 30,
@@ -240,15 +285,19 @@ class _NowScreen extends State<NowScreen> {
                                     color: Colors.white,
                                   ),
                                 )),
-                                onTap: () {
-                                  print("GestureDetector :...");
-                                },
+                                margin: EdgeInsets.only(left: 10, right: 10),
                               ),
-                              margin: EdgeInsets.only(left: 10, right: 10),
+                              onTap: () {
+                                //Todo : "play :... ".Log();
+                                _playAudio();
+                              },
                             ),
-                            Icon(
-                              Icons.skip_next_sharp,
+                            _Button(
+                              icon: Icons.skip_next_sharp,
                               size: 40,
+                              onPressed: () {
+                                "onPressed :...".Log();
+                              },
                             ),
                           ],
                         ),

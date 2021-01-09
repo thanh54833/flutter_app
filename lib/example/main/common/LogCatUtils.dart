@@ -7,6 +7,8 @@ extension FancyNum on num {
 }
 
 extension LogCatUtils on String {
-  Log(message) => (developer.log("===" + message + " : " + this,
+  Log() => (developer.log("===" + " : " + this,
+      stackTrace: StackTrace.fromString("stackTraceString")));
+  Logs(String message) => (developer.log("===" +message+ " : " + this,
       stackTrace: StackTrace.fromString("stackTraceString")));
 }

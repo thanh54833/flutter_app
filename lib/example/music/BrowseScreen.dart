@@ -1,17 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dart_tags/dart_tags.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_app/example/main/common/FilesUtils.dart';
 import 'package:flutter_app/example/main/common/LogCatUtils.dart';
+import 'package:flutter_app/example/music/PlaylistsScreen.dart';
 import 'package:id3/id3.dart';
-import 'package:media_metadata_plugin/media_metadata_plugin.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../main/common/Utils.dart';
+import 'MusicModel.dart';
 
 /// thanh chưa làm xong bài này ...
 /// thanh : Building beautiful UIs with Flutter , https://codelabs.developers.google.com/codelabs/flutter#0
@@ -114,6 +114,8 @@ class _HomePage extends State<HomePage> {
 
   _HomePage({this.onTextChange});
 
+  var isLoading = true;
+
   String normalizeString(String s) {
     var encoded = ascii.encode(s.toString());
     List<int> normalized = new List.from(encoded.map((e) => (e < 32) ? 32 : e));
@@ -153,31 +155,22 @@ class _HomePage extends State<HomePage> {
       var mp3instance = MP3Instance(path);
       MP3Instance mp3instances = new MP3Instance(path);
       mp3instances.parseTagsSync();
-
+      //var mediaMetadataPlugin = MediaMetadataPlugin.getMediaMetaData(path);
+      //mediaMetadataPlugin.then((value){
       if (mp3instance.parseTagsSync()) {
         var title = mp3instance.metaTags["Title"];
         var artist = mp3instance.metaTags["Artist"];
-        var album = mp3instance.metaTags["Album"];
+        //"artist";
+        var album = mp3instance.metaTags["Album"]; //"album";
         var apic = mp3instance.metaTags["APIC"];
-
-        if (index == 10) {
-          var ss = await MediaMetadataPlugin.getMediaMetaData(path);
-          " ss.album :... ${ss.album} ".Log("");
-        }
-
         music.url = path;
         music.name = "";
         music.description = "";
         music.title = title;
         music.artist = artist;
         music.album = album;
-        if (apic != null) {
-          if (index == 10) {
-            //"music.logo:.... ${music.logo}".Log("");
-            //"apic :... ${apic} ".Log("");
-            "mp3instance :... ${mp3instance.metaTags} ".Log("");
-          }
-          music.logo = apic["base64"].toString();
+        if (index == 10) {
+          //"mp3instance.getMetaTags() :.. ${mp3instance.getMetaTags().entries.toList()[1].value}".Log();
         }
       }
       musics.add(music);
@@ -229,13 +222,7 @@ class _HomePage extends State<HomePage> {
   }
 
   build(BuildContext context) {
-    _musicData().then((data) {
-      List<MusicModel> convert = data;
-      convert.asMap().forEach((index, element) {
-        //print("convert :.. ${index} :.. ${element.title}");
-      });
-    });
-
+    isLoading = false;
     return Column(
       children: <Widget>[
         Container(
@@ -323,24 +310,14 @@ class _HomePage extends State<HomePage> {
           child: Divider(height: 0.75, color: HexColor("#80979797")),
           margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
         ),
+
         Container(
           child: FutureBuilder(
             future: _musicData(),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
-              //"snapshot :... ${snapshot.data.length} :... ${snapshot.data[10].title}",
-
-              "${snapshot.data.length} :... ${snapshot.data[10].title}"
-                  .Log("length");
-
-              // List<MusicModel> listValid = snapshot.data
-              //     .where((MusicModel music) => (music.title != null))
-              //     .toList();
-
               List<MusicModel> listValid = snapshot.data
                   .where((element) => (element.title != null))
                   .toList();
-
-              //"${listValid.length}  :... ${listValid[10].logo}".Log("listValid.logo");
 
               getByteBase64(String _base64) {
                 var base64s = base64.decode(_base64); //.split(',').last);
@@ -357,104 +334,180 @@ class _HomePage extends State<HomePage> {
                 }
               }
 
+              " snapshot.data.length :... ${snapshot.data.length}".Log();
+
               return ListView.builder(
                   shrinkWrap: true,
                   itemCount: listValid.length,
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
-                    return Container(
-                      child: Column(
-                        children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Container(
-                                child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: listValid[index].logo != null
-                                        ? Image.network(
-                                            "https://cdn.timviec365.vn/pictures/images/cover-la-gi.png",
-                                            height: 85,
-                                            width: 85,
-                                          ) //Image.file(File(listValid[index].url))//base64.decode(listValid[index].logo)
-                                        : Image.network(
-                                            "https://homepages.cae.wisc.edu/~ece533/images/airplane.png",
-                                            height: 85,
-                                            width: 85,
-                                          )),
-                                margin: EdgeInsets.fromLTRB(25, 15, 0, 0),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(50),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 5,
-                                      blurRadius: 7,
-                                      offset: Offset(
-                                          0, 3), // changes position of shadow
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                child: Column(
+                    return !isLoading
+                        ? Container(
+                            child: Column(
+                              children: <Widget>[
+                                Row(
                                   children: <Widget>[
-                                    // Container(
-                                    //   child: TextField(
-                                    //     decoration: InputDecoration(
-                                    //       border: InputBorder.none,
-                                    //     ),
-                                    //   )
-                                    // ),
                                     Container(
-                                      width: double.infinity,
-                                      padding: EdgeInsets.only(
-                                          top: 8, bottom: 8, left: 15),
-                                      child: Text(
-                                        getTitle(
-                                            listValid[index].title != null
-                                                ? listValid[index].title
-                                                : "null",
-                                            35),
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15),
-                                        overflow: TextOverflow.ellipsis,
+                                      child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                          child: listValid[index].logo != null
+                                              ? Image.network(
+                                                  "https://cdn.timviec365.vn/pictures/images/cover-la-gi.png",
+                                                  height: 85,
+                                                  width: 85,
+                                                ) //Image.file(File(listValid[index].url))//base64.decode(listValid[index].logo)
+                                              : Image.network(
+                                                  "https://homepages.cae.wisc.edu/~ece533/images/airplane.png",
+                                                  height: 85,
+                                                  width: 85,
+                                                )),
+                                      margin: EdgeInsets.fromLTRB(25, 15, 0, 0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(50),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            spreadRadius: 5,
+                                            blurRadius: 7,
+                                            offset: Offset(0,
+                                                3), // changes position of shadow
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Container(
+                                            width: double.infinity,
+                                            padding: EdgeInsets.only(
+                                                top: 8, bottom: 8, left: 15),
+                                            child: Text(
+                                              getTitle(
+                                                  listValid[index].title != null
+                                                      ? listValid[index].title
+                                                      : "null",
+                                                  35),
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          Container(
+                                            width: double.infinity,
+                                            padding: EdgeInsets.only(left: 15),
+                                            child: Text(
+                                              listValid[index].artist != null
+                                                  ? listValid[index].artist
+                                                  : "null",
+                                              //"Guns n Roses",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: 15),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     Container(
-                                      width: double.infinity,
-                                      padding: EdgeInsets.only(left: 15),
-                                      child: Text(
-                                        listValid[index].artist != null
-                                            ? listValid[index].artist
-                                            : "null",
-                                        //"Guns n Roses",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 15),
-                                      ),
+                                      child: RaisedButton(
+                                          padding: EdgeInsets.all(0),
+                                          color: Colors.red,
+                                          textColor: Colors.white,
+                                          child: Center(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Center(child: Text("GET")),
+                                            ),
+                                          ),
+                                          onPressed: () {
+
+                                            //listValid[index].url.Logs("listValid :...");
+
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        PlaylistsScreen(
+                                                            musicModel:
+                                                                listValid[
+                                                                    index])));
+                                          },
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  new BorderRadius.circular(
+                                                      30.0))),
+                                      padding: EdgeInsets.only(right: 25),
                                     ),
                                   ],
                                 ),
+                              ],
+                            ),
+                          )
+                        : Shimmer.fromColors(
+                            baseColor: Colors.grey[300],
+                            highlightColor: Colors.grey[100],
+                            enabled: true,
+                            child: SafeArea(
+                              child: Container(
+                                child: Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Container(
+                                        width: 85,
+                                        height: 85,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Expanded(
+                                        child: Container(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              child: Container(
+                                                width: double.infinity,
+                                                height: 20,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            padding:
+                                                EdgeInsets.only(bottom: 20),
+                                          ),
+                                          Container(
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              child: Container(
+                                                width: double.infinity,
+                                                height: 20,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            margin: EdgeInsets.only(right: 30),
+                                          )
+                                        ],
+                                      ),
+                                      margin:
+                                          EdgeInsets.only(left: 15, right: 4),
+                                    ))
+                                  ],
+                                ),
+                                margin: EdgeInsets.only(
+                                    left: 20, right: 20, top: 5, bottom: 5),
                               ),
-                              Container(
-                                child: RaisedButton(
-                                    padding: EdgeInsets.all(0),
-                                    color: Colors.red,
-                                    textColor: Colors.white,
-                                    child: Text("GET"),
-                                    onPressed: () {},
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            new BorderRadius.circular(30.0))),
-                                padding: EdgeInsets.only(right: 25),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    );
+                            ),
+                          );
                     return Text("Text");
                   });
             },
@@ -584,21 +637,4 @@ class _HomePage extends State<HomePage> {
       ],
     );
   }
-}
-
-class MusicModel {
-  String url = "";
-  String name = "";
-
-  String title = "";
-  String artist = "";
-  String album = "";
-  String mime = "";
-  String textEncoding = "";
-  String picType = "";
-  String description = "";
-  String base64 = "";
-  String logo = "";
-
-  MusicModel(this.url, this.name, this.description);
 }
