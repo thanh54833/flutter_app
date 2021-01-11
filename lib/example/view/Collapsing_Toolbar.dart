@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 /// https://www.developerlibs.com/2018/08/flutter-collapsing-toolbar-layout.html
 
 main() => runApp(
-    //Home()
+    Home()
     //Collapsing()
-    MyApp()
+    //MyApp()
     //
     );
 
