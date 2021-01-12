@@ -6,4 +6,7 @@ class LocalColor {
   static Color PrimaryDark = HexColor("#ccced2");
   static Color PrimaryLight = HexColor("#dbe0ea");
   static Color background = HexColor("#b1c5c5");
+  static Color Transparent = HexColor("#00000000");
 }
+
+// NoonLoopingDemo
