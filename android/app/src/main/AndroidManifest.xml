@@ -10,17 +10,14 @@
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         tools:ignore="WrongManifestParent" />
 
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-
-
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="flutter_app"
-        android:requestLegacyExternalStorage="true"
-        >
-
+        android:requestLegacyExternalStorage="true">
 
         <activity
             android:name=".MainActivity"
@@ -62,7 +59,7 @@
             </intent-filter>
         </service>
 
-        <receiver android:name="com.ryanheise.audioservice.MediaButtonReceiver" >
+        <receiver android:name="com.ryanheise.audioservice.MediaButtonReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>

@@ -57,6 +57,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0-nullsafety.3"
+  bottom_sheet_bar:
+    dependency: "direct main"
+    description:
+      name: bottom_sheet_bar
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.2+7"
   carousel_slider:
     dependency: "direct main"
     description:
@@ -155,6 +162,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.1.5"
+  equalizer:
+    dependency: "direct main"
+    description:
+      name: equalizer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.2+2"
   fake_async:
     dependency: transitive
     description:
@@ -231,6 +245,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_xlider:
+    dependency: "direct main"
+    description:
+      name: flutter_xlider
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.4.0"
   fluttertoast:
     dependency: "direct main"
     description:
@@ -346,6 +367,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.10-nullsafety.3"
+  measure_size:
+    dependency: transitive
+    description:
+      name: measure_size
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0+1"
   media_metadata_plugin:
     dependency: "direct main"
     description:

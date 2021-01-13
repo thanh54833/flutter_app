@@ -28,7 +28,7 @@ final List<String> imgList = [
 class NoonLoopingDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return WidgetGradient();
+    return MaterialApp(home: WidgetGradient());
   }
 }
 
@@ -49,296 +49,293 @@ class _WidgetGradient extends State<WidgetGradient> {
       return paletteGenerator;
     }
 
-    return MaterialApp(
-      home: Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          title: Container(
-            color: Colors.transparent,
-            child: Container(
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.keyboard_arrow_down_sharp,
-                      size: 35,
-                    ),
-                    onPressed: () {
-                      context.pop();
-                    },
-                  ),
-                  Expanded(child: Center(child: Text("Play now"))),
-                  Icon(
-                    Icons.playlist_play_outlined,
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        title: Container(
+          color: Colors.transparent,
+          child: Container(
+            child: Row(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.keyboard_arrow_down_sharp,
                     size: 35,
-                  )
-                ],
+                  ),
+                  onPressed: () {
+                    context.pop();
+                  },
+                ),
+                Expanded(child: Center(child: Text("Play now"))),
+                Icon(
+                  Icons.playlist_play_outlined,
+                  size: 35,
+                )
+              ],
+            ),
+          ),
+          alignment: Alignment.center,
+          margin: EdgeInsets.only(top: 15),
+        ),
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: Container(
+        child: Stack(
+          children: [
+            Container(
+              child: Image.asset(
+                "assets/image/bg.jpg",
+                fit: BoxFit.fitHeight,
+              ),
+              height: double.infinity,
+            ),
+            Container(
+              height: double.infinity,
+              width: double.infinity,
+              child: Container(
+                child: FutureBuilder<PaletteGenerator>(
+                    future: _updatePaletteGenerator(),
+                    // ignore: missing_return
+                    builder: (BuildContext context,
+                        AsyncSnapshot<PaletteGenerator> snapshot) {
+                      if (!snapshot.hasError &&
+                          (snapshot.connectionState == ConnectionState.done)) {
+                        color_gradient = snapshot.data.dominantColor.color;
+                        return Container(
+                          height: double.infinity,
+                          width: double.infinity,
+                          decoration: new BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [color_gradient, Colors.transparent],
+                              begin: Alignment.topCenter, //bottomCenter,
+                              end: Alignment.bottomCenter, //topCenter,
+                            ),
+                          ),
+                        );
+                      } else {
+                        return Container(
+                          height: double.infinity,
+                          width: double.infinity,
+                          decoration: new BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [color_gradient, Colors.transparent],
+                              begin: Alignment.topCenter, //bottomCenter,
+                              end: Alignment.bottomCenter, //topCenter,
+                            ),
+                          ),
+                        );
+                      }
+                    }),
               ),
             ),
-            alignment: Alignment.center,
-            margin: EdgeInsets.only(top: 15),
-          ),
-          backgroundColor: Colors.transparent,
-          foregroundColor: Colors.transparent,
-          elevation: 0,
-        ),
-        body: Container(
-          child: Stack(
-            children: [
-              Container(
-                child: Image.asset(
-                  "assets/image/bg.jpg",
-                  fit: BoxFit.fitHeight,
-                ),
-                height: double.infinity,
-              ),
-              Container(
-                height: double.infinity,
-                width: double.infinity,
-                child: Container(
-                  child: FutureBuilder<PaletteGenerator>(
-                      future: _updatePaletteGenerator(),
-                      // ignore: missing_return
-                      builder: (BuildContext context,
-                          AsyncSnapshot<PaletteGenerator> snapshot) {
-                        if (!snapshot.hasError &&
-                            (snapshot.connectionState ==
-                                ConnectionState.done)) {
-                          color_gradient = snapshot.data.dominantColor.color;
-                          return Container(
-                            height: double.infinity,
-                            width: double.infinity,
-                            decoration: new BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [color_gradient, Colors.transparent],
-                                begin: Alignment.topCenter, //bottomCenter,
-                                end: Alignment.bottomCenter, //topCenter,
-                              ),
-                            ),
-                          );
-                        } else {
-                          return Container(
-                            height: double.infinity,
-                            width: double.infinity,
-                            decoration: new BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [color_gradient, Colors.transparent],
-                                begin: Alignment.topCenter, //bottomCenter,
-                                end: Alignment.bottomCenter, //topCenter,
-                              ),
-                            ),
-                          );
-                        }
-                      }),
-                ),
-              ),
-              Column(
-                children: [
-                  Expanded(
-                    child: Container(
-                      color: Colors.transparent,
-                      margin: EdgeInsets.only(top: 100),
-                      child: CarouselSlider(
-                        options: CarouselOptions(
-                          aspectRatio: 2.0,
-                          enlargeCenterPage: true,
-                          enableInfiniteScroll: false,
-                          initialPage: 1,
-                          autoPlay: false,
-                          height: 700,
-                          //enlargeStrategy: CenterPageEnlargeStrategy.height
-                          onPageChanged: (index, reason) {
-                            //"index :.. ${index} ".Log();
-                            //_gradient = getGradient(index);
-                            //_gradient = WidgetGradient();
+            Column(
+              children: [
+                Expanded(
+                  child: Container(
+                    color: Colors.transparent,
+                    margin: EdgeInsets.only(top: 100),
+                    child: CarouselSlider(
+                      options: CarouselOptions(
+                        aspectRatio: 2.0,
+                        enlargeCenterPage: true,
+                        enableInfiniteScroll: false,
+                        initialPage: 1,
+                        autoPlay: false,
+                        height: 700,
+                        //enlargeStrategy: CenterPageEnlargeStrategy.height
+                        onPageChanged: (index, reason) {
+                          //"index :.. ${index} ".Log();
+                          //_gradient = getGradient(index);
+                          //_gradient = WidgetGradient();
 
-                            setState(() {
-                              this.index = index;
-                            });
-                          },
-                        ),
-                        items: imageSliders,
+                          setState(() {
+                            this.index = index;
+                          });
+                        },
                       ),
+                      items: imageSliders,
                     ),
                   ),
-                  Container(
-                    color: Colors.transparent,
-                    padding: EdgeInsets.only(
-                      bottom: 10,
-                      top: 10,
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          child: Row(
-                            children: [
-                              Container(
-                                child: Container(
-                                  child: Text(
-                                    "00:00",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                    ),
+                ),
+                Container(
+                  color: Colors.transparent,
+                  padding: EdgeInsets.only(
+                    bottom: 10,
+                    top: 10,
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        child: Row(
+                          children: [
+                            Container(
+                              child: Container(
+                                child: Text(
+                                  "00:00",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
                                   ),
-                                  alignment: Alignment.centerLeft,
                                 ),
-                                //flex: 1,
+                                alignment: Alignment.centerLeft,
                               ),
-                              Expanded(
-                                  child: Container(
-                                child: SvgPicture.asset(
-                                  "assets/image/seek_bar.svg",
-                                  height: 30,
-                                  fit: BoxFit.fitWidth,
-                                ),
-                                margin: EdgeInsets.only(left: 15, right: 15),
+                              //flex: 1,
+                            ),
+                            Expanded(
+                                child: Container(
+                              child: SvgPicture.asset(
+                                "assets/image/seek_bar.svg",
                                 height: 30,
-                              )),
-                              Container(
-                                child: Container(
-                                  child: Text(
-                                    "01:00",
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 12),
-                                  ),
-                                  alignment: Alignment.centerRight,
-                                ),
-                                //flex: 1,
+                                fit: BoxFit.fitWidth,
                               ),
-                            ],
-                          ),
-                          margin: EdgeInsets.only(top: 15, left: 20, right: 20),
+                              margin: EdgeInsets.only(left: 15, right: 15),
+                              height: 30,
+                            )),
+                            Container(
+                              child: Container(
+                                child: Text(
+                                  "01:00",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12),
+                                ),
+                                alignment: Alignment.centerRight,
+                              ),
+                              //flex: 1,
+                            ),
+                          ],
                         ),
-                        Container(
-                          height: 100,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  child: SvgPicture.asset(
-                                    "assets/image/shuffle.svg",
-                                    color: Colors.white,
-                                    height: 20,
-                                    width: 20,
-                                  ),
-                                  alignment: Alignment.centerLeft,
-                                  margin: EdgeInsets.only(left: 25),
+                        margin: EdgeInsets.only(top: 15, left: 20, right: 20),
+                      ),
+                      Container(
+                        height: 100,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                child: SvgPicture.asset(
+                                  "assets/image/shuffle.svg",
+                                  color: Colors.white,
+                                  height: 20,
+                                  width: 20,
                                 ),
+                                alignment: Alignment.centerLeft,
+                                margin: EdgeInsets.only(left: 25),
                               ),
-                              Expanded(
-                                child: Container(
-                                  child: IconButton(
-                                    icon: Icon(
-                                      Icons.skip_previous,
-                                      color: Colors.white,
-                                      size: 35,
-                                    ),
-                                    onPressed: () {},
-                                  ),
-                                  height: height_70,
-                                  alignment: Alignment.center,
-                                ),
-                              ),
-                              Container(
-                                child: Container(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(100),
-                                    child: Container(
-                                      child: IconButton(
-                                        icon: Icon(
-                                          Icons.pause,
-                                          color: Colors.white,
-                                          size: 40,
-                                        ),
-                                        onPressed: () {},
-                                        //alignment: Alignment.center,
-                                      ),
-                                      height: 60,
-                                      width: 60,
-                                      color: LocalColor.Primary,
-                                      //alignment: Alignment.center,
-                                    ),
-                                  ),
-                                  alignment: Alignment.center,
-                                ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  child: IconButton(
-                                    icon: Icon(
-                                      Icons.skip_next,
-                                      color: Colors.white,
-                                      size: 35,
-                                    ),
-                                    onPressed: () {},
-                                  ),
-                                  height: height_70,
-                                  alignment: Alignment.center,
-                                ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  child: SvgPicture.asset(
-                                    "assets/image/repeat.svg",
-                                    color: Colors.white,
-                                    height: 20,
-                                    width: 20,
-                                  ),
-                                  alignment: Alignment.centerRight,
-                                  margin: EdgeInsets.only(right: 25),
-                                ),
-                              )
-                            ],
-                          ),
-                          alignment: Alignment.center,
-                        ),
-                        Container(
-                          child: Row(
-                            children: [
-                              Container(
+                            ),
+                            Expanded(
+                              child: Container(
                                 child: IconButton(
                                   icon: Icon(
-                                    Icons.add_box_outlined,
+                                    Icons.skip_previous,
                                     color: Colors.white,
-                                    size: 28,
+                                    size: 35,
                                   ),
                                   onPressed: () {},
                                 ),
-                                alignment: Alignment.centerLeft,
-                                margin: EdgeInsets.only(left: 11),
+                                height: height_70,
+                                alignment: Alignment.center,
                               ),
-                              Expanded(
-                                  child: IconButton(
+                            ),
+                            Container(
+                              child: Container(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(100),
+                                  child: Container(
+                                    child: IconButton(
+                                      icon: Icon(
+                                        Icons.pause,
+                                        color: Colors.white,
+                                        size: 40,
+                                      ),
+                                      onPressed: () {},
+                                      //alignment: Alignment.center,
+                                    ),
+                                    height: 60,
+                                    width: 60,
+                                    color: LocalColor.Primary,
+                                    //alignment: Alignment.center,
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.skip_next,
+                                    color: Colors.white,
+                                    size: 35,
+                                  ),
+                                  onPressed: () {},
+                                ),
+                                height: height_70,
+                                alignment: Alignment.center,
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                child: SvgPicture.asset(
+                                  "assets/image/repeat.svg",
+                                  color: Colors.white,
+                                  height: 20,
+                                  width: 20,
+                                ),
+                                alignment: Alignment.centerRight,
+                                margin: EdgeInsets.only(right: 25),
+                              ),
+                            )
+                          ],
+                        ),
+                        alignment: Alignment.center,
+                      ),
+                      Container(
+                        child: Row(
+                          children: [
+                            Container(
+                              child: IconButton(
                                 icon: Icon(
-                                  Icons.favorite_border_rounded,
-                                  color: LocalColor.Primary,
+                                  Icons.add_box_outlined,
+                                  color: Colors.white,
                                   size: 28,
                                 ),
                                 onPressed: () {},
-                              )),
-                              Container(
+                              ),
+                              alignment: Alignment.centerLeft,
+                              margin: EdgeInsets.only(left: 11),
+                            ),
+                            Expanded(
                                 child: IconButton(
-                                  icon: Icon(
-                                    Icons.line_style,
-                                    color: Colors.white,
-                                    size: 28,
-                                  ),
-                                  onPressed: () {},
+                              icon: Icon(
+                                Icons.favorite_border_rounded,
+                                color: LocalColor.Primary,
+                                size: 28,
+                              ),
+                              onPressed: () {},
+                            )),
+                            Container(
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.line_style,
+                                  color: Colors.white,
+                                  size: 28,
                                 ),
-                                alignment: Alignment.centerRight,
-                                margin: EdgeInsets.only(right: 11),
-                              )
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
+                                onPressed: () {},
+                              ),
+                              alignment: Alignment.centerRight,
+                              margin: EdgeInsets.only(right: 11),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
                   ),
-                ],
-              )
-            ],
-          ),
+                ),
+              ],
+            )
+          ],
         ),
       ),
     );
