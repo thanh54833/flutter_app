@@ -26,9 +26,9 @@ class StateMain extends StatefulWidget {
 
 class _StateMain extends State<StateMain> {
   build(BuildContext context) {
-    // Future.delayed(Duration(milliseconds: 6000), () {
-    //   context.push((context) => Home());
-    // });
+    Future.delayed(Duration(milliseconds: 6000), () {
+      context.push((context) => Home());
+    });
 
     return Stack(
       children: [

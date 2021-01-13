@@ -7,6 +7,7 @@ import 'package:flutter_app/example/main/app/LocalColor.dart';
 import 'package:flutter_app/example/main/common/LogCatUtils.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:palette_generator/palette_generator.dart';
+import 'package:flutter_app/example/main/common/NavigatorUtils.dart';
 
 main() => runApp(NoonLoopingDemo());
 
@@ -57,9 +58,14 @@ class _WidgetGradient extends State<WidgetGradient> {
             child: Container(
               child: Row(
                 children: [
-                  Icon(
-                    Icons.keyboard_arrow_down_sharp,
-                    size: 35,
+                  IconButton(
+                    icon: Icon(
+                      Icons.keyboard_arrow_down_sharp,
+                      size: 35,
+                    ),
+                    onPressed: () {
+                      context.pop();
+                    },
                   ),
                   Expanded(child: Center(child: Text("Play now"))),
                   Icon(
@@ -268,6 +274,7 @@ class _WidgetGradient extends State<WidgetGradient> {
                                     onPressed: () {},
                                   ),
                                   height: height_70,
+                                  alignment: Alignment.center,
                                 ),
                               ),
                               Expanded(
