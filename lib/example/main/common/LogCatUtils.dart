@@ -11,4 +11,5 @@ extension LogCatUtils on String {
       stackTrace: StackTrace.fromString("stackTraceString")));
   Logs(String message) => (developer.log("===" +message+ " : " + this,
       stackTrace: StackTrace.fromString("stackTraceString")));
+  LogP() => (print("===" + " : " + this));
 }

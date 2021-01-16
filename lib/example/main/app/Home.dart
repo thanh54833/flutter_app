@@ -1,19 +1,30 @@
+import 'dart:io';
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_app/example/main/app/Themes.dart';
+import 'package:flutter_app/example/main/app/model/SongModel.dart';
 import 'package:flutter_app/example/main/app/page/AlbumsPage.dart';
 import 'package:flutter_app/example/main/app/page/FavouritesPage.dart';
 import 'package:flutter_app/example/main/app/page/PlaylistPage.dart';
 import 'package:flutter_app/example/main/app/page/TracksPage.dart';
-import 'package:flutter_app/example/main/common/StatelessWidgetBase.dart';
+import 'package:flutter_app/example/main/common/FilesUtils.dart';
+import 'package:flutter_app/example/main/common/Gesture.dart';
 import 'package:flutter_app/example/main/common/LogCatUtils.dart';
 import 'package:flutter_app/example/main/common/NavigatorUtils.dart';
-import 'package:flutter_app/example/view/BottomSheetBarPage.dart';
+import 'package:flutter_app/example/music/MusicModel.dart';
+import 'package:flutter_app/example/view/AnimationDelayList.dart';
+import 'package:id3/id3.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:media_metadata_plugin/media_metadata_plugin.dart';
+import 'package:path_provider_ex/path_provider_ex.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+
 import 'LocalColor.dart';
 import 'Player.dart';
+import 'data/MusicDatabase.dart';
 
 main() => runApp(Home());
 
@@ -30,13 +41,7 @@ class Home extends StatelessWidget {
 }
 
 class StateHome extends StatefulWidget {
-  //Listener listener;
-  var isCollapsed = false;
-
-  //StateHome({Key key, this.listener}) :super(key: key)
-
   createState() => _StateHome();
-//createState() => _StateHome();
 }
 
 class Listener {
@@ -44,19 +49,26 @@ class Listener {
 }
 
 class _StateHome extends State<StateHome> {
-  //with Listener s
   final myController = TextEditingController();
   final _bsbController = BottomSheetBarController();
   final heightBar = 78;
-
   var isCollapsed = false;
+  var isStartAnimation = false;
 
-  _showBottomBar() {
-    "_showBottomBar :... ".Log();
-    this.isCollapsed = true;
+  setIsCollapsed(bool isCollapsed) {
+    setState(() {
+      this.isCollapsed = isCollapsed;
+    });
+  }
+
+  _onCLickItemFavourite(MusicModel) {
+    "songModel:..".Log();
+    isCollapsed = !isCollapsed;
+    setIsCollapsed(isCollapsed);
   }
 
   build(BuildContext context) {
+    //end :...
     _printLatestValue() {
       print("Second text field: ${myController.text}");
     }
@@ -77,7 +89,10 @@ class _StateHome extends State<StateHome> {
                     fontFamily: 'GafataRegular',
                     fontSize: 20,
                     fontWeight: FontWeight.bold),
-              )),
+              ).setOnClick(() {
+                isCollapsed = !isCollapsed;
+                setIsCollapsed(isCollapsed);
+              })),
               IconButton(
                 icon: Icon(
                   Icons.add_box_outlined,
@@ -115,7 +130,11 @@ class _StateHome extends State<StateHome> {
             topLeft: Radius.circular(0.0),
             topRight: Radius.circular(0.0),
           ),
-          expandedBuilder: (scrollController) => Effect(),
+          expandedBuilder: (scrollController) {
+            return Expand(
+              isStartAnimation: _bsbController.isExpanded,
+            );
+          },
           body: Container(
             color: LocalColor.Background,
             child: Column(
@@ -130,9 +149,9 @@ class _StateHome extends State<StateHome> {
                             borderRadius: BorderRadius.circular(10),
                             boxShadow: [
                               new BoxShadow(
-                                color: Colors.black12,
-                                spreadRadius: 0.5,
-                                blurRadius: 1.0,
+                                color: LocalColor.Primary_50,
+                                spreadRadius: 1,
+                                blurRadius: 5,
                                 // You can set this blurRadius as per your requirement
                               ),
                             ]),
@@ -154,14 +173,17 @@ class _StateHome extends State<StateHome> {
                           style:
                               TextStyle(color: LocalColor.Black, fontSize: 16),
                         ),
-                        margin: EdgeInsets.only(left: 20, right: 20, top: 0),
+                        margin: EdgeInsets.only(
+                            left: 20, right: 20, top: 0, bottom: 3),
                       ),
                       Expanded(
                           child: Container(
                         color: Colors.transparent,
                         child: Stack(
                           children: [
-                            HomeWidget(),
+                            HomeWidget(
+                              onCLickItemFavourite: _onCLickItemFavourite,
+                            ),
                           ],
                           alignment: Alignment.bottomCenter,
                         ),
@@ -186,6 +208,17 @@ class BottomBar extends StatefulWidget {
 class _BottomBar extends State<BottomBar> {
   build(BuildContext context) {
     return Container(
+      decoration: BoxDecoration(
+        //Here goes the same radius, u can put into a var or function
+        borderRadius: BorderRadius.circular(8.0),
+        boxShadow: [
+          BoxShadow(
+            color: LocalColor.Primary_80,
+            spreadRadius: 1,
+            blurRadius: 5,
+          ),
+        ],
+      ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
         child: Container(
@@ -274,8 +307,7 @@ class _BottomBar extends State<BottomBar> {
           alignment: Alignment.topCenter,
         ),
       ),
-      padding: EdgeInsets.only(bottom: 8),
-      margin: EdgeInsets.only(left: 8, right: 8, bottom: 0),
+      margin: EdgeInsets.only(left: 8, right: 8, bottom: 8),
     );
   }
 }
@@ -288,6 +320,10 @@ final List<Tab> tabs = <Tab>[
 ];
 
 class HomeWidget extends StatelessWidget {
+  Function(MusicModel) onCLickItemFavourite;
+
+  HomeWidget({@required this.onCLickItemFavourite});
+
   build(BuildContext context) {
     return Container(
       color: Colors.transparent,
@@ -295,7 +331,14 @@ class HomeWidget extends StatelessWidget {
       //height: double.infinity,
       child: ContainedTabBarView(
         tabs: tabs,
-        views: [FavouritesPage(), PlaylistPage(), TracksPage(), AlbumsPage()],
+        views: [
+          FavouritesPage(
+            onCLick: onCLickItemFavourite,
+          ),
+          PlaylistPage(),
+          TracksPage(),
+          AlbumsPage()
+        ],
         onChange: (index) => {print(index)},
         tabBarProperties: TabBarProperties(
             indicatorSize: TabBarIndicatorSize.tab,
@@ -318,171 +361,182 @@ class HomeWidget extends StatelessWidget {
   }
 }
 
-class Effect extends StatefulWidget {
+class Expand extends StatefulWidget {
+  var isStartAnimation = false;
+  final ScrollController scrollController;
+
+  Expand({this.isStartAnimation, this.scrollController});
+
   createState() => _Effect();
 }
 
-class _Effect extends State<Effect> {
+class _Effect extends State<Expand> {
   build(BuildContext context) {
-    return Wrap(
-      children: [
-        Container(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: Container(
-              child: Column(
-                children: [
-                  Container(
-                    child: Row(
-                      children: [
-                        Container(
-                          child: Text("60HZ"),
-                          width: 70,
-                        ),
-                        Container(
-                          child: Expanded(
-                            child: Container(
-                              child: LinearPercentIndicator(
-                                lineHeight: 14.0,
-                                percent: 0.5,
-                                backgroundColor: Colors.grey,
-                                progressColor: Colors.blue,
-                              ),
-                              margin: EdgeInsets.only(left: 00, right: 20),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    margin: EdgeInsets.only(top: 20, left: 10, right: 0),
-                  ),
-                  Container(
-                    child: Row(
-                      children: [
-                        Container(
-                          child: Text("230HZ"),
-                          width: 70,
-                        ),
-                        Container(
-                          child: Expanded(
-                            child: Container(
-                              child: LinearPercentIndicator(
-                                lineHeight: 14.0,
-                                percent: 0.9,
-                                backgroundColor: Colors.grey,
-                                progressColor: Colors.blue,
-                              ),
-                              margin: EdgeInsets.only(left: 0, right: 20),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    margin: EdgeInsets.only(top: 20, left: 10, right: 0),
-                  ),
-                  Container(
-                    child: Row(
-                      children: [
-                        Container(
-                          child: Text("910HZ"),
-                          width: 70,
-                        ),
-                        Container(
-                          child: Expanded(
-                            child: Container(
-                              child: LinearPercentIndicator(
-                                lineHeight: 14.0,
-                                percent: 0.4,
-                                backgroundColor: Colors.grey,
-                                progressColor: Colors.blue,
-                              ),
-                              margin: EdgeInsets.only(left: 0, right: 20),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    margin: EdgeInsets.only(top: 20, left: 10, right: 0),
-                  ),
-                  Container(
-                    child: Row(
-                      children: [
-                        Container(
-                          child: Text("3600HZ"),
-                          width: 70,
-                        ),
-                        Container(
-                          child: Expanded(
-                            child: Container(
-                              child: LinearPercentIndicator(
-                                lineHeight: 14.0,
-                                percent: 0.1,
-                                backgroundColor: Colors.grey,
-                                progressColor: Colors.blue,
-                              ),
-                              margin: EdgeInsets.only(left: 0, right: 20),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    margin: EdgeInsets.only(top: 20, left: 10, right: 0),
-                  ),
-                  Container(
-                    child: Row(
-                      children: [
-                        Container(
-                          child: Text(
-                            "14000HZ",
-                          ),
-                          width: 70,
-                        ),
-                        Container(
-                          child: Expanded(
-                            child: Container(
-                              child: LinearPercentIndicator(
-                                lineHeight: 14.0,
-                                percent: 0.5,
-                                backgroundColor: Colors.grey,
-                                progressColor: Colors.blue,
-                              ),
-                              margin: EdgeInsets.only(left: 0, right: 20),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    margin: EdgeInsets.only(top: 20, left: 10, right: 0),
-                  ),
-                  Container(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20.0),
-                      child: Container(
-                        width: 150,
-                        height: 40,
-                        color: LocalColor.Gray,
-                        child: Center(
-                            child: Text(
-                          "Xong",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'GafataRegular'),
-                        )),
-                      ),
-                    ),
-                    margin: EdgeInsets.only(top: 20, bottom: 10),
-                  )
-                ],
-              ),
-              color: Colors.white,
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        //Here goes the same radius, u can put into a var or function
+        borderRadius: BorderRadius.circular(8.0),
+        boxShadow: [
+          BoxShadow(
+            color: LocalColor.Primary_50,
+            spreadRadius: 1,
+            blurRadius: 5,
           ),
-          color: Colors.transparent,
-          padding: EdgeInsets.all(5.0),
-        )
-      ],
+        ],
+      ),
+      child: Wrap(
+        children: [
+          Container(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Container(
+                child: Column(
+                  children: [
+                    Container(
+                      child: Icon(
+                        Icons.keyboard_arrow_down_sharp,
+                        size: 20,
+                      ),
+                      margin: EdgeInsets.only(top: 10),
+                    ),
+                    Container(
+                      child: Row(
+                        children: [
+                          Container(
+                            child: Text("60HZ"),
+                            width: 70,
+                          ),
+                          Container(
+                            child: Expanded(
+                              child: Container(
+                                child: LinearPercentIndicator(
+                                  lineHeight: 14.0,
+                                  percent: 0.5,
+                                  backgroundColor: Colors.grey,
+                                  progressColor: Colors.blue,
+                                ),
+                                margin: EdgeInsets.only(left: 00, right: 20),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      margin: EdgeInsets.only(top: 10, left: 10, right: 0),
+                    ),
+                    Container(
+                      child: Row(
+                        children: [
+                          Container(
+                            child: Text("230HZ"),
+                            width: 70,
+                          ),
+                          Container(
+                            child: Expanded(
+                              child: Container(
+                                child: LinearPercentIndicator(
+                                  lineHeight: 14.0,
+                                  percent: 0.9,
+                                  backgroundColor: Colors.grey,
+                                  progressColor: Colors.blue,
+                                ),
+                                margin: EdgeInsets.only(left: 0, right: 20),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      margin: EdgeInsets.only(top: 20, left: 10, right: 0),
+                    ),
+                    Container(
+                      child: Row(
+                        children: [
+                          Container(
+                            child: Text("910HZ"),
+                            width: 70,
+                          ),
+                          Container(
+                            child: Expanded(
+                              child: Container(
+                                child: LinearPercentIndicator(
+                                  lineHeight: 14.0,
+                                  percent: 0.4,
+                                  backgroundColor: Colors.grey,
+                                  progressColor: Colors.blue,
+                                ),
+                                margin: EdgeInsets.only(left: 0, right: 20),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      margin: EdgeInsets.only(top: 20, left: 10, right: 0),
+                    ),
+                    Container(
+                      child: Row(
+                        children: [
+                          Container(
+                            child: Text("3600HZ"),
+                            width: 70,
+                          ),
+                          Container(
+                            child: Expanded(
+                              child: Container(
+                                child: LinearPercentIndicator(
+                                  lineHeight: 14.0,
+                                  percent: 0.1,
+                                  backgroundColor: Colors.grey,
+                                  progressColor: Colors.blue,
+                                ),
+                                margin: EdgeInsets.only(left: 0, right: 20),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      margin: EdgeInsets.only(top: 20, left: 10, right: 0),
+                    ),
+                    Container(
+                      child: Row(
+                        children: [
+                          Container(
+                            child: Text(
+                              "14000HZ",
+                            ),
+                            width: 70,
+                          ),
+                          Container(
+                            child: Expanded(
+                              child: Container(
+                                child: LinearPercentIndicator(
+                                  lineHeight: 14.0,
+                                  percent: 0.5,
+                                  backgroundColor: Colors.grey,
+                                  progressColor: Colors.blue,
+                                ),
+                                margin: EdgeInsets.only(left: 0, right: 20),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      margin: EdgeInsets.only(top: 20, left: 10, right: 0),
+                    ),
+                    Container(
+                      child: MoreItem(
+                        isStart: widget.isStartAnimation,
+                      ),
+                      margin: EdgeInsets.only(top: 20, bottom: 10),
+                    )
+                  ],
+                ),
+                color: Colors.white,
+              ),
+            ),
+            color: Colors.transparent,
+            margin: EdgeInsets.all(5.0),
+          )
+        ],
+      ),
     );
   }
 }

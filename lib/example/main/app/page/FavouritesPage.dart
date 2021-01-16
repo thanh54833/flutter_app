@@ -1,45 +1,126 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:audiotagger/audiotagger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/example/main/app/LocalColor.dart';
 import 'package:flutter_app/example/main/app/Themes.dart';
+import 'package:flutter_app/example/main/app/data/MusicDatabase.dart';
 import 'package:flutter_app/example/main/app/model/SongModel.dart';
+import 'package:flutter_app/example/main/common/FilesUtils.dart';
+import 'package:flutter_app/example/main/common/StatefulWrapper.dart';
+import 'package:flutter_app/example/music/MusicModel.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_app/example/main/common/Gesture.dart';
+import 'package:media_metadata_plugin/media_metadata_plugin.dart';
+import 'package:flutter_app/example/main/common/LogCatUtils.dart';
+import 'package:media_store/media_store.dart';
 
-var songs = [
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel(),
-  SongModel()
-];
+import '../Log.dart';
 
-class FavouritesPage extends StatelessWidget {
+// var songs = [
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel(),
+//   SongModel()
+// ];
+
+class FavouritesPage extends StatefulWidget {
+  Function(MusicModel) onCLick;
+
+  FavouritesPage({@required this.onCLick});
+
+  createState() => _FavouritesPage();
+}
+
+class _FavouritesPage extends State<FavouritesPage> {
+  _getMusicModel(path) async {
+    var audioMetaData = await MediaMetadataPlugin.getMediaMetaData(path);
+    var music = MusicModel("", "", "");
+    music.url = path;
+    music.album = audioMetaData.album;
+    music.artist = audioMetaData.artistName;
+    music.authorName = audioMetaData.authorName;
+    music.trackName = audioMetaData.trackName;
+    music.trackDuration = "${audioMetaData.trackDuration}";
+    music.mime = audioMetaData.mimeTYPE;
+    return music;
+  }
+
+  List<MusicModel> data = [];
+
+  _musicData() async {
+    //List<MusicModel> listData = [];
+    List<File> data = await FileUtils.internal().getStorageInfo(["mp3"]);
+    data.asMap().forEach((index, element) async {
+      var path = element.absolute.path;
+      var audioMetaData = await MediaMetadataPlugin.getMediaMetaData(path);
+      var music = MusicModel("", "", "");
+      music.url = path;
+      music.album = audioMetaData.album;
+      music.artist = audioMetaData.artistName;
+      music.authorName = audioMetaData.authorName;
+      music.trackName = audioMetaData.trackName;
+      _printDuration(Duration duration) {
+        String twoDigits(int n) => n.toString().padLeft(2, "0");
+        String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+        String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+        return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+      }
+
+      music.trackDuration =
+          _printDuration(Duration(milliseconds: audioMetaData.trackDuration));
+      music.mime = audioMetaData.mimeTYPE;
+
+      if ((music.artist != null) && (music.artist != "")) {
+        this.data.add(music);
+      }
+    });
+
+    Log("this.data :... ${this.data.length}");
+  }
+
+  _getPathBytes(String path) async {
+    return await Audiotagger().readArtwork(path: path);
+  }
+
+  initState() {
+    super.initState();
+    _musicData();
+  }
+
   build(BuildContext context) {
+    // _musicData().then((_value) {
+    //   //data = _value;
+    // });
+
     return Scaffold(
       backgroundColor: LocalColor.Transparent,
       body: Container(
         child: ListView.builder(
           padding: EdgeInsets.only(top: 10),
-          itemCount: songs.length,
+          itemCount: (data.length == null) ? 0 : data.length,
           itemBuilder: (context, index) {
-            var item = songs[index];
-
-            var isLastItem = (index == songs.length);
+            var item = data[index];
+            //var isLastItem = (index == songs.length);
+            //Log("data :... ${data.length}");
 
             return Container(
               child: ClipRRect(
@@ -51,11 +132,27 @@ class FavouritesPage extends StatelessWidget {
                       Container(
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(50.0),
-                          child: Image.asset(
-                            item.logo,
-                            height: 50,
-                            width: 50,
-                            fit: BoxFit.cover,
+                          child: Container(
+                            child: FutureBuilder(
+                              future: _getPathBytes(item.url),
+                              builder: (context, snapshot) {
+                                var by = snapshot.data;
+                                return (by != null)
+                                    ? Image.memory(
+                                        by,
+                                        height: 50,
+                                        width: 50,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.asset(
+                                        "assets/image/bg_2.jpg",
+                                        height: 50,
+                                        width: 50,
+                                        fit: BoxFit.cover,
+                                      );
+                                ;
+                              },
+                            ),
                           ),
                         ),
                         //alignment: Alignment.center,
@@ -65,12 +162,16 @@ class FavouritesPage extends StatelessWidget {
                           direction: Axis.vertical,
                           children: [
                             Text(
-                              item.name,
+                              (item.artist != null) ? item.artist : "",
                               style: Themes.TextStyle_Small_Bold,
                             ),
-                            Text(
-                              item.artist,
-                              style: Themes.TextStyle_Small,
+                            Container(
+                              child: Text(
+                                (item.artist != null) ? item.artist : "",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.black54),
+                              ),
+                              margin: EdgeInsets.only(top: 2),
                             ),
                           ],
                         ),
@@ -89,7 +190,7 @@ class FavouritesPage extends StatelessWidget {
                               alignment: Alignment.centerRight,
                             ),
                             Container(
-                              child: Text(item.time,
+                              child: Text(item.trackDuration,
                                   style: TextStyle(
                                       fontSize: 12, color: Colors.black26)),
                               alignment: Alignment.centerRight,
@@ -122,7 +223,7 @@ class FavouritesPage extends StatelessWidget {
               ),
               margin:
                   EdgeInsets.only(top: 8.0, bottom: 8.0, left: 10, right: 10),
-            );
+            ).setOnClick(() => widget.onCLick(item));
           },
         ),
         padding: EdgeInsets.only(bottom: 0),

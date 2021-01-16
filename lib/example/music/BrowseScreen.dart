@@ -427,7 +427,6 @@ class _HomePage extends State<HomePage> {
                                             ),
                                           ),
                                           onPressed: () {
-
                                             //listValid[index].url.Logs("listValid :...");
 
                                             Navigator.of(context).push(

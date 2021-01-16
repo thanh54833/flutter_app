@@ -359,10 +359,22 @@ class AudioPlayerTask extends BackgroundAudioTask {
     // Load and broadcast the queue
     AudioServiceBackground.setQueue(queue);
     try {
+
       await _player.setAudioSource(ConcatenatingAudioSource(
-        children:
-            queue.map((item) => AudioSource.uri(Uri.parse(item.id))).toList(),
+        children: queue.map((item) => AudioSource.uri(Uri.parse(item.id)) ).toList(),
       ));
+      
+      await _player.setAudioSource(ConcatenatingAudioSource(
+
+        children:
+
+      ));
+
+      // Uri.parse(item.id)
+      // await _player.setAudioSource(ConcatenatingAudioSource(
+      //   children: queue.map((item) => AudioSource.uri()).toList(),
+      // ));
+
       // In this example, we automatically start playing on start.
       onPlay();
     } catch (e) {

@@ -102,7 +102,7 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
             topLeft: Radius.circular(0.0),
             topRight: Radius.circular(0.0),
           ),
-          expandedBuilder: (scrollController) => Effect(),
+          expandedBuilder: (scrollController) => Expand(),
           body: Container(
             color: Colors.blue,
           ),

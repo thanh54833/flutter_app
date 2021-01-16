@@ -65,8 +65,18 @@ class _WidgetGradient extends State<WidgetGradient> {
                   onPressed: () {
                     context.pop();
                   },
+                  padding: EdgeInsets.zero,
+                  alignment: Alignment.centerLeft,
                 ),
-                Expanded(child: Center(child: Text("Play now"))),
+                Expanded(
+                    child: Center(
+                        child: Text(
+                  "Play now",
+                  style: TextStyle(
+                      fontFamily: 'GafataRegular',
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold),
+                ))),
                 Icon(
                   Icons.playlist_play_outlined,
                   size: 35,
