@@ -3,6 +3,7 @@ import 'package:flutter_app/example/main/app/LocalColor.dart';
 import 'package:flutter_app/example/main/app/view/ViewLoading.dart';
 import 'package:lottie/lottie.dart';
 import 'package:path/path.dart';
+import 'package:flutter_app/example/main/common/Gesture.dart';
 
 class DialogCommon {
   static final DialogCommon singleton = DialogCommon.internal();
@@ -85,7 +86,7 @@ class DialogCommon {
     );
   }
 
-  showDialogV2(context) async {
+  showDialogV2(context,onClickAgree()) async {
     await showDialog(
         barrierDismissible: true,
         context: context,
@@ -118,7 +119,7 @@ class DialogCommon {
                           Container(
                             child: Center(
                                 child: Text(
-                              "Warning!",
+                              "Scanning !",
                               style: TextStyle(
                                   fontSize: 20,
                                   fontFamily: 'GafataRegular',
@@ -148,12 +149,15 @@ class DialogCommon {
                               child: Container(
                                 child: Center(
                                   child: Text(
-                                    "Close",
+                                    "Agree",
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 17,
                                         color: Colors.white),
-                                  ),
+                                  ).setOnClick(() {
+                                    onClickAgree();
+                                    Navigator.pop(context);
+                                  }),
                                 ),
                                 color: Colors.red,
                                 width: 100,

@@ -5,11 +5,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app/example/main/app/Themes.dart';
+import 'package:flutter_app/example/main/app/data/DatabaseUtils.dart';
 import 'package:flutter_app/example/main/app/model/SongModel.dart';
 import 'package:flutter_app/example/main/app/page/AlbumsPage.dart';
 import 'package:flutter_app/example/main/app/page/FavouritesPage.dart';
 import 'package:flutter_app/example/main/app/page/PlaylistPage.dart';
 import 'package:flutter_app/example/main/app/page/TracksPage.dart';
+import 'package:flutter_app/example/main/common/DialogCommon.dart';
+import 'package:flutter_app/example/main/common/DialogUtils.dart';
 import 'package:flutter_app/example/main/common/FilesUtils.dart';
 import 'package:flutter_app/example/main/common/Gesture.dart';
 import 'package:flutter_app/example/main/common/LogCatUtils.dart';
@@ -54,6 +57,7 @@ class _StateHome extends State<StateHome> {
   final heightBar = 78;
   var isCollapsed = false;
   var isStartAnimation = false;
+  var isScan = false;
 
   setIsCollapsed(bool isCollapsed) {
     setState(() {
@@ -62,13 +66,23 @@ class _StateHome extends State<StateHome> {
   }
 
   _onCLickItemFavourite(MusicModel) {
-    "songModel:..".Log();
+    //"songModel:..".Log();
     isCollapsed = !isCollapsed;
     setIsCollapsed(isCollapsed);
   }
 
+  _onClickScan() {
+    var dialog = DialogCommon.internal();
+    dialog.showDialogV2(context, () {
+      setState(() {
+        //isScan = true;
+      });
+    });
+  }
+
   build(BuildContext context) {
-    //end :...
+    //DatabaseUtils.instance.setData()
+
     _printLatestValue() {
       print("Second text field: ${myController.text}");
     }
@@ -83,22 +97,24 @@ class _StateHome extends State<StateHome> {
             children: [
               Expanded(
                   child: Text(
-                "Music Player",
-                style: TextStyle(
-                    color: LocalColor.Black,
-                    fontFamily: 'GafataRegular',
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold),
-              ).setOnClick(() {
-                isCollapsed = !isCollapsed;
-                setIsCollapsed(isCollapsed);
-              })),
+                    "Music Player",
+                    style: TextStyle(
+                        color: LocalColor.Black,
+                        fontFamily: 'GafataRegular',
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold),
+                  ).setOnClick(() {
+                    isCollapsed = !isCollapsed;
+                    setIsCollapsed(isCollapsed);
+                  })),
               IconButton(
                 icon: Icon(
                   Icons.add_box_outlined,
                   color: LocalColor.Primary,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  _onClickScan();
+                },
                 alignment: Alignment.centerRight,
                 padding: EdgeInsets.all(0),
               )
@@ -141,58 +157,60 @@ class _StateHome extends State<StateHome> {
               children: [
                 Expanded(
                     child: Container(
-                  child: Column(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              new BoxShadow(
-                                color: LocalColor.Primary_50,
-                                spreadRadius: 1,
-                                blurRadius: 5,
-                                // You can set this blurRadius as per your requirement
-                              ),
-                            ]),
-                        child: TextField(
-                          controller: myController,
-                          decoration: InputDecoration(
-                            hintStyle:
+                      child: Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  new BoxShadow(
+                                    color: LocalColor.Primary_50,
+                                    spreadRadius: 1,
+                                    blurRadius: 5,
+                                    // You can set this blurRadius as per your requirement
+                                  ),
+                                ]),
+                            child: TextField(
+                              controller: myController,
+                              decoration: InputDecoration(
+                                hintStyle:
                                 TextStyle(color: Colors.black26, fontSize: 16),
-                            hintText: 'Search name',
-                            prefixIcon: Icon(
-                              Icons.search_sharp,
-                              size: 25,
-                              color: LocalColor.Primary,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding:
+                                hintText: 'Search name',
+                                prefixIcon: Icon(
+                                  Icons.search_sharp,
+                                  size: 25,
+                                  color: LocalColor.Primary,
+                                ),
+                                border: InputBorder.none,
+                                contentPadding:
                                 EdgeInsets.only(top: 15, bottom: 15),
-                          ),
-                          style:
+                              ),
+                              style:
                               TextStyle(color: LocalColor.Black, fontSize: 16),
-                        ),
-                        margin: EdgeInsets.only(
-                            left: 20, right: 20, top: 0, bottom: 3),
-                      ),
-                      Expanded(
-                          child: Container(
-                        color: Colors.transparent,
-                        child: Stack(
-                          children: [
-                            HomeWidget(
-                              onCLickItemFavourite: _onCLickItemFavourite,
                             ),
-                          ],
-                          alignment: Alignment.bottomCenter,
-                        ),
-                      )),
-                      //Todo :bottom bar ...
-                    ],
-                  ),
-                  color: Colors.transparent,
-                )),
+                            margin: EdgeInsets.only(
+                                left: 20, right: 20, top: 0, bottom: 3),
+                          ),
+                          Expanded(
+                              child: Container(
+                                color: Colors.transparent,
+                                child: Stack(
+                                  children: [
+                                    HomeWidget(
+                                      onCLickItemFavourite: _onCLickItemFavourite,
+                                      onClickScan: _onClickScan,
+                                      testOnCLick: _testOnCLick,
+                                    ),
+                                  ],
+                                  alignment: Alignment.bottomCenter,
+                                ),
+                              )),
+                          //Todo :bottom bar ...
+                        ],
+                      ),
+                      color: Colors.transparent,
+                    )),
               ],
             ),
             margin: EdgeInsets.only(top: 20),
@@ -263,40 +281,40 @@ class _BottomBar extends State<BottomBar> {
                   children: [
                     Expanded(
                         child: IconButton(
-                      icon: Icon(
-                        Icons.skip_previous,
-                        color: LocalColor.Gray,
-                        size: 25,
-                      ),
-                    )),
+                          icon: Icon(
+                            Icons.skip_previous,
+                            color: LocalColor.Gray,
+                            size: 25,
+                          ),
+                        )),
                     Expanded(
                         child: IconButton(
-                      icon: Icon(
-                        Icons.pause,
-                        color: LocalColor.Primary,
-                        size: 25,
-                      ),
-                      onPressed: () {
-                        context.push((context) => NoonLoopingDemo());
-                      },
-                    )),
+                          icon: Icon(
+                            Icons.pause,
+                            color: LocalColor.Primary,
+                            size: 25,
+                          ),
+                          onPressed: () {
+                            context.push((context) => NoonLoopingDemo());
+                          },
+                        )),
                     Expanded(
                         child: IconButton(
-                      icon: Icon(
-                        Icons.skip_next,
-                        color: LocalColor.Gray,
-                        size: 25,
-                      ),
-                      onPressed: () {},
-                    )),
+                          icon: Icon(
+                            Icons.skip_next,
+                            color: LocalColor.Gray,
+                            size: 25,
+                          ),
+                          onPressed: () {},
+                        )),
                     Expanded(
                         child: IconButton(
-                      icon: Icon(
-                        Icons.volume_up,
-                        color: LocalColor.Gray,
-                      ),
-                      onPressed: () {},
-                    ))
+                          icon: Icon(
+                            Icons.volume_up,
+                            color: LocalColor.Gray,
+                          ),
+                          onPressed: () {},
+                        ))
                   ],
                 ),
               )
@@ -319,12 +337,41 @@ final List<Tab> tabs = <Tab>[
   Tab(text: "Albums"),
 ];
 
-class HomeWidget extends StatelessWidget {
+class HomeWidget extends StatefulWidget {
   Function(MusicModel) onCLickItemFavourite;
+  Function onClickScan;
+  Function onCLickTest;
 
-  HomeWidget({@required this.onCLickItemFavourite});
+  Function setOnCLickTest(Function() onCLickTest) {
+    this.onCLickTest = onCLickTest;
+  }
+
+  bool isScan = false;
+
+  HomeWidget({@required this.onCLickItemFavourite,
+    @required this.onClickScan,});
+
+  createState() => _StateHomeWidget();
+}
+
+class _StateHomeWidget extends State<HomeWidget> {
 
   build(BuildContext context) {
+
+    Future.delayed(Duration(seconds: 2), () {
+      " Future.delayed :... ".Log();
+      widget.onCLickTest();
+
+    });
+
+
+    widget.onClickScan = () {
+      setState(() {
+        "widget.onClickScan :... ".Log();
+        widget.isScan = true;
+      });
+    };
+
     return Container(
       color: Colors.transparent,
       //width: double.infinity,
@@ -333,7 +380,9 @@ class HomeWidget extends StatelessWidget {
         tabs: tabs,
         views: [
           FavouritesPage(
-            onCLick: onCLickItemFavourite,
+            onCLick: widget.onCLickItemFavourite,
+            isClickScan: widget.isScan,
+            setOnClickTest: widget.setOnCLickTest,
           ),
           PlaylistPage(),
           TracksPage(),

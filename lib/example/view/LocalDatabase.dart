@@ -150,7 +150,9 @@ class _StateLocalDatabase extends State<StateLocalDatabase> {
       music.trackDuration = "trackDuration";
       futures.add(_insert(music));
     });
+
     await Future.wait(futures);
+
     return true;
   }
 
@@ -186,15 +188,18 @@ class _StateLocalDatabase extends State<StateLocalDatabase> {
     music.trackName = "trackName";
     music.authorName = "authorName";
     music.trackDuration = "trackDuration";
+
     _delete().then((value) => {});
-    _setDataV2().then((result){
+
+    _setDataV2().then((result) {
       "result :.. ${result} ".Log();
-      if(result==true){
-        _getAll().then((_data){
-         "data.length :... ${_data.length} ".Log();
-       });
+      if (result == true) {
+        _getAll().then((_data) {
+          "data.length :... ${_data.length} ".Log();
+        });
       }
     });
+
     Future.delayed(Duration(seconds: 2), () {
       _getAll().then((_data) {
         List<MusicModel> data = _data;

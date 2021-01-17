@@ -44,13 +44,23 @@ import '../Log.dart';
 
 class FavouritesPage extends StatefulWidget {
   Function(MusicModel) onCLick;
+  bool isClickScan = false;
 
-  FavouritesPage({@required this.onCLick});
+  Function() onCLickTest;
+  Function(onCLickTest _onCLickTest) setOnClickTest;
+
+
+  FavouritesPage(
+      {@required this.onCLick,
+      @required this.isClickScan,
+      @required this.setOnClickTest});
 
   createState() => _FavouritesPage();
 }
 
 class _FavouritesPage extends State<FavouritesPage> {
+  List<MusicModel> data = [];
+
   _getMusicModel(path) async {
     var audioMetaData = await MediaMetadataPlugin.getMediaMetaData(path);
     var music = MusicModel("", "", "");
@@ -63,8 +73,6 @@ class _FavouritesPage extends State<FavouritesPage> {
     music.mime = audioMetaData.mimeTYPE;
     return music;
   }
-
-  List<MusicModel> data = [];
 
   _musicData() async {
     //List<MusicModel> listData = [];
@@ -93,7 +101,6 @@ class _FavouritesPage extends State<FavouritesPage> {
         this.data.add(music);
       }
     });
-
     Log("this.data :... ${this.data.length}");
   }
 
@@ -103,13 +110,20 @@ class _FavouritesPage extends State<FavouritesPage> {
 
   initState() {
     super.initState();
-    _musicData();
+    " widget.isClickScan :... ${widget.isClickScan} ".Log();
+    if (widget.isClickScan) {
+      _musicData();
+    } else {}
   }
 
   build(BuildContext context) {
     // _musicData().then((_value) {
     //   //data = _value;
     // });
+
+    widget.onCLickTest = () {
+      "widget.testOnCLick :... ".Log();
+    };
 
     return Scaffold(
       backgroundColor: LocalColor.Transparent,
@@ -150,7 +164,6 @@ class _FavouritesPage extends State<FavouritesPage> {
                                         width: 50,
                                         fit: BoxFit.cover,
                                       );
-                                ;
                               },
                             ),
                           ),

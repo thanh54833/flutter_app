@@ -135,6 +135,7 @@ class MusicDatabaseHelper {
                 $columnTrackDuration TEXT                   
             )''');
   }
+
   //
   // insertOrUpdateAll(List<Map<String, dynamic>> ticks) async {
   //   Database db = await database;
@@ -157,7 +158,6 @@ class MusicDatabaseHelper {
   //   return await db.rawInsert("INSERT Into Clients ($columns)"
   //       " VALUES ${valuesBuffer.toString()}");
   // }
-
 
   // Database helper methods:
   Future<int> insert(MusicModel music) async {
