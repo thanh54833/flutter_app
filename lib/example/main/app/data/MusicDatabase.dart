@@ -1,5 +1,6 @@
 // database table and column names
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -17,6 +18,7 @@ final String columnPicType = 'picType';
 final String columnDescription = 'description';
 final String columnBase64 = 'base64';
 final String columnLogo = 'logo';
+final String columnLogoMemory = 'logoMemory';
 final String columnTrackName = 'trackName';
 final String columnAuthorName = 'authorName';
 final String columnTrackDuration = 'trackDuration';
@@ -34,6 +36,7 @@ class MusicModel {
   String description = "";
   String base64 = "";
   String logo = "";
+  String logoMemory = "";
   String trackName = "";
   String authorName = "";
   String trackDuration = "";
@@ -53,6 +56,7 @@ class MusicModel {
     description = map[columnDescription];
     base64 = map[columnBase64];
     logo = map[columnLogo];
+    logoMemory = map[columnLogoMemory];
     trackName = map[columnTrackName];
     authorName = map[columnAuthorName];
     trackDuration = map[columnTrackDuration];
@@ -60,25 +64,29 @@ class MusicModel {
 
   // convenience method to create a Map from this Word object
   Map<String, dynamic> toMap() {
-    var map = <String, dynamic>{
-      columnUrl: url,
-      columnName: name,
-      columnTitle: title,
-      columnArtist: artist,
-      columnAlbum: album,
-      columnTextEncoding: textEncoding,
-      columnPicType: picType,
-      columnDescription: description,
-      columnBase64: base64,
-      columnLogo: logo,
-      columnTrackName: trackName,
-      columnAuthorName: authorName,
-      columnTrackDuration: trackDuration,
+    var map = <
+    String
+    , dynamic>{
+    columnUrl: url,
+    columnName: name,
+    columnTitle: title,
+    columnArtist: artist,
+    columnAlbum: album,
+    columnTextEncoding: textEncoding,
+    columnPicType: picType,
+    columnDescription: description,
+    columnBase64: base64,
+    columnLogo: logo,
+    columnLogoMemory : logoMemory,
+    columnTrackName: trackName,
+    columnAuthorName: authorName,
+    columnTrackDuration: trackDuration,
     };
     if (id != null) {
-      map[columnId] = id;
+    map[columnId] = id;
     }
-    return map;
+    return
+    map;
   }
 }
 
@@ -94,7 +102,7 @@ class MusicDatabaseHelper {
   MusicDatabaseHelper._privateConstructor();
 
   static final MusicDatabaseHelper instance =
-      MusicDatabaseHelper._privateConstructor();
+  MusicDatabaseHelper._privateConstructor();
 
   // Only allow a single open connection to the database.
   static Database _database;
@@ -130,6 +138,7 @@ class MusicDatabaseHelper {
                 $columnDescription TEXT,
                 $columnBase64 TEXT,
                 $columnLogo TEXT,
+                $columnLogoMemory TEXT,
                 $columnTrackName TEXT,
                 $columnAuthorName TEXT,
                 $columnTrackDuration TEXT                   
@@ -158,8 +167,8 @@ class MusicDatabaseHelper {
   //   return await db.rawInsert("INSERT Into Clients ($columns)"
   //       " VALUES ${valuesBuffer.toString()}");
   // }
-
   // Database helper methods:
+
   Future<int> insert(MusicModel music) async {
     Database db = await database;
     int id = await db.insert(tableMusic, music.toMap());
@@ -181,6 +190,7 @@ class MusicDatabaseHelper {
           columnBase64,
           columnAlbum,
           columnLogo,
+          columnLogoMemory,
           columnTrackName,
           columnAuthorName,
           columnTrackDuration,

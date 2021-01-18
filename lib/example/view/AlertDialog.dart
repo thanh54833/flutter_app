@@ -1,10 +1,7 @@
-import 'package:f_logs/model/flog/log.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/example/main/common/DialogCommon.dart';
 import 'package:flutter_app/example/main/common/Gesture.dart';
-import 'package:flutter_app/example/main/common/LogCatUtils.dart';
-import 'package:flutter_app/example/main/common/DialogCommon.dart';
 
 main() => runApp(AlertDialogApp());
 

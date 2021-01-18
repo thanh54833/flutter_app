@@ -1,13 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:audiotagger/audiotagger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/example/main/app/LocalColor.dart';
 import 'package:flutter_app/example/main/app/Themes.dart';
+import 'package:flutter_app/example/main/app/data/DatabaseUtils.dart';
 import 'package:flutter_app/example/main/app/data/MusicDatabase.dart';
 import 'package:flutter_app/example/main/app/model/SongModel.dart';
+import 'package:flutter_app/example/main/common/DialogCommon.dart';
 import 'package:flutter_app/example/main/common/FilesUtils.dart';
 import 'package:flutter_app/example/main/common/StatefulWrapper.dart';
 import 'package:flutter_app/example/music/MusicModel.dart';
@@ -16,50 +19,22 @@ import 'package:flutter_app/example/main/common/Gesture.dart';
 import 'package:media_metadata_plugin/media_metadata_plugin.dart';
 import 'package:flutter_app/example/main/common/LogCatUtils.dart';
 import 'package:media_store/media_store.dart';
-
-import '../Log.dart';
-
-// var songs = [
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel(),
-//   SongModel()
-// ];
+import 'package:intl/intl.dart';
 
 class FavouritesPage extends StatefulWidget {
   Function(MusicModel) onCLick;
-  bool isClickScan = false;
+  Function onClickScan;
 
-  Function() onCLickTest;
-  Function(onCLickTest _onCLickTest) setOnClickTest;
-
-
-  FavouritesPage(
-      {@required this.onCLick,
-      @required this.isClickScan,
-      @required this.setOnClickTest});
+  FavouritesPage({
+    @required this.onCLick,
+  });
 
   createState() => _FavouritesPage();
 }
 
 class _FavouritesPage extends State<FavouritesPage> {
   List<MusicModel> data = [];
+  var isInitState = false;
 
   _getMusicModel(path) async {
     var audioMetaData = await MediaMetadataPlugin.getMediaMetaData(path);
@@ -74,34 +49,54 @@ class _FavouritesPage extends State<FavouritesPage> {
     return music;
   }
 
+  _audioMetaData(path, index) async {
+    var audioMetaData = await MediaMetadataPlugin.getMediaMetaData(path);
+    var pathByte = await _getPathBytes(path);
+    var music = MusicModel("", "", "");
+    music.id = index;
+    music.url = path;
+    music.album = audioMetaData.album;
+    music.artist = audioMetaData.artistName;
+    music.authorName = audioMetaData.authorName;
+    music.trackName = audioMetaData.trackName;
+    _printDuration(Duration duration) {
+      String twoDigits(int n) => n.toString().padLeft(2, "0");
+      String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+      String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+      return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+    }
+
+    "pathByte.toString() :... ${pathByte.toString()} ".Log();
+
+    if (pathByte != null) {
+      music.logoMemory = new String.fromCharCodes(pathByte);
+    }
+
+    music.trackDuration =
+        _printDuration(Duration(milliseconds: audioMetaData.trackDuration));
+    music.mime = audioMetaData.mimeTYPE;
+    if ((music.artist != null) && (music.artist != "")) {
+      this.data.add(music);
+    }
+  }
+
   _musicData() async {
-    //List<MusicModel> listData = [];
     List<File> data = await FileUtils.internal().getStorageInfo(["mp3"]);
+    List<Future<void>> listFuture = [];
     data.asMap().forEach((index, element) async {
       var path = element.absolute.path;
-      var audioMetaData = await MediaMetadataPlugin.getMediaMetaData(path);
-      var music = MusicModel("", "", "");
-      music.url = path;
-      music.album = audioMetaData.album;
-      music.artist = audioMetaData.artistName;
-      music.authorName = audioMetaData.authorName;
-      music.trackName = audioMetaData.trackName;
-      _printDuration(Duration duration) {
-        String twoDigits(int n) => n.toString().padLeft(2, "0");
-        String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-        String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-        return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
-      }
-
-      music.trackDuration =
-          _printDuration(Duration(milliseconds: audioMetaData.trackDuration));
-      music.mime = audioMetaData.mimeTYPE;
-
-      if ((music.artist != null) && (music.artist != "")) {
-        this.data.add(music);
-      }
+      listFuture.add(_audioMetaData(path, index));
     });
-    Log("this.data :... ${this.data.length}");
+    await Future.wait(listFuture);
+    DateTime end = DateTime.now();
+    return data;
+  }
+
+  _handleDataLocal(List<MusicModel> data) async {
+    var database = DatabaseUtils.instance;
+    List<Future<void>> list = [database.delete(), database.setData(data)];
+    await Future.wait(list);
+    return true;
   }
 
   _getPathBytes(String path) async {
@@ -110,19 +105,36 @@ class _FavouritesPage extends State<FavouritesPage> {
 
   initState() {
     super.initState();
-    " widget.isClickScan :... ${widget.isClickScan} ".Log();
-    if (widget.isClickScan) {
-      _musicData();
-    } else {}
+    "_FavouritesPage :.. initState :.. ".Log();
+    //Todo : when start screen home check data local ..
+    if (isInitState == false) {
+      var database = DatabaseUtils.instance;
+      database.getAll().then((data) {
+        //"data :.. ${data.length} ".Log();
+        if (data.length > 0) {
+          this.data.clear();
+          setState(() {
+            this.data = data;
+          });
+        }
+      });
+      isInitState = true;
+    }
   }
 
   build(BuildContext context) {
-    // _musicData().then((_value) {
-    //   //data = _value;
-    // });
+    "_FavouritesPage :.. build :.. ".Log();
 
-    widget.onCLickTest = () {
-      "widget.testOnCLick :... ".Log();
+    widget.onClickScan = () {
+      this.data.clear();
+      //Todo :khi thanh click scan file ...
+      _musicData().then((value) {
+        //"value :... ${value.length}".Log();
+        _handleDataLocal(data).then((value) {
+          "_handleDataLocal :... ${value} ".Log();
+        });
+        setState(() {});
+      });
     };
 
     return Scaffold(
@@ -133,9 +145,12 @@ class _FavouritesPage extends State<FavouritesPage> {
           itemCount: (data.length == null) ? 0 : data.length,
           itemBuilder: (context, index) {
             var item = data[index];
-            //var isLastItem = (index == songs.length);
-            //Log("data :... ${data.length}");
 
+            Uint8List _getUnit8List(String logo) {
+              return new Uint8List.fromList(logo.codeUnits);
+            }
+
+            var _imagesLogo = _getUnit8List(item.logoMemory);
             return Container(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(30.0),
@@ -147,24 +162,11 @@ class _FavouritesPage extends State<FavouritesPage> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(50.0),
                           child: Container(
-                            child: FutureBuilder(
-                              future: _getPathBytes(item.url),
-                              builder: (context, snapshot) {
-                                var by = snapshot.data;
-                                return (by != null)
-                                    ? Image.memory(
-                                        by,
-                                        height: 50,
-                                        width: 50,
-                                        fit: BoxFit.cover,
-                                      )
-                                    : Image.asset(
-                                        "assets/image/bg_2.jpg",
-                                        height: 50,
-                                        width: 50,
-                                        fit: BoxFit.cover,
-                                      );
-                              },
+                            child: Image.memory(
+                              _imagesLogo,
+                              height: 50,
+                              width: 50,
+                              fit: BoxFit.cover,
                             ),
                           ),
                         ),

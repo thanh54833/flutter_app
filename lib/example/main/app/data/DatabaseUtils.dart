@@ -35,6 +35,6 @@ class DatabaseUtils {
       futures.add(insert(music));
     });
     await Future.wait(futures);
-    return true;
+    //return true;
   }
 }

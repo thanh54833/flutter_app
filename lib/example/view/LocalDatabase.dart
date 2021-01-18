@@ -145,6 +145,7 @@ class _StateLocalDatabase extends State<StateLocalDatabase> {
       music.description = "description";
       music.base64 = "base64";
       music.logo = "logo";
+      music.logoMemory = "logoMemory";
       music.trackName = "trackName";
       music.authorName = "authorName";
       music.trackDuration = "trackDuration";

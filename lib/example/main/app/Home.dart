@@ -11,6 +11,7 @@ import 'package:flutter_app/example/main/app/page/AlbumsPage.dart';
 import 'package:flutter_app/example/main/app/page/FavouritesPage.dart';
 import 'package:flutter_app/example/main/app/page/PlaylistPage.dart';
 import 'package:flutter_app/example/main/app/page/TracksPage.dart';
+import 'package:flutter_app/example/main/app/permission/HandlePermission.dart';
 import 'package:flutter_app/example/main/common/DialogCommon.dart';
 import 'package:flutter_app/example/main/common/DialogUtils.dart';
 import 'package:flutter_app/example/main/common/FilesUtils.dart';
@@ -24,6 +25,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:media_metadata_plugin/media_metadata_plugin.dart';
 import 'package:path_provider_ex/path_provider_ex.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:permission/permission.dart';
 
 import 'LocalColor.dart';
 import 'Player.dart';
@@ -33,6 +35,10 @@ main() => runApp(Home());
 
 class Home extends StatelessWidget {
   build(BuildContext context) {
+    //Todo : Thanh check permission here...
+    var handlePermission = HandlePermission.instance;
+    handlePermission.requestPermissions([PermissionName.Storage]);
+
     return MaterialApp(
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -71,25 +77,47 @@ class _StateHome extends State<StateHome> {
     setIsCollapsed(isCollapsed);
   }
 
-  _onClickScan() {
-    var dialog = DialogCommon.internal();
-    dialog.showDialogV2(context, () {
-      setState(() {
-        //isScan = true;
-      });
-    });
+  _showDialog() async {
+    await Future.delayed(Duration(milliseconds: 50));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return new Container(child: new Text('foo'));
+        });
+  }
+
+  DialogCommon dialogLoading;
+
+  _showDialogLoading() async {
+    dialogLoading = DialogCommon.internal();
+    await Future.delayed(Duration(microseconds: 50), () {});
+    dialogLoading.showLoading(context);
+  }
+
+  initState() {
+    super.initState();
+    _showDialogLoading();
   }
 
   build(BuildContext context) {
-    //DatabaseUtils.instance.setData()
-
     _printLatestValue() {
       print("Second text field: ${myController.text}");
     }
 
+    Future.delayed(Duration(seconds: 5), () {
+      "dialogLoading.dismiss(); :... ".Log();
+      if (Navigator.canPop(context)) {
+        "dialogLoading.dismiss()111 :... ".Log();
+        dialogLoading.dismiss();
+      }
+    });
+
+    var homeWidget = HomeWidget(
+      onCLickItemFavourite: _onCLickItemFavourite,
+    );
+
     myController.addListener(_printLatestValue);
     return Scaffold(
-      //extendBodyBehindAppBar: true,
       backgroundColor: LocalColor.Background,
       appBar: AppBar(
         title: Container(
@@ -97,23 +125,26 @@ class _StateHome extends State<StateHome> {
             children: [
               Expanded(
                   child: Text(
-                    "Music Player",
-                    style: TextStyle(
-                        color: LocalColor.Black,
-                        fontFamily: 'GafataRegular',
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
-                  ).setOnClick(() {
-                    isCollapsed = !isCollapsed;
-                    setIsCollapsed(isCollapsed);
-                  })),
+                "Music Player",
+                style: TextStyle(
+                    color: LocalColor.Black,
+                    fontFamily: 'GafataRegular',
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
+              ).setOnClick(() {
+                isCollapsed = !isCollapsed;
+                setIsCollapsed(isCollapsed);
+              })),
               IconButton(
                 icon: Icon(
                   Icons.add_box_outlined,
                   color: LocalColor.Primary,
                 ),
                 onPressed: () {
-                  _onClickScan();
+                  var dialog = DialogCommon.internal();
+                  dialog.showDialogV2(context, () {
+                    homeWidget.onClickScan();
+                  });
                 },
                 alignment: Alignment.centerRight,
                 padding: EdgeInsets.all(0),
@@ -157,60 +188,54 @@ class _StateHome extends State<StateHome> {
               children: [
                 Expanded(
                     child: Container(
-                      child: Column(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  new BoxShadow(
-                                    color: LocalColor.Primary_50,
-                                    spreadRadius: 1,
-                                    blurRadius: 5,
-                                    // You can set this blurRadius as per your requirement
-                                  ),
-                                ]),
-                            child: TextField(
-                              controller: myController,
-                              decoration: InputDecoration(
-                                hintStyle:
-                                TextStyle(color: Colors.black26, fontSize: 16),
-                                hintText: 'Search name',
-                                prefixIcon: Icon(
-                                  Icons.search_sharp,
-                                  size: 25,
-                                  color: LocalColor.Primary,
-                                ),
-                                border: InputBorder.none,
-                                contentPadding:
-                                EdgeInsets.only(top: 15, bottom: 15),
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              new BoxShadow(
+                                color: LocalColor.Primary_50,
+                                spreadRadius: 1,
+                                blurRadius: 5,
+                                // You can set this blurRadius as per your requirement
                               ),
-                              style:
-                              TextStyle(color: LocalColor.Black, fontSize: 16),
+                            ]),
+                        child: TextField(
+                          controller: myController,
+                          decoration: InputDecoration(
+                            hintStyle:
+                                TextStyle(color: Colors.black26, fontSize: 16),
+                            hintText: 'Search name',
+                            prefixIcon: Icon(
+                              Icons.search_sharp,
+                              size: 25,
+                              color: LocalColor.Primary,
                             ),
-                            margin: EdgeInsets.only(
-                                left: 20, right: 20, top: 0, bottom: 3),
+                            border: InputBorder.none,
+                            contentPadding:
+                                EdgeInsets.only(top: 15, bottom: 15),
                           ),
-                          Expanded(
-                              child: Container(
-                                color: Colors.transparent,
-                                child: Stack(
-                                  children: [
-                                    HomeWidget(
-                                      onCLickItemFavourite: _onCLickItemFavourite,
-                                      onClickScan: _onClickScan,
-                                      testOnCLick: _testOnCLick,
-                                    ),
-                                  ],
-                                  alignment: Alignment.bottomCenter,
-                                ),
-                              )),
-                          //Todo :bottom bar ...
-                        ],
+                          style:
+                              TextStyle(color: LocalColor.Black, fontSize: 16),
+                        ),
+                        margin: EdgeInsets.only(
+                            left: 20, right: 20, top: 0, bottom: 3),
                       ),
-                      color: Colors.transparent,
-                    )),
+                      Expanded(
+                          child: Container(
+                        color: Colors.transparent,
+                        child: Stack(
+                          children: [homeWidget],
+                          alignment: Alignment.bottomCenter,
+                        ),
+                      )),
+                      //Todo :bottom bar ...
+                    ],
+                  ),
+                  color: Colors.transparent,
+                )),
               ],
             ),
             margin: EdgeInsets.only(top: 20),
@@ -281,40 +306,40 @@ class _BottomBar extends State<BottomBar> {
                   children: [
                     Expanded(
                         child: IconButton(
-                          icon: Icon(
-                            Icons.skip_previous,
-                            color: LocalColor.Gray,
-                            size: 25,
-                          ),
-                        )),
+                      icon: Icon(
+                        Icons.skip_previous,
+                        color: LocalColor.Gray,
+                        size: 25,
+                      ),
+                    )),
                     Expanded(
                         child: IconButton(
-                          icon: Icon(
-                            Icons.pause,
-                            color: LocalColor.Primary,
-                            size: 25,
-                          ),
-                          onPressed: () {
-                            context.push((context) => NoonLoopingDemo());
-                          },
-                        )),
+                      icon: Icon(
+                        Icons.pause,
+                        color: LocalColor.Primary,
+                        size: 25,
+                      ),
+                      onPressed: () {
+                        context.push((context) => NoonLoopingDemo());
+                      },
+                    )),
                     Expanded(
                         child: IconButton(
-                          icon: Icon(
-                            Icons.skip_next,
-                            color: LocalColor.Gray,
-                            size: 25,
-                          ),
-                          onPressed: () {},
-                        )),
+                      icon: Icon(
+                        Icons.skip_next,
+                        color: LocalColor.Gray,
+                        size: 25,
+                      ),
+                      onPressed: () {},
+                    )),
                     Expanded(
                         child: IconButton(
-                          icon: Icon(
-                            Icons.volume_up,
-                            color: LocalColor.Gray,
-                          ),
-                          onPressed: () {},
-                        ))
+                      icon: Icon(
+                        Icons.volume_up,
+                        color: LocalColor.Gray,
+                      ),
+                      onPressed: () {},
+                    ))
                   ],
                 ),
               )
@@ -340,35 +365,25 @@ final List<Tab> tabs = <Tab>[
 class HomeWidget extends StatefulWidget {
   Function(MusicModel) onCLickItemFavourite;
   Function onClickScan;
-  Function onCLickTest;
 
-  Function setOnCLickTest(Function() onCLickTest) {
-    this.onCLickTest = onCLickTest;
-  }
-
-  bool isScan = false;
-
-  HomeWidget({@required this.onCLickItemFavourite,
-    @required this.onClickScan,});
+  HomeWidget({
+    @required this.onCLickItemFavourite,
+  });
 
   createState() => _StateHomeWidget();
 }
 
 class _StateHomeWidget extends State<HomeWidget> {
-
   build(BuildContext context) {
-
-    Future.delayed(Duration(seconds: 2), () {
-      " Future.delayed :... ".Log();
-      widget.onCLickTest();
-
-    });
-
+    var favouritesPage = FavouritesPage(
+      onCLick: widget.onCLickItemFavourite,
+    );
 
     widget.onClickScan = () {
       setState(() {
         "widget.onClickScan :... ".Log();
-        widget.isScan = true;
+        //widget.isScan = true;
+        favouritesPage.onClickScan();
       });
     };
 
@@ -378,16 +393,7 @@ class _StateHomeWidget extends State<HomeWidget> {
       //height: double.infinity,
       child: ContainedTabBarView(
         tabs: tabs,
-        views: [
-          FavouritesPage(
-            onCLick: widget.onCLickItemFavourite,
-            isClickScan: widget.isScan,
-            setOnClickTest: widget.setOnCLickTest,
-          ),
-          PlaylistPage(),
-          TracksPage(),
-          AlbumsPage()
-        ],
+        views: [favouritesPage, PlaylistPage(), TracksPage(), AlbumsPage()],
         onChange: (index) => {print(index)},
         tabBarProperties: TabBarProperties(
             indicatorSize: TabBarIndicatorSize.tab,

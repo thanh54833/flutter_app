@@ -13,7 +13,6 @@ class DialogCommon {
   }
 
   DialogCommon.internal();
-
   BuildContext _buildContext;
 
   dismiss() {
@@ -22,7 +21,6 @@ class DialogCommon {
 
   showMaterialDialog(context) async {
     _buildContext = context;
-
     await showDialog(
         context: context,
         builder: (context) => new AlertDialog(
