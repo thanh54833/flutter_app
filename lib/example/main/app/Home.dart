@@ -1,29 +1,21 @@
-import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_app/example/main/app/Themes.dart';
-import 'package:flutter_app/example/main/app/data/DatabaseUtils.dart';
-import 'package:flutter_app/example/main/app/model/SongModel.dart';
 import 'package:flutter_app/example/main/app/page/AlbumsPage.dart';
 import 'package:flutter_app/example/main/app/page/FavouritesPage.dart';
 import 'package:flutter_app/example/main/app/page/PlaylistPage.dart';
 import 'package:flutter_app/example/main/app/page/TracksPage.dart';
 import 'package:flutter_app/example/main/app/permission/HandlePermission.dart';
 import 'package:flutter_app/example/main/common/DialogCommon.dart';
-import 'package:flutter_app/example/main/common/DialogUtils.dart';
-import 'package:flutter_app/example/main/common/FilesUtils.dart';
 import 'package:flutter_app/example/main/common/Gesture.dart';
 import 'package:flutter_app/example/main/common/LogCatUtils.dart';
 import 'package:flutter_app/example/main/common/NavigatorUtils.dart';
-import 'package:flutter_app/example/music/MusicModel.dart';
 import 'package:flutter_app/example/view/AnimationDelayList.dart';
-import 'package:id3/id3.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:media_metadata_plugin/media_metadata_plugin.dart';
-import 'package:path_provider_ex/path_provider_ex.dart';
+import 'package:flutter_app/example/view/ScrollingText.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:permission/permission.dart';
 
@@ -63,18 +55,24 @@ class _StateHome extends State<StateHome> {
   final heightBar = 78;
   var isCollapsed = false;
   var isStartAnimation = false;
+  MusicModel itemSelect;
   var isScan = false;
 
-  setIsCollapsed(bool isCollapsed) {
-    setState(() {
-      this.isCollapsed = isCollapsed;
-    });
-  }
+  _onCLickItemFavourite(MusicModel _musicModel) {
+    "_musicModel :... ${_musicModel.logoMemory} ".Log();
 
-  _onCLickItemFavourite(MusicModel) {
-    //"songModel:..".Log();
-    isCollapsed = !isCollapsed;
-    setIsCollapsed(isCollapsed);
+    if ((!isCollapsed) &&
+        (_musicModel.logoMemory != "") &&
+        (_musicModel.logoMemory != null)) {
+      setState(() {
+        isCollapsed = !isCollapsed;
+        itemSelect = _musicModel;
+      });
+    } else {
+      setState(() {
+        itemSelect = _musicModel;
+      });
+    }
   }
 
   _showDialog() async {
@@ -132,8 +130,8 @@ class _StateHome extends State<StateHome> {
                     fontSize: 20,
                     fontWeight: FontWeight.bold),
               ).setOnClick(() {
-                isCollapsed = !isCollapsed;
-                setIsCollapsed(isCollapsed);
+                //isCollapsed = !isCollapsed;
+                //setIsCollapsed(isCollapsed);
               })),
               IconButton(
                 icon: Icon(
@@ -164,7 +162,9 @@ class _StateHome extends State<StateHome> {
           color: Colors.transparent,
           backdropColor: Colors.transparent,
           collapsed: Container(
-            child: BottomBar(),
+            child: BottomBar(
+              itemSelect: itemSelect,
+            ),
             alignment: Alignment.topCenter,
           ),
           height: isCollapsed ? 78 : 0,
@@ -245,6 +245,10 @@ class _StateHome extends State<StateHome> {
 }
 
 class BottomBar extends StatefulWidget {
+  MusicModel itemSelect;
+
+  BottomBar({this.itemSelect});
+
   createState() => _BottomBar();
 }
 
@@ -270,49 +274,83 @@ class _BottomBar extends State<BottomBar> {
               Center(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8.0),
-                  child: Image.asset(
-                    "assets/image/bg_2.jpg",
-                    height: 60,
-                    width: 60,
-                    fit: BoxFit.cover,
+                  child: Container(
+                    child: ((widget.itemSelect.logoMemory != null) &&
+                            (widget.itemSelect.logoMemory != ""))
+                        ? Image.memory(
+                            new Uint8List.fromList(
+                                widget.itemSelect.logoMemory.codeUnits),
+                            height: 60,
+                            width: 60,
+                            fit: BoxFit.cover,
+                          )
+                        : Container(),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.4),
+                          spreadRadius: 1,
+                          blurRadius: 2,
+                          offset: Offset(2, -2),
+                        ),
+                      ],
+                    ),
+                    //margin: EdgeInsets.all(1),
                   ),
                 ),
               ),
-              Container(
-                child: Wrap(
-                  direction: Axis.vertical,
-                  children: [
-                    Container(
-                      child: Text(
-                        "Way down we go",
-                        style: Themes.TextStyle_Small_Bold,
-                      ),
-                    ),
-                    Container(
-                      child: Text("Kaleo", style: Themes.TextStyle_Small),
-                    ),
-                    // Container(
-                    //   child: Text(""),
-                    // )
-                  ],
-                ),
-                //alignment: Alignment.topLeft,
-                margin: EdgeInsets.only(left: 5, right: 5),
-                padding: EdgeInsets.only(bottom: 8),
-                color: Colors.transparent,
-              ),
               Expanded(
+                child: Container(
+                  child: Wrap(
+                    direction: Axis.vertical,
+                    children: [
+                      Container(
+                        child: MarqueeWidget(
+                          direction: Axis.horizontal,
+                          child: Text(
+                            " " + widget.itemSelect.artist + " ",
+                            style: Themes.TextStyle_Small_Bold,
+                          ),
+                        ),
+                        height: 20,
+                        width: 120,
+                        color: Colors.transparent,
+                      ),
+                      Container(
+                        child: MarqueeWidget(
+                          direction: Axis.horizontal,
+                          child: Text(
+                            " " + widget.itemSelect.artist + " ",
+                            style: Themes.TextStyle_Small_Bold,
+                          ),
+                        ),
+                        height: 20,
+                        width: 120,
+                        color: Colors.transparent,
+                      ),
+                    ],
+                  ),
+                  //alignment: Alignment.topLeft,
+                  margin: EdgeInsets.only(left: 5, right: 5),
+                  padding: EdgeInsets.only(bottom: 8),
+                  color: Colors.transparent,
+                ),
+              ),
+              Container(
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Expanded(
+                    Container(
                         child: IconButton(
                       icon: Icon(
                         Icons.skip_previous,
                         color: LocalColor.Gray,
                         size: 25,
                       ),
+                      onPressed: () {},
                     )),
-                    Expanded(
+                    Container(
                         child: IconButton(
                       icon: Icon(
                         Icons.pause,
@@ -323,7 +361,7 @@ class _BottomBar extends State<BottomBar> {
                         context.push((context) => NoonLoopingDemo());
                       },
                     )),
-                    Expanded(
+                    Container(
                         child: IconButton(
                       icon: Icon(
                         Icons.skip_next,
@@ -332,7 +370,7 @@ class _BottomBar extends State<BottomBar> {
                       ),
                       onPressed: () {},
                     )),
-                    Expanded(
+                    Container(
                         child: IconButton(
                       icon: Icon(
                         Icons.volume_up,
@@ -380,11 +418,12 @@ class _StateHomeWidget extends State<HomeWidget> {
     );
 
     widget.onClickScan = () {
-      setState(() {
-        "widget.onClickScan :... ".Log();
-        //widget.isScan = true;
-        favouritesPage.onClickScan();
-      });
+      // setState(() {
+      //   "widget.onClickScan :... ".Log();
+      //   //widget.isScan = true;
+      //   favouritesPage.onClickScan();
+      // });
+      favouritesPage.onClickScan();
     };
 
     return Container(

@@ -16,16 +16,40 @@ class PlaylistPage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  child: Text(
-                    'Your Playlist',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'GafataRegular',
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          child: Text(
+                            'Your Playlist',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'GafataRegular',
+                            ),
+                          ),
+                          alignment: Alignment.centerLeft,
+                          padding:
+                              EdgeInsets.only(left: 15, top: 10, bottom: 10),
+                          color: Colors.transparent,
+                        ),
+                      ),
+                      Container(
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.add_circle_outline,
+                            color: LocalColor.Primary,
+                            size: 30,
+                          ),
+                          padding: EdgeInsets.zero,
+                        ),
+                        margin: EdgeInsets.only(right: 5),
+                        color: Colors.transparent,
+                      )
+                    ],
                   ),
-                  alignment: Alignment.centerLeft,
-                  padding: EdgeInsets.only(left: 15, top: 10, bottom: 10),
+                  color: Colors.transparent,
                 ),
                 SizedBox(
                   height: 200,

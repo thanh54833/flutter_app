@@ -16,6 +16,7 @@ import 'package:flutter_app/example/main/common/StatefulWrapper.dart';
 import 'package:flutter_app/example/music/MusicModel.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_app/example/main/common/Gesture.dart';
+import 'package:media_metadata_plugin/media_media_data.dart';
 import 'package:media_metadata_plugin/media_metadata_plugin.dart';
 import 'package:flutter_app/example/main/common/LogCatUtils.dart';
 import 'package:media_store/media_store.dart';
@@ -36,29 +37,24 @@ class _FavouritesPage extends State<FavouritesPage> {
   List<MusicModel> data = [];
   var isInitState = false;
 
-  _getMusicModel(path) async {
-    var audioMetaData = await MediaMetadataPlugin.getMediaMetaData(path);
-    var music = MusicModel("", "", "");
-    music.url = path;
-    music.album = audioMetaData.album;
-    music.artist = audioMetaData.artistName;
-    music.authorName = audioMetaData.authorName;
-    music.trackName = audioMetaData.trackName;
-    music.trackDuration = "${audioMetaData.trackDuration}";
-    music.mime = audioMetaData.mimeTYPE;
-    return music;
-  }
+  // _getMusicModel(path) async {
+  //   var audioMetaData = await MediaMetadataPlugin.getMediaMetaData(path);
+  //   var music = MusicModel("", "", "");
+  //   music.url = path;
+  //   music.album = audioMetaData.album;
+  //   music.artist = audioMetaData.artistName;
+  //   music.authorName = audioMetaData.authorName;
+  //   music.trackName = audioMetaData.trackName;
+  //   music.trackDuration = "${audioMetaData.trackDuration}";
+  //   music.mime = audioMetaData.mimeTYPE;
+  //   return music;
+  // }
 
   _audioMetaData(path, index) async {
-    var audioMetaData = await MediaMetadataPlugin.getMediaMetaData(path);
-    var pathByte = await _getPathBytes(path);
     var music = MusicModel("", "", "");
-    music.id = index;
-    music.url = path;
-    music.album = audioMetaData.album;
-    music.artist = audioMetaData.artistName;
-    music.authorName = audioMetaData.authorName;
-    music.trackName = audioMetaData.trackName;
+    //AudioMetaData
+    //Future<AudioMetaData>  audioMetaData = await MediaMetadataPlugin.getMediaMetaData(path);
+    Future<Uint8List> pathByte = await _getPathBytes(path);
     _printDuration(Duration duration) {
       String twoDigits(int n) => n.toString().padLeft(2, "0");
       String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
@@ -66,18 +62,39 @@ class _FavouritesPage extends State<FavouritesPage> {
       return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
     }
 
-    "pathByte.toString() :... ${pathByte.toString()} ".Log();
+    Future.wait([
+      // ignore: missing_return
+      await MediaMetadataPlugin.getMediaMetaData(path).then((audioMetaData) {
+        music.album = audioMetaData.album;
+        music.artist = audioMetaData.artistName;
+        music.authorName = audioMetaData.authorName;
+        music.trackName = audioMetaData.trackName;
+        // int trackDuration = 0;
 
-    if (pathByte != null) {
-      music.logoMemory = new String.fromCharCodes(pathByte);
-    }
+        "audioMetaData :.. ${audioMetaData.artistName} "
+                "_ ${audioMetaData.authorName} "
+                "_ ${audioMetaData.trackName} "
+                "_ ${audioMetaData.album} "
+                "_ ${audioMetaData.mimeTYPE} "
+            .Log();
 
-    music.trackDuration =
-        _printDuration(Duration(milliseconds: audioMetaData.trackDuration));
-    music.mime = audioMetaData.mimeTYPE;
-    if ((music.artist != null) && (music.artist != "")) {
-      this.data.add(music);
-    }
+        music.trackDuration =
+            _printDuration(Duration(milliseconds: audioMetaData.trackDuration));
+        music.mime = audioMetaData.mimeTYPE;
+        if ((music.artist != null) && (music.artist != "")) {
+          this.data.add(music);
+        }
+      }),
+      pathByte.then((value) {
+        //"pathByte.toString() :... ${pathByte.toString()} ".Log();
+        if (value != null) {
+          music.logoMemory = new String.fromCharCodes(value);
+        }
+      })
+    ]);
+
+    music.id = index;
+    music.url = path;
   }
 
   _musicData() async {
@@ -88,7 +105,6 @@ class _FavouritesPage extends State<FavouritesPage> {
       listFuture.add(_audioMetaData(path, index));
     });
     await Future.wait(listFuture);
-    DateTime end = DateTime.now();
     return data;
   }
 
@@ -105,7 +121,7 @@ class _FavouritesPage extends State<FavouritesPage> {
 
   initState() {
     super.initState();
-    "_FavouritesPage :.. initState :.. ".Log();
+    //"_FavouritesPage :.. initState :.. ".Log();
     //Todo : when start screen home check data local ..
     if (isInitState == false) {
       var database = DatabaseUtils.instance;
@@ -123,7 +139,7 @@ class _FavouritesPage extends State<FavouritesPage> {
   }
 
   build(BuildContext context) {
-    "_FavouritesPage :.. build :.. ".Log();
+    //"_FavouritesPage :.. build :.. ".Log();
 
     widget.onClickScan = () {
       this.data.clear();
@@ -145,6 +161,10 @@ class _FavouritesPage extends State<FavouritesPage> {
           itemCount: (data.length == null) ? 0 : data.length,
           itemBuilder: (context, index) {
             var item = data[index];
+            // String url = "";
+
+            //album
+            //("item :... ${item.name} __ ${item.trackDuration} ").Log();
 
             Uint8List _getUnit8List(String logo) {
               return new Uint8List.fromList(logo.codeUnits);
@@ -167,6 +187,17 @@ class _FavouritesPage extends State<FavouritesPage> {
                               height: 50,
                               width: 50,
                               fit: BoxFit.cover,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.4),
+                                  spreadRadius: 1,
+                                  blurRadius: 2,
+                                  offset: Offset(2, -2),
+                                ),
+                              ],
                             ),
                           ),
                         ),
