@@ -22,6 +22,7 @@ final String columnLogoMemory = 'logoMemory';
 final String columnTrackName = 'trackName';
 final String columnAuthorName = 'authorName';
 final String columnTrackDuration = 'trackDuration';
+final String columnDuration = 'duration';
 
 class MusicModel {
   int id = 0;
@@ -40,6 +41,7 @@ class MusicModel {
   String trackName = "";
   String authorName = "";
   String trackDuration = "";
+  int duration = 0;
 
   MusicModel(this.url, this.name, this.description);
 
@@ -60,33 +62,32 @@ class MusicModel {
     trackName = map[columnTrackName];
     authorName = map[columnAuthorName];
     trackDuration = map[columnTrackDuration];
+    duration = map[columnDuration];
   }
 
   // convenience method to create a Map from this Word object
   Map<String, dynamic> toMap() {
-    var map = <
-    String
-    , dynamic>{
-    columnUrl: url,
-    columnName: name,
-    columnTitle: title,
-    columnArtist: artist,
-    columnAlbum: album,
-    columnTextEncoding: textEncoding,
-    columnPicType: picType,
-    columnDescription: description,
-    columnBase64: base64,
-    columnLogo: logo,
-    columnLogoMemory : logoMemory,
-    columnTrackName: trackName,
-    columnAuthorName: authorName,
-    columnTrackDuration: trackDuration,
+    var map = <String, dynamic>{
+      columnUrl: url,
+      columnName: name,
+      columnTitle: title,
+      columnArtist: artist,
+      columnAlbum: album,
+      columnTextEncoding: textEncoding,
+      columnPicType: picType,
+      columnDescription: description,
+      columnBase64: base64,
+      columnLogo: logo,
+      columnLogoMemory: logoMemory,
+      columnTrackName: trackName,
+      columnAuthorName: authorName,
+      columnTrackDuration: trackDuration,
+      columnDuration: duration,
     };
     if (id != null) {
-    map[columnId] = id;
+      map[columnId] = id;
     }
-    return
-    map;
+    return map;
   }
 }
 
@@ -102,7 +103,7 @@ class MusicDatabaseHelper {
   MusicDatabaseHelper._privateConstructor();
 
   static final MusicDatabaseHelper instance =
-  MusicDatabaseHelper._privateConstructor();
+      MusicDatabaseHelper._privateConstructor();
 
   // Only allow a single open connection to the database.
   static Database _database;
@@ -141,7 +142,8 @@ class MusicDatabaseHelper {
                 $columnLogoMemory TEXT,
                 $columnTrackName TEXT,
                 $columnAuthorName TEXT,
-                $columnTrackDuration TEXT                   
+                $columnTrackDuration TEXT,
+                $columnDuration INTEGER                 
             )''');
   }
 
@@ -194,6 +196,7 @@ class MusicDatabaseHelper {
           columnTrackName,
           columnAuthorName,
           columnTrackDuration,
+          columnDuration
         ],
         where: '$columnId = ?',
         whereArgs: [id]);

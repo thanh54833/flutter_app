@@ -49,30 +49,39 @@ class Listener {
   _showBottomBar() {}
 }
 
+class HomeValueNotifier {}
+
 class _StateHome extends State<StateHome> {
+  //var isCollapseds2 = ValueNotifier(false);
+  ValueNotifier itemSelect = ValueNotifier(MusicModel("", "", ""));
+
   final myController = TextEditingController();
   final _bsbController = BottomSheetBarController();
   final heightBar = 78;
-  var isCollapsed = false;
+  var isCollapsed = true;
   var isStartAnimation = false;
-  MusicModel itemSelect;
+
+  //MusicModel itemSelect;
   var isScan = false;
+  var homeValueNotifier = HomeValueNotifier();
 
   _onCLickItemFavourite(MusicModel _musicModel) {
-    "_musicModel :... ${_musicModel.logoMemory} ".Log();
-
-    if ((!isCollapsed) &&
-        (_musicModel.logoMemory != "") &&
-        (_musicModel.logoMemory != null)) {
-      setState(() {
-        isCollapsed = !isCollapsed;
-        itemSelect = _musicModel;
-      });
-    } else {
-      setState(() {
-        itemSelect = _musicModel;
-      });
-    }
+    //"_musicModel :... ${_musicModel.logoMemory} ".Log();
+    itemSelect.value = _musicModel;
+    // if ((!isCollapsed) &&
+    //     (_musicModel.logoMemory != "") &&
+    //     (_musicModel.logoMemory != null)) {
+    //   // setState(() {
+    //   //   isCollapsed = !isCollapsed;
+    //   //   itemSelect = _musicModel;
+    //   // });
+    //   itemSelect.value = _musicModel;
+    // } else {
+    //   // setState(() {
+    //   //   itemSelect = _musicModel;
+    //   // });
+    //
+    // }
   }
 
   _showDialog() async {
@@ -109,11 +118,9 @@ class _StateHome extends State<StateHome> {
         dialogLoading.dismiss();
       }
     });
-
     var homeWidget = HomeWidget(
       onCLickItemFavourite: _onCLickItemFavourite,
     );
-
     myController.addListener(_printLatestValue);
     return Scaffold(
       backgroundColor: LocalColor.Background,
@@ -129,10 +136,7 @@ class _StateHome extends State<StateHome> {
                     fontFamily: 'GafataRegular',
                     fontSize: 20,
                     fontWeight: FontWeight.bold),
-              ).setOnClick(() {
-                //isCollapsed = !isCollapsed;
-                //setIsCollapsed(isCollapsed);
-              })),
+              ).setOnClick(() {})),
               IconButton(
                 icon: Icon(
                   Icons.add_box_outlined,
@@ -141,7 +145,24 @@ class _StateHome extends State<StateHome> {
                 onPressed: () {
                   var dialog = DialogCommon.internal();
                   dialog.showDialogV2(context, () {
-                    homeWidget.onClickScan();
+                    //dialog.dismiss();
+                    //dialog.showLoading(context);
+
+                    Future.delayed(Duration(microseconds: 50), () {
+                      homeWidget.onClickScan();
+                    });
+
+                    // Future.wait([
+                    //   Future.delayed(Duration(microseconds: 50), () {
+                    //     "Future.delayed :... ".Log();
+                    //     homeWidget.onClickScan();
+                    //   }),
+                    //   Future.delayed(Duration(seconds: 5), () {
+                    //     "Future.delayed :... ".Log();
+                    //     //homeWidget.onClickScan();
+                    //     dialog.dismiss();
+                    //   }),
+                    // ]);
                   });
                 },
                 alignment: Alignment.centerRight,
@@ -162,10 +183,16 @@ class _StateHome extends State<StateHome> {
           color: Colors.transparent,
           backdropColor: Colors.transparent,
           collapsed: Container(
-            child: BottomBar(
-              itemSelect: itemSelect,
+            child: ValueListenableBuilder(
+              valueListenable: itemSelect,
+              builder: (context, value, child) {
+                return BottomBar(
+                  itemSelect: value,
+                );
+              },
             ),
             alignment: Alignment.topCenter,
+            height: 100,
           ),
           height: isCollapsed ? 78 : 0,
           controller: _bsbController,
@@ -275,7 +302,8 @@ class _BottomBar extends State<BottomBar> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8.0),
                   child: Container(
-                    child: ((widget.itemSelect.logoMemory != null) &&
+                    child: ((widget.itemSelect != null) &&
+                            (widget.itemSelect.logoMemory != null) &&
                             (widget.itemSelect.logoMemory != ""))
                         ? Image.memory(
                             new Uint8List.fromList(
@@ -286,16 +314,8 @@ class _BottomBar extends State<BottomBar> {
                           )
                         : Container(),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.4),
-                          spreadRadius: 1,
-                          blurRadius: 2,
-                          offset: Offset(2, -2),
-                        ),
-                      ],
-                    ),
+                        borderRadius: BorderRadius.circular(8.0),
+                        color: LocalColor.Primary_20),
                     //margin: EdgeInsets.all(1),
                   ),
                 ),
@@ -309,7 +329,10 @@ class _BottomBar extends State<BottomBar> {
                         child: MarqueeWidget(
                           direction: Axis.horizontal,
                           child: Text(
-                            " " + widget.itemSelect.artist + " ",
+                            ((widget.itemSelect != null) &&
+                                    (widget.itemSelect.artist != null))
+                                ? " Song:" + widget.itemSelect.artist + " "
+                                : "",
                             style: Themes.TextStyle_Small_Bold,
                           ),
                         ),
@@ -321,8 +344,11 @@ class _BottomBar extends State<BottomBar> {
                         child: MarqueeWidget(
                           direction: Axis.horizontal,
                           child: Text(
-                            " " + widget.itemSelect.artist + " ",
-                            style: Themes.TextStyle_Small_Bold,
+                            ((widget.itemSelect != null) &&
+                                    (widget.itemSelect.artist != null))
+                                ? " " + widget.itemSelect.artist + " "
+                                : "",
+                            style: Themes.TextStyle_Small,
                           ),
                         ),
                         height: 20,

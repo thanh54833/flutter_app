@@ -7,7 +7,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/example/main/app/LocalColor.dart';
 import 'package:flutter_app/example/main/app/Themes.dart';
+import 'package:flutter_app/example/main/app/config/AppConfig.dart';
 import 'package:flutter_app/example/main/app/data/DatabaseUtils.dart';
+import 'package:flutter_app/example/main/app/data/HandleMusicData.dart';
 import 'package:flutter_app/example/main/app/data/MusicDatabase.dart';
 import 'package:flutter_app/example/main/app/model/SongModel.dart';
 import 'package:flutter_app/example/main/common/DialogCommon.dart';
@@ -37,77 +39,6 @@ class _FavouritesPage extends State<FavouritesPage> {
   List<MusicModel> data = [];
   var isInitState = false;
 
-  // _getMusicModel(path) async {
-  //   var audioMetaData = await MediaMetadataPlugin.getMediaMetaData(path);
-  //   var music = MusicModel("", "", "");
-  //   music.url = path;
-  //   music.album = audioMetaData.album;
-  //   music.artist = audioMetaData.artistName;
-  //   music.authorName = audioMetaData.authorName;
-  //   music.trackName = audioMetaData.trackName;
-  //   music.trackDuration = "${audioMetaData.trackDuration}";
-  //   music.mime = audioMetaData.mimeTYPE;
-  //   return music;
-  // }
-
-  _audioMetaData(path, index) async {
-    var music = MusicModel("", "", "");
-    //AudioMetaData
-    //Future<AudioMetaData>  audioMetaData = await MediaMetadataPlugin.getMediaMetaData(path);
-    Future<Uint8List> pathByte = await _getPathBytes(path);
-    _printDuration(Duration duration) {
-      String twoDigits(int n) => n.toString().padLeft(2, "0");
-      String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-      String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-      return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
-    }
-
-    Future.wait([
-      // ignore: missing_return
-      await MediaMetadataPlugin.getMediaMetaData(path).then((audioMetaData) {
-        music.album = audioMetaData.album;
-        music.artist = audioMetaData.artistName;
-        music.authorName = audioMetaData.authorName;
-        music.trackName = audioMetaData.trackName;
-        // int trackDuration = 0;
-
-        "audioMetaData :.. ${audioMetaData.artistName} "
-                "_ ${audioMetaData.authorName} "
-                "_ ${audioMetaData.trackName} "
-                "_ ${audioMetaData.album} "
-                "_ ${audioMetaData.mimeTYPE} "
-            .Log();
-
-        music.trackDuration =
-            _printDuration(Duration(milliseconds: audioMetaData.trackDuration));
-        music.mime = audioMetaData.mimeTYPE;
-        if ((music.artist != null) && (music.artist != "")) {
-          this.data.add(music);
-        }
-      }),
-      pathByte.then((value) {
-        //"pathByte.toString() :... ${pathByte.toString()} ".Log();
-        if (value != null) {
-          music.logoMemory = new String.fromCharCodes(value);
-        }
-      })
-    ]);
-
-    music.id = index;
-    music.url = path;
-  }
-
-  _musicData() async {
-    List<File> data = await FileUtils.internal().getStorageInfo(["mp3"]);
-    List<Future<void>> listFuture = [];
-    data.asMap().forEach((index, element) async {
-      var path = element.absolute.path;
-      listFuture.add(_audioMetaData(path, index));
-    });
-    await Future.wait(listFuture);
-    return data;
-  }
-
   _handleDataLocal(List<MusicModel> data) async {
     var database = DatabaseUtils.instance;
     List<Future<void>> list = [database.delete(), database.setData(data)];
@@ -115,22 +46,29 @@ class _FavouritesPage extends State<FavouritesPage> {
     return true;
   }
 
-  _getPathBytes(String path) async {
-    return await Audiotagger().readArtwork(path: path);
-  }
+  AppConfig appConfig;
 
   initState() {
     super.initState();
+    appConfig = AppConfig.instance;
+
     //"_FavouritesPage :.. initState :.. ".Log();
     //Todo : when start screen home check data local ..
     if (isInitState == false) {
       var database = DatabaseUtils.instance;
       database.getAll().then((data) {
-        //"data :.. ${data.length} ".Log();
+        //"data :.. ${data.length} ___ ${data[10].url} ".Log();
         if (data.length > 0) {
+          "data.length > 0".Log();
+
           this.data.clear();
           setState(() {
             this.data = data;
+          });
+
+          appConfig.getIndexCurrentPlay().then((index) {
+            "current index :... ${index} ".Log();
+            widget.onCLick(this.data[index]);
           });
         }
       });
@@ -143,16 +81,19 @@ class _FavouritesPage extends State<FavouritesPage> {
 
     widget.onClickScan = () {
       this.data.clear();
+      var handleMusicData = HandleMusicData.instance;
       //Todo :khi thanh click scan file ...
-      _musicData().then((value) {
-        //"value :... ${value.length}".Log();
+      handleMusicData.musicData().then((listData) {
+        "value  sss:... ${listData.length}".Log();
         _handleDataLocal(data).then((value) {
           "_handleDataLocal :... ${value} ".Log();
+          //Todo : handle done scan ...
+          setState(() {
+            this.data = listData;
+          });
         });
-        setState(() {});
       });
     };
-
     return Scaffold(
       backgroundColor: LocalColor.Transparent,
       body: Container(
@@ -162,10 +103,6 @@ class _FavouritesPage extends State<FavouritesPage> {
           itemBuilder: (context, index) {
             var item = data[index];
             // String url = "";
-
-            //album
-            //("item :... ${item.name} __ ${item.trackDuration} ").Log();
-
             Uint8List _getUnit8List(String logo) {
               return new Uint8List.fromList(logo.codeUnits);
             }
@@ -189,16 +126,16 @@ class _FavouritesPage extends State<FavouritesPage> {
                               fit: BoxFit.cover,
                             ),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.4),
-                                  spreadRadius: 1,
-                                  blurRadius: 2,
-                                  offset: Offset(2, -2),
-                                ),
-                              ],
-                            ),
+                                borderRadius: BorderRadius.circular(50.0),
+                                // boxShadow: [
+                                //   BoxShadow(
+                                //     color: Colors.black.withOpacity(0.4),
+                                //     spreadRadius: 1,
+                                //     blurRadius: 2,
+                                //     offset: Offset(2, -2),
+                                //   ),
+                                // ],
+                                color: LocalColor.Primary_20),
                           ),
                         ),
                         //alignment: Alignment.center,
@@ -269,7 +206,10 @@ class _FavouritesPage extends State<FavouritesPage> {
               ),
               margin:
                   EdgeInsets.only(top: 8.0, bottom: 8.0, left: 10, right: 10),
-            ).setOnClick(() => widget.onCLick(item));
+            ).setOnClick(() {
+              appConfig.setIndexCurrentPlay(index);
+              widget.onCLick(item);
+            });
           },
         ),
         padding: EdgeInsets.only(bottom: 0),

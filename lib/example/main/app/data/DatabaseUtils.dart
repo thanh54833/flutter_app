@@ -14,6 +14,16 @@ class DatabaseUtils {
     int id = await helper.insert(music);
   }
 
+  Future getListFavourites() async {
+    List<MusicModel> data = [];
+    Database database = await MusicDatabaseHelper.instance.database;
+    var word = await database.query(tableMusic);
+    word.forEach((element) {
+      data.add(MusicModel.fromMap(element));
+    });
+    return data;
+  }
+
   Future getAll() async {
     List<MusicModel> data = [];
     Database database = await MusicDatabaseHelper.instance.database;
