@@ -41,7 +41,10 @@ class _FavouritesPage extends State<FavouritesPage> {
 
   _handleDataLocal(List<MusicModel> data) async {
     var database = DatabaseUtils.instance;
-    List<Future<void>> list = [database.delete(), database.setData(data)];
+    List<Future<void>> list = [
+      await database.delete(),
+      await database.setData(data)
+    ];
     await Future.wait(list);
     return true;
   }

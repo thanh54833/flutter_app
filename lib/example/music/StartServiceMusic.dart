@@ -23,7 +23,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Audio Service Demo',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: AudioServiceWidget(child: MainScreen()),
+      home: Scaffold(
+        body: MainScreen(),
+      ),
     );
   }
 }
@@ -32,75 +34,26 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     " AudioService.start :.. ".Log();
-
     AudioService.stop();
-
     AudioService.start(
       backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
       androidNotificationChannelName: 'Audio Service Demo',
       // Enable this if you want the Android service to exit the foreground state on pause.
-      //androidStopForegroundOnPause: true,
+      // androidStopForegroundOnPause: true,
       androidNotificationColor: 0xFF2196f3,
       androidNotificationIcon: 'mipmap/ic_launcher',
       androidEnableQueue: true,
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Audio Service Demo'),
-      ),
-      body: Center(
+    return AudioServiceWidget(
+        child: Container(
+      child: Center(
         child: StreamBuilder<bool>(
           stream: AudioService.runningStream,
           builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.active) {
-              // Don't show anything until we've ascertained whether or not the
-              // service is running, since we want to show a different UI in
-              // each case.
-              return SizedBox();
-            }
-
-            final running = snapshot.data ?? false;
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
-                StreamBuilder<QueueState>(
-                  stream: _queueStateStream,
-                  builder: (context, snapshot) {
-                    final queueState = snapshot.data;
-                    final queue = queueState?.queue ?? [];
-                    final mediaItem = queueState?.mediaItem;
-                    //"queue.length :... ${queue.length}".Log();
-                    //"mediaItem ${mediaItem.id} ".Log();
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (queue != null && queue.isNotEmpty)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.skip_previous),
-                                iconSize: 64.0,
-                                onPressed: mediaItem == queue.first
-                                    ? null
-                                    : AudioService.skipToPrevious,
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.skip_next),
-                                iconSize: 64.0,
-                                onPressed: mediaItem == queue.last
-                                    ? null
-                                    : AudioService.skipToNext,
-                              ),
-                            ],
-                          ),
-                        if (mediaItem?.title != null) Text(mediaItem.title),
-                      ],
-                    );
-                  },
-                ),
                 // Play/pause/stop buttons.
                 StreamBuilder<bool>(
                   stream: AudioService.playbackStateStream
@@ -112,96 +65,17 @@ class MainScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (playing) pauseButton() else playButton(),
-                        stopButton(),
                       ],
                     );
                   },
                 ),
-                // A seek bar.
-                StreamBuilder<MediaState>(
-                  stream: _mediaStateStream,
-                  builder: (context, snapshot) {
-                    final mediaState = snapshot.data;
-                    return SeekBar(
-                      duration:
-                      mediaState?.mediaItem?.duration ?? Duration.zero,
-                      position: mediaState?.position ?? Duration.zero,
-                      onChangeEnd: (newPosition) {
-                        AudioService.seekTo(newPosition);
-                      },
-                    );
-                  },
-                ),
-                // Display the processing state.
-                StreamBuilder<AudioProcessingState>(
-                  stream: AudioService.playbackStateStream
-                      .map((state) => state.processingState)
-                      .distinct(),
-                  builder: (context, snapshot) {
-                    final processingState =
-                        snapshot.data ?? AudioProcessingState.none;
-                    return Text(
-                        "Processing state: ${describeEnum(processingState)}");
-                  },
-                ),
-
-                // Display the latest custom event.
-                StreamBuilder(
-                  stream: AudioService.customEventStream,
-                  builder: (context, snapshot) {
-                    return Text("custom event: ${snapshot.data}");
-                  },
-                ),
-
-                // Display the notification click status.
-                StreamBuilder<bool>(
-                  stream: AudioService.notificationClickEventStream,
-                  builder: (context, snapshot) {
-                    return Text(
-                      'Notification Click Status: ${snapshot.data}',
-                    );
-                  },
-                ),
-
-
               ],
             );
           },
         ),
       ),
-    );
+    ));
   }
-
-  /// A stream reporting the combined state of the current media item and its
-  /// current position.
-  Stream<MediaState> get _mediaStateStream =>
-      Rx.combineLatest2<MediaItem, Duration, MediaState>(
-          AudioService.currentMediaItemStream,
-          AudioService.positionStream,
-          (mediaItem, position) => MediaState(mediaItem, position));
-
-  /// A stream reporting the combined state of the current queue and the current
-  /// media item within that queue.
-  Stream<QueueState> get _queueStateStream =>
-      Rx.combineLatest2<List<MediaItem>, MediaItem, QueueState>(
-          AudioService.queueStream,
-          AudioService.currentMediaItemStream,
-          (queue, mediaItem) => QueueState(queue, mediaItem));
-
-  RaisedButton audioPlayerButton() => startButton(
-        'AudioPlayer',
-        () {
-          AudioService.start(
-            backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
-            androidNotificationChannelName: 'Audio Service Demo',
-            // Enable this if you want the Android service to exit the foreground state on pause.
-            //androidStopForegroundOnPause: true,
-            androidNotificationColor: 0xFF2196f3,
-            androidNotificationIcon: 'mipmap/ic_launcher',
-            androidEnableQueue: true,
-          );
-        },
-      );
 
   RaisedButton textToSpeechButton() => startButton(
         'TextToSpeech',
@@ -328,19 +202,6 @@ void _audioPlayerTaskEntrypoint() async {
   AudioServiceBackground.run(() => AudioPlayerTask());
 }
 
-getMediaItem(MusicModel musicModel) {
-  var mediaItem = MediaItem(
-    id: musicModel.url,
-    album: musicModel.album,
-    title: musicModel.artist,
-    artist: musicModel.artist,
-    duration: Duration(milliseconds: musicModel.duration),
-    artUri:
-    "https://image.freepik.com/free-photo/white-clean-brick-wall-as-texture-background-backdrop-high-resolution-picture_117930-181.jpg", //Uint8List.fromList(musicModel.logoMemory.codeUnits),//"https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg",
-  );
-  return mediaItem;
-}
-
 /// This task defines logic for playing a list of podcast episodes.
 class AudioPlayerTask extends BackgroundAudioTask {
   final _mediaLibrary = MediaLibrary();
@@ -354,17 +215,28 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   int get index => _player.currentIndex;
 
-
+  _getMediaItem(MusicModel musicModel) {
+    var mediaItem = MediaItem(
+      id: musicModel.url,
+      album: musicModel.album,
+      title: musicModel.artist,
+      artist: musicModel.artist,
+      duration: Duration(milliseconds: musicModel.duration),
+      artUri:
+          "https://image.freepik.com/free-photo/white-clean-brick-wall-as-texture-background-backdrop-high-resolution-picture_117930-181.jpg", //Uint8List.fromList(musicModel.logoMemory.codeUnits),//"https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg",
+    );
+    return mediaItem;
+  }
 
   _getListMediaItem(List<MusicModel> data) {
     List<MediaItem> listMedialItem = [];
     data.forEach((element) {
-      listMedialItem.add(getMediaItem(element));
+      listMedialItem.add(_getMediaItem(element));
     });
     return listMedialItem;
   }
 
-  MediaItem get mediaItem => index == null ? null : getMediaItem(queue[index]);
+  MediaItem get mediaItem => index == null ? null : _getMediaItem(queue[index]);
 
   @override
   Future<void> onStart(Map<String, dynamic> params) async {
@@ -380,7 +252,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       // Broadcast media item changes.
       _player.currentIndexStream.listen((index) {
         var musicData = queue[index];
-        var mediaItem = getMediaItem(musicData);
+        var mediaItem = _getMediaItem(musicData);
         if (index != null) AudioServiceBackground.setMediaItem(mediaItem);
       });
 
@@ -435,8 +307,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onSkipToQueueItem(String mediaId) async {
-    "===mediaId :... ${mediaId} ".Log();
-
+    //"mediaId :... ${mediaId} ".Log();
     //"onSkipToQueueItem :.. ${queue.length} } ".Log();
 
     // Then default implementations of onSkipToNext and onSkipToPrevious will
@@ -449,11 +320,11 @@ class AudioPlayerTask extends BackgroundAudioTask {
     // previous. This variable holds the preferred state to send instead of
     // buffering during a skip, and it is cleared as soon as the player exits
     // buffering (see the listener in onStart).
-    _skipState = newIndex > index ? AudioProcessingState.skippingToNext : AudioProcessingState.skippingToPrevious;
+    _skipState = newIndex > index
+        ? AudioProcessingState.skippingToNext
+        : AudioProcessingState.skippingToPrevious;
     // This jumps to the beginning of the queue item at newIndex.
     _player.seek(Duration.zero, index: newIndex);
-
-
   }
 
   playLocal() async {

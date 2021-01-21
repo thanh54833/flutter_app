@@ -113,8 +113,9 @@ class _VisState extends State<PlaySong> {
 
       var ss = audioPlayer.androidAudioSessionId;
       audioPlayer.androidAudioSessionIdStream.forEach((element) {
-        "element :... ${element} ".Log();H
-      });//then((id){});
+        "element :... ${element} ".Log();
+        H
+      }); //then((id){});
       "sessionId :.. ${sessionId} __ ${ss} ".Log();
 
       playerID = sessionId;
@@ -127,10 +128,11 @@ class _VisState extends State<PlaySong> {
     return DropdownButton(
       //map each value from the lIst to our dropdownMenuItem widget
       items: _dropdownValues
-          .map((value) => DropdownMenuItem(
-                child: Text(value),
-                value: value,
-              ))
+          .map((value) =>
+          DropdownMenuItem(
+            child: Text(value),
+            value: value,
+          ))
           .toList(),
       onChanged: (String value) {
         newValue = value;
@@ -150,111 +152,144 @@ class _VisState extends State<PlaySong> {
   Widget build(BuildContext context) {
     return new MaterialApp(
         home: new Scaffold(
-      appBar: new AppBar(
-        title: new Text(' Visulizer '),
-        actions: <Widget>[
-          dropdownWidget(),
-        ],
-      ),
-      body: playerID != null
-          ? selected == 'MultiWaveVisualizer'
+          appBar: new AppBar(
+            title: new Text(' Visulizer '),
+            actions: <Widget>[
+              dropdownWidget(),
+            ],
+          ),
+          body: playerID != null
+              ? selected == 'MultiWaveVisualizer'
               ? new Visualizer(
-                  builder: (BuildContext context, List<int> wave) {
-                    return new CustomPaint(
-                      painter: new MultiWaveVisualizer(
-                        waveData: wave,
-                        height: MediaQuery.of(context).size.height,
-                        color: Colors.blueAccent,
-                      ),
-                      child: new Container(),
-                    );
-                  },
-                  id: playerID,
-                )
+            builder: (BuildContext context, List<int> wave) {
+              return new CustomPaint(
+                painter: new MultiWaveVisualizer(
+                  waveData: wave,
+                  height: MediaQuery
+                      .of(context)
+                      .size
+                      .height,
+                  color: Colors.blueAccent,
+                ),
+                child: new Container(),
+              );
+            },
+            id: playerID,
+          )
               : selected == 'LineVisualizer'
-                  ? new Visualizer(
-                      builder: (BuildContext context, List<int> wave) {
-                        return new CustomPaint(
-                          painter: new LineVisualizer(
-                            waveData: wave,
-                            height: MediaQuery.of(context).size.height,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.blueAccent,
-                          ),
-                          child: new Container(),
-                        );
-                      },
-                      id: playerID,
-                    )
-                  : selected == 'LineBarVisualizer'
-                      ? new Visualizer(
-                          builder: (BuildContext context, List<int> wave) {
-                            return new CustomPaint(
-                              painter: new LineBarVisualizer(
-                                waveData: wave,
-                                height: MediaQuery.of(context).size.height,
-                                width: MediaQuery.of(context).size.width,
-                                color: Colors.blueAccent,
-                              ),
-                              child: new Container(),
-                            );
-                          },
-                          id: playerID,
-                        )
-                      : selected == 'CircularLineVisualizer'
-                          ? new Visualizer(
-                              builder: (BuildContext context, List<int> wave) {
-                                return new CustomPaint(
-                                  painter: new CircularLineVisualizer(
-                                    waveData: wave,
-                                    height: MediaQuery.of(context).size.height,
-                                    width: MediaQuery.of(context).size.width,
-                                    color: Colors.blueAccent,
-                                  ),
-                                  child: new Container(),
-                                );
-                              },
-                              id: playerID,
-                            )
-                          : selected == 'CircularBarVisualizer'
-                              ? new Visualizer(
-                                  builder:
-                                      (BuildContext context, List<int> wave) {
-                                    return new CustomPaint(
-                                      painter: new CircularBarVisualizer(
-                                        waveData: wave,
-                                        height:
-                                            MediaQuery.of(context).size.height,
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        color: Colors.blueAccent,
-                                      ),
-                                      child: new Container(),
-                                    );
-                                  },
-                                  id: playerID,
-                                )
-                              : new Visualizer(
-                                  builder:
-                                      (BuildContext context, List<int> wave) {
-                                    return new CustomPaint(
-                                      painter: new BarVisualizer(
-                                        waveData: wave,
-                                        height:
-                                            MediaQuery.of(context).size.height,
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        color: Colors.blueAccent,
-                                      ),
-                                      child: new Container(),
-                                    );
-                                  },
-                                  id: playerID,
-                                )
-          : Center(
-              child: Text('No SessionID'),
-            ),
-    ));
+              ? new Visualizer(
+            builder: (BuildContext context, List<int> wave) {
+              return new CustomPaint(
+                painter: new LineVisualizer(
+                  waveData: wave,
+                  height: MediaQuery
+                      .of(context)
+                      .size
+                      .height,
+                  width: MediaQuery
+                      .of(context)
+                      .size
+                      .width,
+                  color: Colors.blueAccent,
+                ),
+                child: new Container(),
+              );
+            },
+            id: playerID,
+          )
+              : selected == 'LineBarVisualizer'
+              ? new Visualizer(
+            builder: (BuildContext context, List<int> wave) {
+              return new CustomPaint(
+                painter: new LineBarVisualizer(
+                  waveData: wave,
+                  height: MediaQuery
+                      .of(context)
+                      .size
+                      .height,
+                  width: MediaQuery
+                      .of(context)
+                      .size
+                      .width,
+                  color: Colors.blueAccent,
+                ),
+                child: new Container(),
+              );
+            },
+            id: playerID,
+          )
+              : selected == 'CircularLineVisualizer'
+              ? new Visualizer(
+            builder: (BuildContext context, List<int> wave) {
+              return new CustomPaint(
+                painter: new CircularLineVisualizer(
+                  waveData: wave,
+                  height: MediaQuery
+                      .of(context)
+                      .size
+                      .height,
+                  width: MediaQuery
+                      .of(context)
+                      .size
+                      .width,
+                  color: Colors.blueAccent,
+                ),
+                child: new Container(),
+              );
+            },
+            id: playerID,
+          )
+              : selected == 'CircularBarVisualizer'
+              ? new Visualizer(
+            builder:
+                (BuildContext context, List<int> wave) {
+              return new CustomPaint(
+                painter: new CircularBarVisualizer(
+                  waveData: wave,
+                  height:
+                  MediaQuery
+                      .of(context)
+                      .size
+                      .height,
+                  width:
+                  MediaQuery
+                      .of(context)
+                      .size
+                      .width,
+                  color: Colors.blueAccent,
+                ),
+                child: new Container(),
+              );
+            },
+            id: playerID,
+          )
+              : new Visualizer(
+            builder:
+                (BuildContext context, List<int> wave) {
+              return new CustomPaint(
+                painter: new BarVisualizer(
+                  waveData: wave,
+                  height:
+                  MediaQuery
+                      .of(context)
+                      .size
+                      .height,
+                  width:
+                  MediaQuery
+                      .of(context)
+                      .size
+                      .width,
+                  color: Colors.blueAccent,
+                ),
+                child: new Container(),
+              );
+            },
+            id: playerID,
+          )
+              : Center(
+            child: Text('No SessionID'),
+          ),
+        ));
   }
 }
 

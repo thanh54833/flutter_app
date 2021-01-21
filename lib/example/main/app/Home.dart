@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,11 +15,12 @@ import 'package:flutter_app/example/main/common/DialogCommon.dart';
 import 'package:flutter_app/example/main/common/Gesture.dart';
 import 'package:flutter_app/example/main/common/LogCatUtils.dart';
 import 'package:flutter_app/example/main/common/NavigatorUtils.dart';
+import 'package:flutter_app/example/music/AudioService.dart';
 import 'package:flutter_app/example/view/AnimationDelayList.dart';
 import 'package:flutter_app/example/view/ScrollingText.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:permission/permission.dart';
-
+import 'package:rxdart/rxdart.dart';
 import 'LocalColor.dart';
 import 'Player.dart';
 import 'data/MusicDatabase.dart';
@@ -279,144 +281,352 @@ class BottomBar extends StatefulWidget {
   createState() => _BottomBar();
 }
 
+// NOTE: Your entrypoint MUST be a top-level function.
+void _audioPlayerTaskEntrypoint() async {
+  AudioServiceBackground.run(() => AudioPlayerTask());
+}
+
 class _BottomBar extends State<BottomBar> {
   build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        //Here goes the same radius, u can put into a var or function
-        borderRadius: BorderRadius.circular(8.0),
-        boxShadow: [
-          BoxShadow(
-            color: LocalColor.Primary_80,
-            spreadRadius: 1,
-            blurRadius: 5,
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8.0),
-        child: Container(
-          child: Row(
-            children: [
-              Center(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Container(
-                    child: ((widget.itemSelect != null) &&
-                            (widget.itemSelect.logoMemory != null) &&
-                            (widget.itemSelect.logoMemory != ""))
-                        ? Image.memory(
-                            new Uint8List.fromList(
-                                widget.itemSelect.logoMemory.codeUnits),
-                            height: 60,
-                            width: 60,
-                            fit: BoxFit.cover,
-                          )
-                        : Container(),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8.0),
-                        color: LocalColor.Primary_20),
-                    //margin: EdgeInsets.all(1),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  child: Wrap(
-                    direction: Axis.vertical,
-                    children: [
-                      Container(
-                        child: MarqueeWidget(
-                          direction: Axis.horizontal,
-                          child: Text(
-                            ((widget.itemSelect != null) &&
-                                    (widget.itemSelect.artist != null))
-                                ? " Song:" + widget.itemSelect.artist + " "
-                                : "",
-                            style: Themes.TextStyle_Small_Bold,
-                          ),
-                        ),
-                        height: 20,
-                        width: 120,
-                        color: Colors.transparent,
-                      ),
-                      Container(
-                        child: MarqueeWidget(
-                          direction: Axis.horizontal,
-                          child: Text(
-                            ((widget.itemSelect != null) &&
-                                    (widget.itemSelect.artist != null))
-                                ? " " + widget.itemSelect.artist + " "
-                                : "",
-                            style: Themes.TextStyle_Small,
-                          ),
-                        ),
-                        height: 20,
-                        width: 120,
-                        color: Colors.transparent,
-                      ),
-                    ],
-                  ),
-                  //alignment: Alignment.topLeft,
-                  margin: EdgeInsets.only(left: 5, right: 5),
-                  padding: EdgeInsets.only(bottom: 8),
-                  color: Colors.transparent,
-                ),
-              ),
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                        child: IconButton(
-                      icon: Icon(
-                        Icons.skip_previous,
-                        color: LocalColor.Gray,
-                        size: 25,
-                      ),
-                      onPressed: () {},
-                    )),
-                    Container(
-                        child: IconButton(
-                      icon: Icon(
-                        Icons.pause,
-                        color: LocalColor.Primary,
-                        size: 25,
-                      ),
-                      onPressed: () {
-                        context.push((context) => NoonLoopingDemo());
-                      },
-                    )),
-                    Container(
-                        child: IconButton(
-                      icon: Icon(
-                        Icons.skip_next,
-                        color: LocalColor.Gray,
-                        size: 25,
-                      ),
-                      onPressed: () {},
-                    )),
-                    Container(
-                        child: IconButton(
-                      icon: Icon(
-                        Icons.volume_up,
-                        color: LocalColor.Gray,
-                      ),
-                      onPressed: () {},
-                    ))
-                  ],
-                ),
-              )
-            ],
-          ),
-          color: Colors.white,
-          padding: EdgeInsets.only(top: 0, bottom: 0, left: 6, right: 6),
-          alignment: Alignment.topCenter,
+    AudioService.stop();
+    AudioService.start(
+      backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
+      androidNotificationChannelName: 'Audio Service Demo',
+      // Enable this if you want the Android service to exit the foreground state on pause.
+      //androidStopForegroundOnPause: true,
+      androidNotificationColor: 0xFF2196f3,
+      androidNotificationIcon: 'mipmap/ic_launcher',
+      androidEnableQueue: true,
+    );
+
+    if (widget.itemSelect != null) {
+      "AudioService.playFromMediaId :... ${widget.itemSelect.url} ".Log();
+      //AudioService.playMediaItem(null);
+      //AudioService.playFromMediaId(widget.itemSelect.url);
+      //AudioService.play();
+
+      //AudioService.playMediaItem(getMediaItem(widget.itemSelect));
+
+      AudioService.playFromMediaId(widget.itemSelect.url);
+      var stream = AudioService.playbackStateStream
+          .map((state) => state.playing)
+          .distinct();
+
+      // stream.
+
+      stream.listen((event) {});
+    }
+    return AudioServiceWidget(
+      child: Container(
+        decoration: BoxDecoration(
+          //Here goes the same radius, u can put into a var or function
+          borderRadius: BorderRadius.circular(8.0),
+          boxShadow: [
+            BoxShadow(
+              color: LocalColor.Primary_80,
+              spreadRadius: 1,
+              blurRadius: 5,
+            ),
+          ],
         ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8.0),
+          child: Container(
+            child: Row(
+              children: [
+                Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Container(
+                      child: ((widget.itemSelect != null) &&
+                              (widget.itemSelect.logoMemory != null) &&
+                              (widget.itemSelect.logoMemory != ""))
+                          ? Image.memory(
+                              new Uint8List.fromList(
+                                  widget.itemSelect.logoMemory.codeUnits),
+                              height: 60,
+                              width: 60,
+                              fit: BoxFit.cover,
+                            )
+                          : Container(),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          color: LocalColor.Primary_20),
+                      //margin: EdgeInsets.all(1),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    child: Wrap(
+                      direction: Axis.vertical,
+                      children: [
+                        Container(
+                          child: MarqueeWidget(
+                            direction: Axis.horizontal,
+                            child: Text(
+                              ((widget.itemSelect != null) &&
+                                      (widget.itemSelect.artist != null))
+                                  ? " Song:" + widget.itemSelect.artist + " "
+                                  : "",
+                              style: Themes.TextStyle_Small_Bold,
+                            ),
+                          ),
+                          height: 20,
+                          width: 120,
+                          color: Colors.transparent,
+                        ),
+                        Container(
+                          child: MarqueeWidget(
+                            direction: Axis.horizontal,
+                            child: Text(
+                              ((widget.itemSelect != null) &&
+                                      (widget.itemSelect.artist != null))
+                                  ? " " + widget.itemSelect.artist + " "
+                                  : "",
+                              style: Themes.TextStyle_Small,
+                            ),
+                          ),
+                          height: 20,
+                          width: 120,
+                          color: Colors.transparent,
+                        ),
+                      ],
+                    ),
+                    //alignment: Alignment.topLeft,
+                    margin: EdgeInsets.only(left: 5, right: 5),
+                    padding: EdgeInsets.only(bottom: 8),
+                    color: Colors.transparent,
+                  ),
+                ),
+                Container(
+                  child: StreamBuilder<bool>(
+                    stream: AudioService.runningStream,
+                    builder: (context, snapshot) {
+                      "snapshot.connectionState :... ${snapshot.connectionState} "
+                          .Log();
+
+                      if (snapshot.connectionState != ConnectionState.active) {
+                        // Don't show anything until we've ascertained whether or not the
+                        // service is running, since we want to show a different UI in
+                        // each case.
+                        return SizedBox();
+                      } else {
+                        "snapshot.connectionState :... 11 22 ".Log();
+                        //AudioService.play();
+                        AudioService.play();
+                      }
+
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          StreamBuilder<QueueState>(
+                            stream: _queueStateStream,
+                            builder: (context, snapshot) {
+                              final queueState = snapshot.data;
+                              final queue = queueState?.queue ?? [];
+                              final mediaItem = queueState?.mediaItem;
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (queue != null && queue.isNotEmpty) ...[
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.skip_previous,
+                                            color: LocalColor.Gray,
+                                          ),
+                                          iconSize: 25.0,
+                                          onPressed: mediaItem == queue.first
+                                              ? null
+                                              : AudioService.skipToPrevious,
+                                        ),
+                                      ],
+                                    )
+                                  ] else ...[
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.skip_previous,
+                                            color: LocalColor.Gray,
+                                          ),
+                                          iconSize: 25.0,
+                                          onPressed: mediaItem == queue.first
+                                              ? null
+                                              : AudioService.skipToPrevious,
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ],
+                              );
+                            },
+                          ),
+                          StreamBuilder<bool>(
+                            stream: AudioService.playbackStateStream
+                                .map((state) => state.playing)
+                                .distinct(),
+                            builder: (context, snapshot) {
+                              final playing = snapshot.data ?? false;
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (playing) pauseButton() else playButton(),
+                                ],
+                              );
+                            },
+                          ),
+                          StreamBuilder<QueueState>(
+                            stream: _queueStateStream,
+                            builder: (context, snapshot) {
+                              final queueState = snapshot.data;
+                              final queue = queueState?.queue ?? [];
+                              final mediaItem = queueState?.mediaItem;
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (queue != null && queue.isNotEmpty) ...[
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.skip_next,
+                                            color: LocalColor.Gray,
+                                          ),
+                                          iconSize: 25.0,
+                                          onPressed: mediaItem == queue.last
+                                              ? null
+                                              : AudioService.skipToNext,
+                                        ),
+                                      ],
+                                    ),
+                                  ] else ...[
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.skip_next,
+                                            color: LocalColor.Gray_20,
+                                          ),
+                                          iconSize: 25.0,
+                                        ),
+                                      ],
+                                    ),
+                                  ]
+                                ],
+                              );
+                            },
+                          ),
+                          Container(
+                              child: IconButton(
+                            icon: Icon(
+                              Icons.volume_up,
+                              color: LocalColor.Gray,
+                            ),
+                            onPressed: () {},
+                          ))
+                        ],
+                      );
+                    },
+                  ),
+                )
+              ],
+            ),
+            color: Colors.white,
+            padding: EdgeInsets.only(top: 0, bottom: 0, left: 6, right: 6),
+            alignment: Alignment.topCenter,
+          ),
+        ),
+        margin: EdgeInsets.only(left: 8, right: 8, bottom: 8),
       ),
-      margin: EdgeInsets.only(left: 8, right: 8, bottom: 8),
     );
   }
+
+  /// A stream reporting the combined state of the current media item and its
+  /// current position.
+  Stream<MediaState> get _mediaStateStream =>
+      Rx.combineLatest2<MediaItem, Duration, MediaState>(
+          AudioService.currentMediaItemStream,
+          AudioService.positionStream,
+          (mediaItem, position) => MediaState(mediaItem, position));
+
+  /// A stream reporting the combined state of the current queue and the current
+  /// media item within that queue.
+  Stream<QueueState> get _queueStateStream =>
+      Rx.combineLatest2<List<MediaItem>, MediaItem, QueueState>(
+          AudioService.queueStream,
+          AudioService.currentMediaItemStream,
+          (queue, mediaItem) => QueueState(queue, mediaItem));
+
+  /// A stream reporting the combined state of the current queue and the current
+  /// media item within that queue.
+  Stream<QueueState> get _selectItemStateStream =>
+      Rx.combineLatest2<List<MediaItem>, MediaItem, QueueState>(
+          AudioService.queueStream,
+          AudioService.currentMediaItemStream,
+          (queue, mediaItem) => QueueState(queue, mediaItem));
+
+  RaisedButton audioPlayerButton() => startButton(
+        'AudioPlayer',
+        () {
+          AudioService.start(
+            backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
+            androidNotificationChannelName: 'Audio Service Demo',
+            // Enable this if you want the Android service to exit the foreground state on pause.
+            //androidStopForegroundOnPause: true,
+            androidNotificationColor: 0xFF2196f3,
+            androidNotificationIcon: 'mipmap/ic_launcher',
+            androidEnableQueue: true,
+          );
+        },
+      );
+
+  IconButton playButton() => IconButton(
+      icon: Icon(
+        Icons.play_arrow,
+        color: LocalColor.Gray,
+      ),
+      iconSize: 25.0,
+      onPressed: () {
+        "playButton :... ".Log();
+        return AudioService.play;
+      });
+
+  IconButton pauseButton() => IconButton(
+        icon: Icon(
+          Icons.pause,
+          color: LocalColor.Gray,
+        ),
+        iconSize: 25.0,
+        onPressed: AudioService.pause,
+      );
+
+  RaisedButton startButton(String label, VoidCallback onPressed) =>
+      RaisedButton(
+        child: Text(
+          label,
+        ),
+        onPressed: onPressed,
+      );
+
+  IconButton stopButton() => IconButton(
+        icon: Icon(
+          Icons.stop,
+          color: LocalColor.Gray,
+        ),
+        iconSize: 25.0,
+        onPressed: AudioService.stop,
+      );
 }
 
 final List<Tab> tabs = <Tab>[

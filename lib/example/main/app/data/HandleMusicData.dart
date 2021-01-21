@@ -51,7 +51,7 @@ class HandleMusicData {
       }),
       // ignore: missing_return
       _getPathBytes(path).then((value) {
-        "_getPathBytes :.. ${value}".Log();
+        //"_getPathBytes :.. ${value}".Log();
         if (value != null) {
           music.logoMemory = new String.fromCharCodes(value);
         }
