@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Khi scan thi xoa hết thông tin di ...
 class AppConfig {
   static var IndexCurrentPlay = "IndexCurrentPlay";
-  int indexCurrentPlay = 0;
+  int indexCurrentPlay = 2;
 
   AppConfig._privateConstructor();
 

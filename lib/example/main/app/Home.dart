@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:audio_service/audio_service.dart';
@@ -6,6 +7,7 @@ import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/example/main/app/Themes.dart';
+import 'package:flutter_app/example/main/app/config/AppConfig.dart';
 import 'package:flutter_app/example/main/app/page/AlbumsPage.dart';
 import 'package:flutter_app/example/main/app/page/FavouritesPage.dart';
 import 'package:flutter_app/example/main/app/page/PlaylistPage.dart';
@@ -109,6 +111,9 @@ class _StateHome extends State<StateHome> {
   }
 
   build(BuildContext context) {
+    var appConfig = AppConfig.instance;
+    appConfig.setIndexCurrentPlay(5);
+
     _printLatestValue() {
       print("Second text field: ${myController.text}");
     }
@@ -289,6 +294,9 @@ void _audioPlayerTaskEntrypoint() async {
 class _BottomBar extends State<BottomBar> {
   build(BuildContext context) {
     AudioService.stop();
+    //AudioService.stop();
+    //"AudioService.connected 1  ${AudioService.connected} ".Log();
+
     AudioService.start(
       backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
       androidNotificationChannelName: 'Audio Service Demo',
@@ -296,8 +304,10 @@ class _BottomBar extends State<BottomBar> {
       //androidStopForegroundOnPause: true,
       androidNotificationColor: 0xFF2196f3,
       androidNotificationIcon: 'mipmap/ic_launcher',
-      androidEnableQueue: true,
+      androidEnableQueue: false,
     );
+
+    //"AudioService.connected 2 ${AudioService.connected} ".Log();
 
     if (widget.itemSelect != null) {
       "AudioService.playFromMediaId :... ${widget.itemSelect.url} ".Log();
@@ -306,15 +316,28 @@ class _BottomBar extends State<BottomBar> {
       //AudioService.play();
 
       //AudioService.playMediaItem(getMediaItem(widget.itemSelect));
+      //AudioService.playFromMediaId(widget.itemSelect.url);
 
-      AudioService.playFromMediaId(widget.itemSelect.url);
-      var stream = AudioService.playbackStateStream
-          .map((state) => state.playing)
-          .distinct();
+      //AudioService.play();
+      //AudioService.play();
+      // AudioService.playFromMediaId(widget.itemSelect.url);
+      // var stream = AudioService.playbackStateStream
+      //     .map((state) => state.playing)
+      //     .distinct();
+      //
+      // // stream.
+      // stream.listen((event) {
+      //
+      // });
+      //AudioService.play();
+      // StreamBuilder<QueueState>(
+      //
+      //
+      // )
+      // final imgStream = StreamController<QueueState>();
+      // imgStream.stream.single.then((value) {});
+      //AudioService.playFromMediaId(widget.itemSelect.url);
 
-      // stream.
-
-      stream.listen((event) {});
     }
     return AudioServiceWidget(
       child: Container(
@@ -413,8 +436,10 @@ class _BottomBar extends State<BottomBar> {
                         return SizedBox();
                       } else {
                         "snapshot.connectionState :... 11 22 ".Log();
-                        //AudioService.play();
+                        //AudioService.playFromMediaId(widget.itemSelect.url);
                         AudioService.play();
+                        //AudioService.stop();
+                        //AudioService.play();
                       }
 
                       return Row(
@@ -457,9 +482,7 @@ class _BottomBar extends State<BottomBar> {
                                             color: LocalColor.Gray,
                                           ),
                                           iconSize: 25.0,
-                                          onPressed: mediaItem == queue.first
-                                              ? null
-                                              : AudioService.skipToPrevious,
+                                          //onPressed: mediaItem == queue.first ? null : AudioService.skipToPrevious,
                                         ),
                                       ],
                                     )
@@ -474,6 +497,9 @@ class _BottomBar extends State<BottomBar> {
                                 .distinct(),
                             builder: (context, snapshot) {
                               final playing = snapshot.data ?? false;
+
+                              "playing :... ${playing} ".Log();
+
                               return Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [

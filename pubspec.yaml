@@ -65,7 +65,7 @@ dependencies:
   permission_handler: ^5.0.1+1
   permission: ^0.1.7
   provider: ^4.3.3
-  flutter_visualizers: ^0.0.2
+  #flutter_visualizers: ^0.0.2
 
 
 

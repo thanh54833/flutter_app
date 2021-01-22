@@ -352,7 +352,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   //List<MediaItem> get queue => _mediaLibrary.items;
   List<MusicModel> queue;
 
-  int get index => _player.currentIndex;
+  int get index => Random().nextInt(20);//Todo : _player.currentIndex;
 
 
 
@@ -435,6 +435,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onSkipToQueueItem(String mediaId) async {
+
     "===mediaId :... ${mediaId} ".Log();
 
     //"onSkipToQueueItem :.. ${queue.length} } ".Log();
