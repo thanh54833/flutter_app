@@ -15,6 +15,8 @@ class HandleMusicData {
   List<MusicModel> Listdata = [];
 
   Future<void> _audioMetaData(path, index) async {
+    "index :.. ${index} __ ${path} ".Log();
+
     var music = MusicModel("", "", "");
     //AudioMetaData
     //Future<AudioMetaData>  audioMetaData = await MediaMetadataPlugin.getMediaMetaData(path);
@@ -56,13 +58,15 @@ class HandleMusicData {
           music.logoMemory = new String.fromCharCodes(value);
         }
       }),
-    ]);
-
+    ]).catchError((onError) {
+      "onError :.. ${onError}".Log();
+    });
     music.id = index;
     music.url = path;
     if ((music.artist != null) && (music.artist != "")) {
       Listdata.add(music);
     }
+    "_audioMetaData :... ".Log();
     //return wait;
   }
 

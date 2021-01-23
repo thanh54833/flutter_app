@@ -64,7 +64,6 @@ class MainScreen extends StatelessWidget {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
                 StreamBuilder<QueueState>(
                   stream: _queueStateStream,
                   builder: (context, snapshot) {
@@ -124,7 +123,7 @@ class MainScreen extends StatelessWidget {
                     final mediaState = snapshot.data;
                     return SeekBar(
                       duration:
-                      mediaState?.mediaItem?.duration ?? Duration.zero,
+                          mediaState?.mediaItem?.duration ?? Duration.zero,
                       position: mediaState?.position ?? Duration.zero,
                       onChangeEnd: (newPosition) {
                         AudioService.seekTo(newPosition);
@@ -162,8 +161,6 @@ class MainScreen extends StatelessWidget {
                     );
                   },
                 ),
-
-
               ],
             );
           },
@@ -336,7 +333,7 @@ getMediaItem(MusicModel musicModel) {
     artist: musicModel.artist,
     duration: Duration(milliseconds: musicModel.duration),
     artUri:
-    "https://image.freepik.com/free-photo/white-clean-brick-wall-as-texture-background-backdrop-high-resolution-picture_117930-181.jpg", //Uint8List.fromList(musicModel.logoMemory.codeUnits),//"https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg",
+        "https://image.freepik.com/free-photo/white-clean-brick-wall-as-texture-background-backdrop-high-resolution-picture_117930-181.jpg", //Uint8List.fromList(musicModel.logoMemory.codeUnits),//"https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg",
   );
   return mediaItem;
 }
@@ -352,9 +349,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   //List<MediaItem> get queue => _mediaLibrary.items;
   List<MusicModel> queue;
 
-  int get index => Random().nextInt(20);//Todo : _player.currentIndex;
-
-
+  int get index => Random().nextInt(20); //Todo : _player.currentIndex;
 
   _getListMediaItem(List<MusicModel> data) {
     List<MediaItem> listMedialItem = [];
@@ -434,12 +429,10 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   @override
-  Future<void> onSkipToQueueItem(String mediaId) async {
-
+  Future<void> onPlayFromMediaId(String mediaId) async {
+    "===onPlayFromMediaId :... ${mediaId} ".Log();
     "===mediaId :... ${mediaId} ".Log();
-
     //"onSkipToQueueItem :.. ${queue.length} } ".Log();
-
     // Then default implementations of onSkipToNext and onSkipToPrevious will
     // delegate to this method.
     final newIndex = queue.indexWhere((MusicModel item) => item.url == mediaId);
@@ -450,11 +443,33 @@ class AudioPlayerTask extends BackgroundAudioTask {
     // previous. This variable holds the preferred state to send instead of
     // buffering during a skip, and it is cleared as soon as the player exits
     // buffering (see the listener in onStart).
-    _skipState = newIndex > index ? AudioProcessingState.skippingToNext : AudioProcessingState.skippingToPrevious;
+    //_skipState = newIndex > index ? AudioProcessingState.skippingToNext : AudioProcessingState.skippingToPrevious;
+    //Todo : chọn bài mới ..
+    _skipState = AudioProcessingState.skippingToQueueItem;
     // This jumps to the beginning of the queue item at newIndex.
     _player.seek(Duration.zero, index: newIndex);
+  }
 
+  @override
+  Future<void> onSkipToQueueItem(String mediaId) async {
+    "===mediaId :... ${mediaId} ".Log();
 
+    //"onSkipToQueueItem :.. ${queue.length} } ".Log();
+    // Then default implementations of onSkipToNext and onSkipToPrevious will
+    // delegate to this method.
+    final newIndex = queue.indexWhere((MusicModel item) => item.url == mediaId);
+    if (newIndex == -1) return;
+    // During a skip, the player may enter the buffering state. We could just
+    // propagate that state directly to AudioService clients but AudioService
+    // has some more specific states we could use for skipping to next and
+    // previous. This variable holds the preferred state to send instead of
+    // buffering during a skip, and it is cleared as soon as the player exits
+    // buffering (see the listener in onStart).
+    _skipState = newIndex > index
+        ? AudioProcessingState.skippingToNext
+        : AudioProcessingState.skippingToPrevious;
+    // This jumps to the beginning of the queue item at newIndex.
+    _player.seek(Duration.zero, index: newIndex);
   }
 
   playLocal() async {

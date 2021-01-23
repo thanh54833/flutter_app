@@ -54,6 +54,7 @@ class Model {
   var age = 20;
 
   Model(this.name, this.age);
+
   @override
   String toString() {
     return 'Model{name: $name, age: $age}';

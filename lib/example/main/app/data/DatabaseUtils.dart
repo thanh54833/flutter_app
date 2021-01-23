@@ -11,7 +11,9 @@ class DatabaseUtils {
 
   Future insert(music) async {
     MusicDatabaseHelper helper = MusicDatabaseHelper.instance;
-    int id = await helper.insert(music);
+    await helper.insert(music).catchError((onError){
+      "onError :.. ${onError} ".Log();
+    }); //int id =
   }
 
   Future getListFavourites() async {
@@ -40,11 +42,15 @@ class DatabaseUtils {
   }
 
   Future setData(List<MusicModel> listData) async {
+    "setData :...".Log();
     List<Future<void>> futures = [];
     listData.forEach((music) {
-      futures.add(insert(music));
+      futures.add(insert(music).catchError((e) {
+        "onError :.. $e ".Log();
+      }));
     });
-    await Future.wait(futures);
-    //return true;
+    await Future.wait(futures).catchError((e) {
+      "onError 111 :.. $e ".Log();
+    });
   }
 }
