@@ -344,6 +344,7 @@ class _BottomBar extends State<BottomBar> {
     return AudioServiceWidget(
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             decoration: BoxDecoration(
@@ -370,20 +371,21 @@ class _BottomBar extends State<BottomBar> {
                             borderRadius: BorderRadius.circular(8.0),
                             child: Container(
                               child: ((widget.itemSelect != null) &&
-                                  (widget.itemSelect.logoMemory != null) &&
-                                  (widget.itemSelect.logoMemory != ""))
+                                      (widget.itemSelect.logoMemory != null) &&
+                                      (widget.itemSelect.logoMemory != ""))
                                   ? Image.memory(
-                                new Uint8List.fromList(
-                                    widget.itemSelect.logoMemory.codeUnits),
-                                height: 60,
-                                width: 60,
-                                fit: BoxFit.cover,
-                              )
+                                      new Uint8List.fromList(widget
+                                          .itemSelect.logoMemory.codeUnits),
+                                      height: 60,
+                                      width: 60,
+                                      fit: BoxFit.cover,
+                                    )
                                   : Container(),
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8.0),
                                   color: LocalColor.Primary_20),
                               //margin: EdgeInsets.all(1),
+                              //padding: EdgeInsets.only(top: 2, bottom: 2),
                             ),
                           ),
                         ),
@@ -397,8 +399,11 @@ class _BottomBar extends State<BottomBar> {
                                     direction: Axis.horizontal,
                                     child: Text(
                                       ((widget.itemSelect != null) &&
-                                          (widget.itemSelect.artist != null))
-                                          ? " Song:" + widget.itemSelect.artist + " "
+                                              (widget.itemSelect.artist !=
+                                                  null))
+                                          ? " Song:" +
+                                              widget.itemSelect.artist +
+                                              " "
                                           : "",
                                       style: Themes.TextStyle_Small_Bold,
                                     ),
@@ -412,7 +417,8 @@ class _BottomBar extends State<BottomBar> {
                                     direction: Axis.horizontal,
                                     child: Text(
                                       ((widget.itemSelect != null) &&
-                                          (widget.itemSelect.artist != null))
+                                              (widget.itemSelect.artist !=
+                                                  null))
                                           ? " " + widget.itemSelect.artist + " "
                                           : "",
                                       style: Themes.TextStyle_Small,
@@ -437,7 +443,8 @@ class _BottomBar extends State<BottomBar> {
                               "snapshot.connectionState :... ${snapshot.connectionState} "
                                   .Log();
 
-                              if (snapshot.connectionState != ConnectionState.active) {
+                              if (snapshot.connectionState !=
+                                  ConnectionState.active) {
                                 // Don't show anything until we've ascertained whether or not the
                                 // service is running, since we want to show a different UI in
                                 // each case.
@@ -445,7 +452,8 @@ class _BottomBar extends State<BottomBar> {
                               } else {
                                 "widget.itemSelect.url :.. ${widget.itemSelect.url}"
                                     .Log();
-                                AudioService.playFromMediaId(widget.itemSelect.url);
+                                AudioService.playFromMediaId(
+                                    widget.itemSelect.url);
                                 AudioService.play();
                               }
 
@@ -461,10 +469,11 @@ class _BottomBar extends State<BottomBar> {
                                       return Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          if (queue != null && queue.isNotEmpty) ...[
+                                          if (queue != null &&
+                                              queue.isNotEmpty) ...[
                                             Row(
                                               mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                                  MainAxisAlignment.center,
                                               children: [
                                                 IconButton(
                                                   icon: Icon(
@@ -472,16 +481,18 @@ class _BottomBar extends State<BottomBar> {
                                                     color: LocalColor.Gray,
                                                   ),
                                                   iconSize: 25.0,
-                                                  onPressed: mediaItem == queue.first
-                                                      ? null
-                                                      : AudioService.skipToPrevious,
+                                                  onPressed:
+                                                      mediaItem == queue.first
+                                                          ? null
+                                                          : AudioService
+                                                              .skipToPrevious,
                                                 ),
                                               ],
                                             )
                                           ] else ...[
                                             Row(
                                               mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                                  MainAxisAlignment.center,
                                               children: [
                                                 IconButton(
                                                   icon: Icon(
@@ -506,9 +517,13 @@ class _BottomBar extends State<BottomBar> {
                                       final playing = snapshot.data ?? false;
                                       "playing :... ${playing} ".Log();
                                       return Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
-                                          if (playing) pauseButton() else playButton(),
+                                          if (playing)
+                                            pauseButton()
+                                          else
+                                            playButton(),
                                         ],
                                       );
                                     },
@@ -522,10 +537,11 @@ class _BottomBar extends State<BottomBar> {
                                       return Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          if (queue != null && queue.isNotEmpty) ...[
+                                          if (queue != null &&
+                                              queue.isNotEmpty) ...[
                                             Row(
                                               mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                                  MainAxisAlignment.center,
                                               children: [
                                                 IconButton(
                                                   icon: Icon(
@@ -533,7 +549,8 @@ class _BottomBar extends State<BottomBar> {
                                                     color: LocalColor.Gray,
                                                   ),
                                                   iconSize: 25.0,
-                                                  onPressed: mediaItem == queue.last
+                                                  onPressed: mediaItem ==
+                                                          queue.last
                                                       ? null
                                                       : AudioService.skipToNext,
                                                 ),
@@ -542,7 +559,7 @@ class _BottomBar extends State<BottomBar> {
                                           ] else ...[
                                             Row(
                                               mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                                  MainAxisAlignment.center,
                                               children: [
                                                 IconButton(
                                                   icon: Icon(
@@ -560,12 +577,12 @@ class _BottomBar extends State<BottomBar> {
                                   ),
                                   Container(
                                       child: IconButton(
-                                        icon: Icon(
-                                          Icons.volume_up,
-                                          color: LocalColor.Gray,
-                                        ),
-                                        onPressed: () {},
-                                      ))
+                                    icon: Icon(
+                                      Icons.volume_up,
+                                      color: LocalColor.Gray,
+                                    ),
+                                    onPressed: () {},
+                                  ))
                                 ],
                               );
                             },
@@ -584,15 +601,15 @@ class _BottomBar extends State<BottomBar> {
           ),
           Container(
             child: WaveSlider(
-              initialBarPosition: 200,
-              barWidth: 5.0,
+              initialBarPosition: 10,
+              barWidth: 2.0,
               maxBarHight: 20,
-              width: MediaQuery.of(context).size.width,
-              barPosition: 50,
+              width: 250,
+              barPosition: 10,
             ),
             height: 20,
             color: Colors.transparent,
-            padding: EdgeInsets.only(left: 8,right: 8),
+            alignment: Alignment.center,
           )
         ],
       ),

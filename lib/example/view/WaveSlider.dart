@@ -79,22 +79,22 @@ class AppState extends StatefulWidget {
 
 class _AppState extends State<AppState> {
   var barPosition = ValueNotifier(0);
-  var maxBar = 200;
+  var maxBar = 10;
 
   build(BuildContext context) {
     barPosition.value = 0;
 
-    countDownTimer() async {
-      //int timerCount;
-      List<void>.generate(10, (index) => index).forEach((element) async {
-        await Future.delayed(Duration(seconds: 1)).then((_) {
-          barPosition.value = (barPosition.value + 10) * 2;
-          " barPosition.value :... ${barPosition.value} ".Log();
-        });
-      });
-    }
+    // countDownTimer() async {
+    //   //int timerCount;
+    //   List<void>.generate(10, (index) => index).forEach((element) async {
+    //     await Future.delayed(Duration(seconds: 1)).then((_) {
+    //       barPosition.value = (barPosition.value + 10) * 2;
+    //       " barPosition.value :... ${barPosition.value} ".Log();
+    //     });
+    //   });
+    // }
+    //countDownTimer();
 
-    countDownTimer();
     return Container(
       height: double.infinity,
       width: double.infinity,
@@ -110,7 +110,8 @@ class _AppState extends State<AppState> {
                   initialBarPosition: maxBar.toDouble(),
                   barWidth: 5.0,
                   maxBarHight: 20,
-                  width: MediaQuery.of(context).size.width,
+                  width: 200,
+                  //MediaQuery.of(context).size.width,
                   barPosition: value.toDouble(),
                 );
               },
@@ -144,7 +145,7 @@ class WaveSlider extends StatefulWidget {
   final double initialBarPosition;
   final double barWidth;
   final int maxBarHight;
-  final double width;
+  double width;
   double barPosition;
 
   WaveSlider({
@@ -161,11 +162,8 @@ class WaveSlider extends StatefulWidget {
 
 class WaveSliderState extends State<WaveSlider> {
   List<int> bars = [];
-
-  //double barPosition;
   double barWidth;
   int maxBarHight;
-  double width;
   int numberOfBars;
 
   void randomNumberGenerator() {
@@ -189,72 +187,78 @@ class WaveSliderState extends State<WaveSlider> {
     widget.barPosition = widget.initialBarPosition;
     barWidth = widget.barWidth;
     maxBarHight = widget.maxBarHight.toInt();
-    width = widget.width;
     if (bars.isNotEmpty) bars = [];
-    numberOfBars = width ~/ barWidth;
+    numberOfBars = widget.width ~/ barWidth;
     randomNumberGenerator();
   }
 
   @override
   Widget build(BuildContext context) {
     int barItem = 0;
+
+    "widget.width :.. ${widget.width} ".Log();
+
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Container(
-        alignment: Alignment.bottomCenter,
+      body: Center(
         child: Container(
           alignment: Alignment.bottomCenter,
-          child: GestureDetector(
-            onTapDown: (TapDownDetails details) => _onTapDown(details),
-            onHorizontalDragUpdate: (DragUpdateDetails details) {
-              setState(() {
-                widget.barPosition = details.globalPosition.dx;
-              });
-            },
-            child: Container(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: bars.map((int height) {
-                  Color color = barItem + 1 < widget.barPosition / barWidth
-                      ? LocalColor.Primary
-                      : Colors.grey;
-                  barItem++;
-                  return Row(
-                    children: <Widget>[
-                      Container(
-                        width: .1,
-                        height: height.toDouble(),
-                        color: Colors.green,
-                      ),
-                      //Animation(
-                      // child:
-                      Container(
-                        decoration: BoxDecoration(
-                          color: color,
-                          borderRadius: BorderRadius.only(
-                            topLeft: const Radius.circular(1.0),
-                            topRight: const Radius.circular(1.0),
-                          ),
+          child: Container(
+            alignment: Alignment.bottomCenter,
+            child: GestureDetector(
+              onTapDown: (TapDownDetails details) => _onTapDown(details),
+              onHorizontalDragUpdate: (DragUpdateDetails details) {
+                setState(() {
+                  widget.barPosition = details.globalPosition.dx;
+                });
+              },
+              child: Container(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: bars.map((int height) {
+                    Color color = barItem + 1 < widget.barPosition / barWidth
+                        ? LocalColor.Primary
+                        : Colors.grey;
+                    barItem++;
+                    return Row(
+                      children: <Widget>[
+                        Container(
+                          width: .1,
+                          height: height.toDouble(),
+                          color: Colors.green,
                         ),
-                        height: height.toDouble(),
-                        width: 4.8,
-                      ),
-                      // maxHeight: 10,//height.toDouble(),
-                      // minHeight: 5,
-                      //)
-                      Container(
-                        width: .1,
-                        height: height.toDouble(),
-                        color: Colors.green,
-                      ),
-                    ],
-                  );
-                }).toList(),
+                        //Animation(
+                        // child:
+                        Container(
+                          decoration: BoxDecoration(
+                            color: color,
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(1.0),
+                              topRight: const Radius.circular(1.0),
+                            ),
+                          ),
+                          height: height.toDouble(),
+                          width: 4.8,
+                        ),
+                        // maxHeight: 10,//height.toDouble(),
+                        // minHeight: 5,
+                        //)
+                        Container(
+                          width: .1,
+                          height: height.toDouble(),
+                          color: Colors.green,
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+                margin: EdgeInsets.only(bottom: 2),
               ),
-              margin: EdgeInsets.only(bottom: 2),
             ),
           ),
+          color: Colors.transparent,
+          width: widget.width,
         ),
       ),
     );
