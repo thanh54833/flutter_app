@@ -604,7 +604,7 @@ class _BottomBar extends State<BottomBar> {
               initialBarPosition: 10,
               barWidth: 2.0,
               maxBarHight: 20,
-              width: 250,
+              width: 200,
               barPosition: 10,
             ),
             height: 20,
