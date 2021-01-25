@@ -21,6 +21,10 @@ import 'package:flutter_app/example/music/AudioService.dart';
 import 'package:flutter_app/example/view/AnimationDelayList.dart';
 import 'package:flutter_app/example/view/ScrollingText.dart';
 import 'package:flutter_app/example/view/WaveSlider.dart';
+import 'package:flutter_app/example/view/bass_boost.dart';
+import 'package:flutter_visualizers/Visualizers/BarVisualizer.dart';
+import 'package:flutter_visualizers/Visualizers/LineBarVisualizer.dart';
+import 'package:flutter_visualizers/visualizer.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:permission/permission.dart';
 import 'package:rxdart/rxdart.dart';
@@ -71,6 +75,7 @@ class _StateHome extends State<StateHome> {
   var homeValueNotifier = HomeValueNotifier();
 
   _onCLickItemFavourite(MusicModel _musicModel) {
+    "_onCLickItemFavourite :.. ".Log();
     //"_musicModel :... ${_musicModel.logoMemory} ".Log();
     itemSelect.value = _musicModel;
     // if ((!isCollapsed) &&
@@ -200,9 +205,9 @@ class _StateHome extends State<StateHome> {
               },
             ),
             alignment: Alignment.topCenter,
-            height: 85,
+            height: 175,
           ),
-          height: isCollapsed ? 85 : 0,
+          height: isCollapsed ? 175 : 0,
           controller: _bsbController,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(0),
@@ -293,33 +298,49 @@ void _audioPlayerTaskEntrypoint() async {
 }
 
 class _BottomBar extends State<BottomBar> {
+  var isStartService = false;
+
   build(BuildContext context) {
-    AudioService.stop();
     //AudioService.stop();
     //"AudioService.connected 1  ${AudioService.connected} ".Log();
-
+    AudioService.stop();
     //Todo : kiêm tra list data :...
-    if (false) {
-      AudioService.start(
-        backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
-        androidNotificationChannelName: 'Audio Service Demo',
-        // Enable this if you want the Android service to exit the foreground state on pause.
-        //androidStopForegroundOnPause: true,
-        androidNotificationColor: 0xFF2196f3,
-        androidNotificationIcon: 'mipmap/ic_launcher',
-        androidEnableQueue: false,
-      );
-    }
+    //if (!isStartService) {
+    AudioService.start(
+      backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
+      androidNotificationChannelName: 'Audio Service Demo',
+      // Enable this if you want the Android service to exit the foreground state on pause.
+      //androidStopForegroundOnPause: true,
+      androidNotificationColor: 0xFF2196f3,
+      androidNotificationIcon: 'mipmap/ic_launcher',
+      androidEnableQueue: false,
+    );
+    //isStartService = true;
+    //}
+
+
+    //var bass = BassBoost(audioSessionId: 47425);
+    //47417
+    // bass.getEnabled().then((value) {
+    //   "getEnabled :.. ${value} ".Log();
+    // });
+    //bass.setEnabled(enabled: true);
+
+    // bass.getStrength().then((value) {
+    //   "bass :... ${value}".Log();
+    // });
+    //
+    // bass.setStrength(strength: 1000);
+
     //"AudioService.connected 2 ${AudioService.connected} ".Log();
     if (widget.itemSelect != null) {
       "AudioService.playFromMediaId :... ${widget.itemSelect.url} ".Log();
+
       //AudioService.playMediaItem(null);
       //AudioService.playFromMediaId(widget.itemSelect.url);
       //AudioService.play();
-
       //AudioService.playMediaItem(getMediaItem(widget.itemSelect));
       //AudioService.playFromMediaId(widget.itemSelect.url);
-
       //AudioService.play();
       //AudioService.play();
       // AudioService.playFromMediaId(widget.itemSelect.url);
@@ -341,11 +362,49 @@ class _BottomBar extends State<BottomBar> {
       //AudioService.playFromMediaId(widget.itemSelect.url);
 
     }
+
+    // _getView(){
+    //   return Visualizer(
+    //     builder: (context, fft) {
+    //       " fft.length :... ${fft.length} ".Log();
+    //     },
+    //     id: 47673,
+    //   );
+    // }
+
     return AudioServiceWidget(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // Container(
+          //     child: StreamBuilder<bool>(
+          //         stream: AudioService.runningStream,
+          //         builder: (context, snapshot) {
+          //           //.snapshot.data
+          //
+          //           return Container(
+          //             height: 100,
+          //             child: new Visualizer(
+          //               builder: (BuildContext context, List<int> wave) {
+          //
+          //                 "wave :... ${wave.length}".Log();
+          //                 wave = [1, 2, 3, 4, 5, 4, 2, 4, 4, 4, 2];
+          //                 return  CustomPaint(
+          //                   painter: new LineBarVisualizer(
+          //                     waveData: wave,
+          //                     height: 100,
+          //                     width: double.infinity,
+          //                     color: Colors.blueAccent,
+          //                   ),
+          //                 );
+          //               },
+          //               id: 47625,
+          //             ),
+          //             color: Colors.red,
+          //           );
+          //         })),
+          //_getView(),
           Container(
             decoration: BoxDecoration(
               //Here goes the same radius, u can put into a var or function
@@ -366,7 +425,7 @@ class _BottomBar extends State<BottomBar> {
                   children: [
                     Row(
                       children: [
-                        Center(
+                        Container(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8.0),
                             child: Container(
@@ -385,9 +444,10 @@ class _BottomBar extends State<BottomBar> {
                                   borderRadius: BorderRadius.circular(8.0),
                                   color: LocalColor.Primary_20),
                               //margin: EdgeInsets.all(1),
-                              //padding: EdgeInsets.only(top: 2, bottom: 2),
+                              //margin: EdgeInsets.only(top: 5, bottom: 5),
                             ),
                           ),
+                          padding: EdgeInsets.only(top: 4, bottom: 4),
                         ),
                         Expanded(
                           child: Container(
@@ -457,6 +517,7 @@ class _BottomBar extends State<BottomBar> {
                                 AudioService.play();
                               }
 
+
                               return Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
@@ -466,6 +527,17 @@ class _BottomBar extends State<BottomBar> {
                                       final queueState = snapshot.data;
                                       final queue = queueState?.queue ?? [];
                                       final mediaItem = queueState?.mediaItem;
+
+                                  
+                                      var bass = BassBoost(audioSessionId: 0);
+                                      bass.setEnabled(enabled: true);
+                                      bass.setStrength(strength: 500).then((value){
+
+                                        "bass.setStrength :... ".Log();
+
+                                      });
+                                      
+
                                       return Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
@@ -475,6 +547,14 @@ class _BottomBar extends State<BottomBar> {
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
+                                                // Container(
+                                                //   child: Visualizer(
+                                                //     builder: (context, fft) {
+                                                //       "fft :.. ${fft.length} ".Log();
+                                                //     },
+                                                //     id:47753,
+                                                //   ),
+                                                // ),
                                                 IconButton(
                                                   icon: Icon(
                                                     Icons.skip_previous,
@@ -599,18 +679,20 @@ class _BottomBar extends State<BottomBar> {
             ),
             margin: EdgeInsets.only(left: 8, right: 8, bottom: 2),
           ),
-          Container(
-            child: WaveSlider(
-              initialBarPosition: 10,
-              barWidth: 2.0,
-              maxBarHight: 20,
-              width: 200,
-              barPosition: 10,
-            ),
-            height: 20,
-            color: Colors.transparent,
-            alignment: Alignment.center,
-          )
+          //Todo :....
+
+          // Container(
+          //   child: WaveSlider(
+          //     initialBarPosition: 10,
+          //     barWidth: 2.0,
+          //     maxBarHight: 20,
+          //     width: 200,
+          //     barPosition: 10,
+          //   ),
+          //   height: 20,
+          //   color: Colors.transparent,
+          //   alignment: Alignment.center,
+          // )
         ],
       ),
     );

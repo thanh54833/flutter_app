@@ -39,6 +39,7 @@ class FavouritesPage extends StatefulWidget {
 class _FavouritesPage extends State<FavouritesPage> {
   List<MusicModel> data = [];
   var isInitState = false;
+  var itemSelected = 0;
 
   _handleDataLocal(List<MusicModel> data) async {
     var database = DatabaseUtils.instance;
@@ -64,10 +65,12 @@ class _FavouritesPage extends State<FavouritesPage> {
           setState(() {
             this.data = data;
           });
-          appConfig.getIndexCurrentPlay().then((index) {
-            "current index :... ${index} ".Log();
-            widget.onCLick(this.data[index]);
-          });
+
+          // appConfig.getIndexCurrentPlay().then((index) {
+          //   "current index :... ${index} ".Log();
+          //   widget.onCLick(this.data[index]);
+          // });
+
         }
       });
       isInitState = true;
@@ -104,11 +107,22 @@ class _FavouritesPage extends State<FavouritesPage> {
             //var _imagesLogo = _getUnit8List(item.logoMemory);
             //var isPlay=false;
 
-            return ItemSong(
-              appConfig: appConfig,
-              onCLick: widget.onCLick,
-              item: item,
-              index: index,
+            return ValueListenableBuilder(
+              valueListenable: item.isSelected,
+              builder: (context, value, child) {
+                return ItemSong(
+                  appConfig: appConfig,
+                  onCLick: (music) {
+                    data[index].isSelected.value = true;
+                    data[itemSelected].isSelected.value = false;
+                    itemSelected = index;
+                    return widget.onCLick(item);
+                  },
+                  item: item,
+                  index: index,
+                  isSelected: item.isSelected.value,
+                );
+              },
             );
           },
         ),
@@ -123,8 +137,10 @@ class ItemSong extends StatefulWidget {
   Function(MusicModel) onCLick;
   MusicModel item;
   int index;
+  bool isSelected = false;
 
-  ItemSong({this.appConfig, this.onCLick, this.item, this.index});
+  ItemSong(
+      {this.appConfig, this.onCLick, this.item, this.index, this.isSelected});
 
   createState() => StateItemSong();
 }
@@ -154,18 +170,20 @@ class StateItemSong extends State<ItemSong> {
                           width: 50,
                           fit: BoxFit.cover,
                         ),
-                        Container(
-                          height: 50,
-                          width: 50,
-                          color: Colors.white24.withOpacity(0.7),
-                          child: Lottie.asset(
-                            'assets/image/play_music.json',
-                            width: 50,
+                        if (widget.isSelected) ...[
+                          Container(
                             height: 50,
-                            fit: BoxFit.cover,
+                            width: 50,
+                            color: Colors.white24.withOpacity(0.7),
+                            child: Lottie.asset(
+                              'assets/image/play_music.json',
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            ),
+                            padding: EdgeInsets.all(11),
                           ),
-                          padding: EdgeInsets.all(11),
-                        ),
+                        ]
                       ],
                     ),
                     decoration: BoxDecoration(

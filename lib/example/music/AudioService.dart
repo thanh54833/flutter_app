@@ -240,7 +240,6 @@ class MainScreen extends StatelessWidget {
 class QueueState {
   final List<MediaItem> queue;
   final MediaItem mediaItem;
-
   QueueState(this.queue, this.mediaItem);
 }
 
@@ -348,6 +347,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   //List<MediaItem> get queue => _mediaLibrary.items;
   List<MusicModel> queue;
+  int sessionId;
 
   int get index => Random().nextInt(20); //Todo : _player.currentIndex;
 
@@ -372,6 +372,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       // switch between two types of audio as this example does.
       final session = await AudioSession.instance;
       await session.configure(AudioSessionConfiguration.speech());
+      //sessionId = _player.androidAudioSessionId;
       // Broadcast media item changes.
       _player.currentIndexStream.listen((index) {
         var musicData = queue[index];
@@ -421,10 +422,11 @@ class AudioPlayerTask extends BackgroundAudioTask {
     databaseUtils.getAll().then((data) {
       "data :.. ${data.length} ".Log();
       queue = data;
-
       //Todo : start :...
       handle();
       //Todo :end :...
+    }).catchError((e) {
+      "catchError :.. ${e} ".Log();
     });
   }
 
@@ -435,7 +437,11 @@ class AudioPlayerTask extends BackgroundAudioTask {
     //"onSkipToQueueItem :.. ${queue.length} } ".Log();
     // Then default implementations of onSkipToNext and onSkipToPrevious will
     // delegate to this method.
+    "queue :... ${queue.length}".Log();
+
     final newIndex = queue.indexWhere((MusicModel item) => item.url == mediaId);
+    "newIndex :... ${newIndex} ".Log();
+
     if (newIndex == -1) return;
     // During a skip, the player may enter the buffering state. We could just
     // propagate that state directly to AudioService clients but AudioService
@@ -478,7 +484,22 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   @override
-  Future<void> onPlay() => _player.play(); //_player.play();
+  Future<void> onPlay() {
+    sessionId = _player.androidAudioSessionId;
+
+    "sessionId :... ${_player.androidAudioSessionId}  "
+            "\n ${_player.androidAudioSessionIdStream} "
+            "\n "
+            "\n "
+            "\n "
+        .Log();
+
+    // _player.onAudioSessionIdChange.listen((audioSessionId) {
+    //   print("audio Session Id: $audioSessionId");
+    // });
+
+    return _player.play();
+  } //_player.play();
 
   @override
   Future<void> onPause() => _player.pause();

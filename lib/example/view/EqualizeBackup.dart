@@ -1,17 +1,17 @@
+
 import 'dart:async';
+
 import 'package:equalizer/equalizer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_app/example/main/app/LocalColor.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_app/example/main/common/LogCatUtils.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
-  createState() => _MyAppState();
+  @override
+  _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
@@ -29,15 +29,8 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
-  // Future<AudioPlayer> playLocalAsset() async {
-  //   AudioCache cache = new AudioCache();
-  //   return await cache.play("assets/sound/music.mp3");
-  // }
-
   @override
   Widget build(BuildContext context) {
-    //playLocalAsset().then((value) => {"playLocalAsset :...".Log()});
-
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -73,7 +66,13 @@ class _MyAppState extends State<MyApp> {
             Container(
               color: Colors.grey.withOpacity(0.1),
               child: SwitchListTile(
-                title: Text('Custom Equalizer'),
+                title: Text(
+                  'Custom Equalizer',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontFamily: 'GafataRegular',
+                      fontSize: 16),
+                ),
                 value: enableCustomEQ,
                 onChanged: (value) {
                   Equalizer.setEnabled(value);
@@ -81,6 +80,7 @@ class _MyAppState extends State<MyApp> {
                     enableCustomEQ = value;
                   });
                 },
+                activeColor: LocalColor.Primary,
               ),
             ),
             FutureBuilder<List<int>>(
@@ -130,20 +130,20 @@ class _CustomEQState extends State<CustomEQ> {
       builder: (context, snapshot) {
         return snapshot.connectionState == ConnectionState.done
             ? Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: snapshot.data
-                        .map((freq) => _buildSliderBand(freq, bandId++))
-                        .toList(),
-                  ),
-                  Divider(),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: _buildPresets(),
-                  ),
-                ],
-              )
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: snapshot.data
+                  .map((freq) => _buildSliderBand(freq, bandId++))
+                  .toList(),
+            ),
+            Divider(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: _buildPresets(),
+            ),
+          ],
+        )
             : CircularProgressIndicator();
       },
     );
@@ -191,11 +191,11 @@ class _CustomEQState extends State<CustomEQ> {
             value: _selectedValue,
             onChanged: widget.enabled
                 ? (String value) {
-                    Equalizer.setPreset(value);
-                    setState(() {
-                      _selectedValue = value;
-                    });
-                  }
+              Equalizer.setPreset(value);
+              setState(() {
+                _selectedValue = value;
+              });
+            }
                 : null,
             items: presets.map((String value) {
               return DropdownMenuItem<String>(

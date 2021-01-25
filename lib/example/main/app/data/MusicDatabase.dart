@@ -2,6 +2,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -42,6 +43,8 @@ class MusicModel {
   String authorName = "";
   String trackDuration = "";
   int duration = 0;
+
+  ValueNotifier<bool> isSelected = ValueNotifier(false);
 
   MusicModel(this.url, this.name, this.description);
 
