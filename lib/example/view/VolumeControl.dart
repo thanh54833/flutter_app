@@ -49,7 +49,7 @@ class _VolumeControl extends State<VolumeControl> {
 
   @override
   Widget build(BuildContext context) {
-    return  Container(
+    return Container(
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Container(

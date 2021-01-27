@@ -70,6 +70,7 @@ dependencies:
   #flutter_exoplayer: ^0.5.5
   bass_boost: ^0.1.1
   volume: ^1.0.1
+  modal_bottom_sheet: ^1.0.0+1
 
 
 

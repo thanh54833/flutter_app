@@ -28,6 +28,8 @@ class BottomSheet extends StatelessWidget {
           });
     }
 
+    _modalBottomSheetMenu();
+
     return MaterialApp(
       home: Scaffold(
         body: Container(
@@ -35,7 +37,8 @@ class BottomSheet extends StatelessWidget {
             child: Text("show bottomsheet :... "),
           ),
         ).setOnClick(() => {
-              showModalBottomSheet(
+
+          showModalBottomSheet(
                   context: context,
                   builder: (builder) {
                     return new Container(
@@ -55,7 +58,10 @@ class BottomSheet extends StatelessWidget {
                       ),
                     );
                   })
-            }),
+            }
+
+
+            ),
       ),
     );
   }

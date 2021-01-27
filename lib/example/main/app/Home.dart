@@ -13,6 +13,7 @@ import 'package:flutter_app/example/main/app/page/FavouritesPage.dart';
 import 'package:flutter_app/example/main/app/page/PlaylistPage.dart';
 import 'package:flutter_app/example/main/app/page/TracksPage.dart';
 import 'package:flutter_app/example/main/app/permission/HandlePermission.dart';
+import 'package:flutter_app/example/main/app/view/ItemView.dart';
 import 'package:flutter_app/example/main/common/DialogCommon.dart';
 import 'package:flutter_app/example/main/common/Gesture.dart';
 import 'package:flutter_app/example/main/common/LogCatUtils.dart';
@@ -25,6 +26,7 @@ import 'package:flutter_app/example/view/bass_boost.dart';
 import 'package:flutter_visualizers/Visualizers/BarVisualizer.dart';
 import 'package:flutter_visualizers/Visualizers/LineBarVisualizer.dart';
 import 'package:flutter_visualizers/visualizer.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:permission/permission.dart';
 import 'package:rxdart/rxdart.dart';
@@ -82,6 +84,89 @@ class _StateHome extends State<StateHome> {
     itemSelect.value = _musicModel;
   }
 
+  _onCLickMoreItem(int index, MusicModel _musicModel) {
+    "_onCLickMoreItem :.. ${index} ".Log();
+    _showDialog();
+  }
+
+  _showDialog() {
+    //Todo : https://pub.dev/packages/modal_bottom_sheet
+    var dialog = showMaterialModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return ClipRRect(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+            child: Wrap(
+              children: [
+                Container(
+                  color: Colors.white,
+                  child: Column(
+                    children: [
+                      Container(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            color: Colors.grey,
+                            height: 5,
+                            width: 50,
+                          ),
+                        ),
+                        margin: EdgeInsets.only(top: 10, bottom: 15),
+                      ),
+                      ItemView(
+                        icon: Icon(Icons.play_circle_outline_rounded),
+                        content: "Play",
+                        onClick: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      ItemView(
+                        icon: Icon(Icons.featured_play_list_rounded),
+                        content: "Add to playlist",
+                        onClick: () {},
+                      ),
+                      ItemView(
+                        icon: Icon(Icons.multitrack_audio),
+                        content: "Edit track info",
+                        onClick: () {},
+                      ),
+                      ItemView(
+                        icon: Icon(Icons.share_rounded),
+                        content: "Share",
+                        onClick: () {},
+                      ),
+                      ItemView(
+                        icon: Icon(Icons.delete_sweep),
+                        content: "Delete",
+                        onClick: () {},
+                      ),
+                      ItemView(
+                        icon: Icon(Icons.queue_play_next_rounded),
+                        content: "Play next",
+                        onClick: () {},
+                      ),
+                      ItemView(
+                        icon: Icon(Icons.add_to_queue_rounded),
+                        content: "Add to queue",
+                        onClick: () {},
+                      ),
+                      ItemView(
+                        icon: Icon(Icons.hearing),
+                        content: "Set as ringtone",
+                        onClick: () {},
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          );
+        },
+        backgroundColor: Colors.transparent,
+        barrierColor: Colors.transparent);
+  }
+
   DialogCommon dialogLoading;
 
   _showDialogLoading() async {
@@ -96,6 +181,10 @@ class _StateHome extends State<StateHome> {
   }
 
   build(BuildContext context) {
+    // Future.delayed(Duration(milliseconds: 2000), () {
+    //   _showDialog();
+    // });
+
     var expandPage1 = ExpandPage1(
       isStartAnimation: _bsbController.isExpanded,
     );
@@ -119,6 +208,7 @@ class _StateHome extends State<StateHome> {
     });
     var homeWidget = HomeWidget(
       onCLickItemFavourite: _onCLickItemFavourite,
+      onClickMoreItem: _onCLickMoreItem,
     );
     myController.addListener(_printLatestValue);
     return Scaffold(
@@ -232,9 +322,7 @@ class _StateHome extends State<StateHome> {
             // });
 
             itemSelect.addListener(() {
-
               expandPage1.onClickItem(itemSelect.value);
-
             });
 
             return Wrap(
@@ -743,10 +831,10 @@ final List<Tab> tabs = <Tab>[
 class HomeWidget extends StatefulWidget {
   Function(MusicModel) onCLickItemFavourite;
   Function onClickScan;
+  Function(int, MusicModel) onClickMoreItem;
 
-  HomeWidget({
-    @required this.onCLickItemFavourite,
-  });
+  HomeWidget(
+      {@required this.onCLickItemFavourite, @required this.onClickMoreItem});
 
   createState() => _StateHomeWidget();
 }
@@ -755,6 +843,7 @@ class _StateHomeWidget extends State<HomeWidget> {
   build(BuildContext context) {
     var favouritesPage = FavouritesPage(
       onCLick: widget.onCLickItemFavourite,
+      onClickMoreItem: widget.onClickMoreItem,
     );
 
     widget.onClickScan = () {

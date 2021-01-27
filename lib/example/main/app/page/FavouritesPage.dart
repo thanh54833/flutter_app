@@ -28,10 +28,9 @@ import 'package:intl/intl.dart';
 class FavouritesPage extends StatefulWidget {
   Function(MusicModel) onCLick;
   Function onClickScan;
+  Function(int, MusicModel) onClickMoreItem;
 
-  FavouritesPage({
-    @required this.onCLick,
-  });
+  FavouritesPage({@required this.onCLick, @required this.onClickMoreItem});
 
   createState() => _FavouritesPage();
 }
@@ -118,7 +117,10 @@ class _FavouritesPage extends State<FavouritesPage> {
                       data[itemSelected].isSelected.value = false;
                     }
                     itemSelected = index;
-                    return widget.onCLick(item);
+                    widget.onCLick(item);
+                  },
+                  onClickMoreItem: (index, music) {
+                    widget.onClickMoreItem(index, music);
                   },
                   item: item,
                   index: index,
@@ -137,12 +139,18 @@ class _FavouritesPage extends State<FavouritesPage> {
 class ItemSong extends StatefulWidget {
   AppConfig appConfig;
   Function(MusicModel) onCLick;
+  Function(int, MusicModel) onClickMoreItem;
   MusicModel item;
   int index;
   bool isSelected = false;
 
   ItemSong(
-      {this.appConfig, this.onCLick, this.item, this.index, this.isSelected});
+      {this.appConfig,
+      this.onCLick,
+      this.item,
+      this.index,
+      this.isSelected,
+      this.onClickMoreItem});
 
   createState() => StateItemSong();
 }
@@ -251,7 +259,9 @@ class StateItemSong extends State<ItemSong> {
                   child: Container(
                     child: IconButton(
                       icon: Icon(Icons.more_horiz),
-                      onPressed: () {},
+                      onPressed: () {
+                        widget.onClickMoreItem(widget.index, widget.item);
+                      },
                       padding: EdgeInsets.all(0),
                     ),
                     color: Colors.white54,
