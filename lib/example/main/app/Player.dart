@@ -47,7 +47,7 @@ class _WidgetGradient extends State<WidgetGradient> {
 
   _getListData() {
     var _blurRadius = 10.0;
-    "listSongs :.. ${listSongs.length} ".Log();
+    //"listSongs :.. ${listSongs.length} ".Log();
     return listSongs
         .map((item) => Card(
               child: Container(

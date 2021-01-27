@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/example/main/app/LocalColor.dart';
+import 'package:flutter_app/example/view/AlertDialog.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_app/example/main/common/Gesture.dart';
 import 'package:flutter_app/example/main/common/LogCatUtils.dart';
@@ -27,7 +28,7 @@ class _ExampleState extends State<DelayListItems> {
               Container(
                 height: 200,
                 width: 40,
-                color: Colors.red,
+                color: Colors.transparent,
               ).setOnClick(() {
                 "setOnClick :...".Log();
                 setState(() {
@@ -48,39 +49,27 @@ class _ExampleState extends State<DelayListItems> {
 }
 
 final listData = [
+  Icon(
+    Icons.add_circle_outline,
+    color: LocalColor.Dark,
+    size: 25,
+  ),
   SvgPicture.asset(
     "assets/image/shuffle.svg",
-    color: Colors.white,
+    color: LocalColor.Dark,
     height: 20,
     width: 20,
-  ),
-  Icon(
-    Icons.add_box_outlined,
-    color: Colors.white,
-  ),
-  Icon(
-    Icons.favorite_border_rounded,
-    color: Colors.white,
-  ),
-  IconButton(
-    icon: Icon(
-      Icons.line_style,
-      color: Colors.white,
-    ),
-    onPressed: () {},
-    padding: EdgeInsets.zero,
-    alignment: Alignment.center,
-    constraints: BoxConstraints(),
   ),
   SvgPicture.asset(
     "assets/image/repeat.svg",
-    color: Colors.white,
+    color: LocalColor.Dark,
     height: 20,
     width: 20,
   ),
   Icon(
-    Icons.settings,
-    color: Colors.white,
+    Icons.settings_rounded,
+    color: LocalColor.Dark,
+    size: 25,
   ),
 ];
 
@@ -134,13 +123,14 @@ class _MoreItem extends State<MoreItem> with TickerProviderStateMixin {
                 );
               },
               separatorBuilder: (BuildContext context, int index) => Container(
-                width: 15,
+                width: 10,
               ),
             ),
-            height: 48,
+            height: 40,
+            color: Colors.transparent,
           )
         : Container(
-            height: 40,
+            height: 30,
             color: Colors.transparent,
           );
   }
@@ -192,19 +182,33 @@ class _ItemState extends State<Item> {
     return Container(
       child: Opacity(
         opacity: _animation.value,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10.0),
-          child: new Container(
-            color: LocalColor.Gray,
-            child: widget.item,
-            width: 48,
-            height: 48,
-            padding: EdgeInsets.all(10.0),
-            alignment: Alignment.center,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(50.0),
+            color: Colors.white.withOpacity(0.1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                offset: Offset(0.0, 1.0), //(x,y)
+                blurRadius: 0.5,
+              ),
+            ],
           ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(50.0),
+            child: new Container(
+              color: Colors.white,
+              child: widget.item,
+              padding: EdgeInsets.all(5.0),
+              alignment: Alignment.center,
+            ),
+          ),
+          padding: EdgeInsets.all(2),
         ),
       ),
       color: Colors.transparent,
+      height: 40,
+      width: 40,
     );
   }
 }

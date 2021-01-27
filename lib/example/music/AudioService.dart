@@ -240,6 +240,7 @@ class MainScreen extends StatelessWidget {
 class QueueState {
   final List<MediaItem> queue;
   final MediaItem mediaItem;
+
   QueueState(this.queue, this.mediaItem);
 }
 
@@ -278,41 +279,52 @@ class _SeekBarState extends State<SeekBar> {
     if (_dragValue != null && !_dragging) {
       _dragValue = null;
     }
-    return Stack(
-      children: [
-        Slider(
-          min: 0.0,
-          max: widget.duration.inMilliseconds.toDouble(),
-          value: value,
-          onChanged: (value) {
-            if (!_dragging) {
-              _dragging = true;
-            }
-            setState(() {
-              _dragValue = value;
-            });
-            if (widget.onChanged != null) {
-              widget.onChanged(Duration(milliseconds: value.round()));
-            }
-          },
-          onChangeEnd: (value) {
-            if (widget.onChangeEnd != null) {
-              widget.onChangeEnd(Duration(milliseconds: value.round()));
-            }
-            _dragging = false;
-          },
-        ),
-        Positioned(
-          right: 16.0,
-          bottom: 0.0,
-          child: Text(
-              RegExp(r'((^0*[1-9]\d*:)?\d{2}:\d{2})\.\d+$')
-                      .firstMatch("$_remaining")
-                      ?.group(1) ??
-                  '$_remaining',
-              style: Theme.of(context).textTheme.caption),
-        ),
-      ],
+    return Container(
+      margin: EdgeInsets.only(left: 12, right: 12),
+      child: Row(
+        children: [
+          Text(
+            "01:01",
+            style: TextStyle(
+                fontSize: 12,
+                fontFamily: 'GafataRegular',
+                color: Colors.black,
+                fontWeight: FontWeight.bold),
+          ),
+          Expanded(
+            child: Slider(
+              min: 0.0,
+              max: widget.duration.inMilliseconds.toDouble(),
+              value: value,
+              onChanged: (value) {
+                if (!_dragging) {
+                  _dragging = true;
+                }
+                setState(() {
+                  _dragValue = value;
+                });
+                if (widget.onChanged != null) {
+                  widget.onChanged(Duration(milliseconds: value.round()));
+                }
+              },
+              onChangeEnd: (value) {
+                if (widget.onChangeEnd != null) {
+                  widget.onChangeEnd(Duration(milliseconds: value.round()));
+                }
+                _dragging = false;
+              },
+            ),
+          ),
+          Text(
+            "04:10",
+            style: TextStyle(
+                fontSize: 12,
+                fontFamily: 'GafataRegular',
+                color: Colors.black,
+                fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
     );
   }
 
@@ -483,23 +495,17 @@ class AudioPlayerTask extends BackgroundAudioTask {
     //int result = await audioPlayer.play(path, isLocal: true);
   }
 
+  // @override
+  // Future<void> onPlay() {
+  //   sessionId = _player.androidAudioSessionId;
+  //   // _player.onAudioSessionIdChange.listen((audioSessionId) {
+  //   //   print("audio Session Id: $audioSessionId");
+  //   // });
+  //   return _player.play();
+  // } //_player.play();
+
   @override
-  Future<void> onPlay() {
-    sessionId = _player.androidAudioSessionId;
-
-    "sessionId :... ${_player.androidAudioSessionId}  "
-            "\n ${_player.androidAudioSessionIdStream} "
-            "\n "
-            "\n "
-            "\n "
-        .Log();
-
-    // _player.onAudioSessionIdChange.listen((audioSessionId) {
-    //   print("audio Session Id: $audioSessionId");
-    // });
-
-    return _player.play();
-  } //_player.play();
+  Future<void> onPlay() => _player.play();
 
   @override
   Future<void> onPause() => _player.pause();

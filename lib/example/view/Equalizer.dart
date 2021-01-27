@@ -8,14 +8,14 @@ import 'package:flutter_app/example/view/bass_boost.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:flutter_app/example/main/common/LogCatUtils.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(EqualizerWidget());
 
-class MyApp extends StatefulWidget {
+class EqualizerWidget extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<EqualizerWidget> {
   bool enableCustomEQ = false;
 
   @override
@@ -32,44 +32,42 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Equalizer example'),
-        ),
-        body: ListView(
-          children: [
-            Container(
-              color: Colors.grey.withOpacity(0.1),
-              child: SwitchListTile(
-                title: Text(
-                  'Custom Equalizer',
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontFamily: 'GafataRegular',
-                      fontSize: 16),
-                ),
-                value: enableCustomEQ,
-                onChanged: (value) {
-                  Equalizer.setEnabled(value);
-                  setState(() {
-                    enableCustomEQ = value;
-                  });
-                },
-                activeColor: LocalColor.Primary,
+    return ListView(
+      shrinkWrap: true,
+      children: [
+        Container(
+          //color: Colors.grey.withOpacity(0.1),
+          child: Padding(
+            padding: const EdgeInsets.all(0.0),
+            child: SwitchListTile(
+              title: Text(
+                'Custom Equalizer',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontFamily: 'GafataRegular',
+                    fontSize: 16),
               ),
-            ),
-            FutureBuilder<List<int>>(
-              future: Equalizer.getBandLevelRange(),
-              builder: (context, snapshot) {
-                return snapshot.connectionState == ConnectionState.done
-                    ? CustomEQ(enableCustomEQ, snapshot.data)
-                    : CircularProgressIndicator();
+              value: enableCustomEQ,
+              onChanged: (value) {
+                Equalizer.setEnabled(value);
+                setState(() {
+                  enableCustomEQ = value;
+                });
               },
+              activeColor: LocalColor.Primary,
             ),
-          ],
+          ),
+          padding: EdgeInsets.zero,
         ),
-      ),
+        FutureBuilder<List<int>>(
+          future: Equalizer.getBandLevelRange(),
+          builder: (context, snapshot) {
+            return snapshot.connectionState == ConnectionState.done
+                ? CustomEQ(enableCustomEQ, snapshot.data)
+                : CircularProgressIndicator();
+          },
+        ),
+      ],
     );
   }
 }
@@ -85,69 +83,137 @@ class CustomEQ extends StatefulWidget {
 }
 
 class _CustomEQState extends State<CustomEQ> {
-  double min, max;
   Future<List<String>> fetchPresets;
-  int itemSelected = 0;
+  var itemSelected = 0;
+  ValueNotifier<String> _selectedValue = ValueNotifier('');
+  double min, max;
+
+  //SlideBan slideBan;
 
   @override
   void initState() {
     super.initState();
+    fetchPresets = Equalizer.getPresetNames();
     min = widget.bandLevelRange[0].toDouble();
     max = widget.bandLevelRange[1].toDouble();
-    fetchPresets = Equalizer.getPresetNames();
-
-    // var bass = BassBoost(audioSessionId: 0);
-    // //47417
-    // bass.getEnabled().then((value) {
-    //   "getEnabled :.. ${value} ".Log();
-    // });
-    // bass.setEnabled(enabled: true);
-    // bass.setStrength(strength: 100);
-  }
-
-  setBass() async {
-    BassBoost bassBoost = new BassBoost(audioSessionId: 0);
-    var setStrength = await bassBoost.setStrength(strength: 300);
-
-    "setStrength :... ${setStrength} ".Log();
-
   }
 
   @override
   Widget build(BuildContext context) {
+    // slideBan = SlideBan(
+    //   enabled: widget.enabled,
+    //   bandLevelRange: widget.bandLevelRange,
+    // );
+    "itemSelected :... ${itemSelected} ".Log();
     int bandId = 0;
-
-    setBass();
-
-    return FutureBuilder<List<int>>(
-      future: Equalizer.getCenterBandFreqs(),
-      builder: (context, snapshot) {
-        return snapshot.connectionState == ConnectionState.done
-            ? Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: snapshot.data
-                        .map((freq) => _buildSliderBand(freq, bandId++))
-                        .toList(),
-                  ),
-                  Divider(),
-                  Padding(
-                    padding: const EdgeInsets.all(0.0),
-                    child: _buildPresets(),
-                  ),
-                ],
-              )
-            : CircularProgressIndicator();
-      },
+    return Column(
+      children: [
+        // ValueListenableBuilder(
+        //   valueListenable: _selectedValue,
+        //   builder: (context, value, child) {
+        FutureBuilder<List<int>>(
+          future: Equalizer.getCenterBandFreqs(),
+          builder: (context, snapshot) {
+            return (snapshot.connectionState == ConnectionState.done) && true
+                ? Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: snapshot.data
+                          .map((freq) => _buildSliderBand(freq, bandId++))
+                          .toList(),
+                    ),
+                    height: 200,
+                  )
+                : Container(
+                    child: Container(
+                      child: Center(
+                          //child: CircularProgressIndicator(),
+                          ),
+                      height: 40,
+                      width: 40,
+                    ),
+                    height: 200,
+                  );
+          },
+        ),
+        Divider(),
+        Padding(
+          padding: const EdgeInsets.all(0.0),
+          child: _buildPresets(),
+        ),
+      ],
     );
+  }
+
+  Widget _buildPresets() {
+    return FutureBuilder<List<String>>(
+        future: fetchPresets,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final presets = snapshot.data;
+            if (presets.isEmpty) return Text('No presets available!');
+
+            List<Widget> list = [];
+            List<ValueNotifier<bool>> listNotifier =
+                List.generate(presets.length, (index) => ValueNotifier(false));
+            listNotifier[itemSelected].value = true;
+
+            presets.asMap().forEach((index, item) {
+              list.add(ValueListenableBuilder(
+                valueListenable: listNotifier[index],
+                builder: (context, value, child) {
+                  return Container(
+                    child: ChoiceChip(
+                      label: Text(
+                        item,
+                        style: TextStyle(
+                            fontFamily: 'GafataRegular',
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: (listNotifier[index].value)
+                                ? LocalColor.Primary
+                                : Colors.grey),
+                      ),
+                      selected: listNotifier[index].value,
+                      //itemSelected == index,
+                      onSelected: (value) {
+                        //"onSelected :.. ${item} ".Log();
+                        Equalizer.setPreset(item);
+                        //slideBan.setPreset(item);
+                        setState(() {});
+                        _selectedValue.value = item;
+                        listNotifier[index].value = true;
+                        listNotifier[itemSelected].value = false;
+                        itemSelected = index;
+                      },
+                      selectedColor: LocalColor.Primary_20,
+                      //disabledColor: Colors.grey.withOpacity(20),
+                      backgroundColor: Colors.grey.shade200,
+                    ),
+                    margin: EdgeInsets.only(left: 5, right: 5),
+                  );
+                },
+              ));
+            });
+
+            return Container(
+              child: Wrap(
+                children: list,
+              ),
+              color: Colors.transparent,
+            );
+          } else if (snapshot.hasError)
+            return Text(snapshot.error);
+          else
+            return CircularProgressIndicator();
+        });
   }
 
   Widget _buildSliderBand(int freq, int bandId) {
     return Column(
       children: [
         SizedBox(
-          height: 250.0,
+          height: 180.0,
           child: FutureBuilder<int>(
             future: Equalizer.getBandLevel(bandId),
             builder: (context, snapshot) {
@@ -169,56 +235,41 @@ class _CustomEQState extends State<CustomEQ> {
       ],
     );
   }
+}
 
-  String _selectedValue;
+class SlideBan extends StatefulWidget {
+  final bool enabled;
+  final List<int> bandLevelRange;
+  Function(String value) setPreset;
 
-  Widget _buildPresets() {
-    return FutureBuilder<List<String>>(
-        future: fetchPresets,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final presets = snapshot.data;
-            if (presets.isEmpty) return Text('No presets available!');
-            List<Widget> list = [];
-            presets.asMap().forEach((index, item) {
-              list.add(Container(
-                child: ChoiceChip(
-                  label: Text(
-                    item,
-                    style: TextStyle(
-                        fontFamily: 'GafataRegular',
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: (itemSelected == index)
-                            ? LocalColor.Primary
-                            : Colors.grey),
-                  ),
-                  selected: itemSelected == index,
-                  onSelected: (value) {
-                    //"onSelected :.. ${item} ".Log();
-                    Equalizer.setPreset(item);
-                    setState(() {
-                      itemSelected = index;
-                      _selectedValue = item;
-                    });
-                  },
-                  selectedColor: LocalColor.Primary_20,
-                  //disabledColor: Colors.grey.withOpacity(20),
-                  backgroundColor: Colors.grey.shade200,
-                ),
-                margin: EdgeInsets.only(left: 5, right: 5),
-              ));
-            });
-            return Container(
-              child: Wrap(
-                children: list,
-              ),
-              color: Colors.transparent,
-            );
-          } else if (snapshot.hasError)
-            return Text(snapshot.error);
-          else
-            return CircularProgressIndicator();
-        });
+  SlideBan({this.enabled, this.bandLevelRange});
+
+  createState() => StateSlideBan();
+}
+
+class StateSlideBan extends State<SlideBan> {
+  int bandId = 0;
+  double min, max;
+
+  @override
+  void initState() {
+    super.initState();
+    min = widget.bandLevelRange[0].toDouble();
+    max = widget.bandLevelRange[1].toDouble();
+  }
+
+  build(BuildContext context) {
+    widget.setPreset = (value) {
+      " widget.setPreset :.. ${value} ".Log();
+      Equalizer.setPreset(value);
+      setState(() {});
+    };
+
+    return FutureBuilder<List<int>>(
+      future: Equalizer.getBandLevelRange(),
+      builder: (context, snapshot) {
+        return Container();
+      },
+    );
   }
 }

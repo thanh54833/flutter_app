@@ -113,8 +113,10 @@ class _FavouritesPage extends State<FavouritesPage> {
                 return ItemSong(
                   appConfig: appConfig,
                   onCLick: (music) {
-                    data[index].isSelected.value = true;
-                    data[itemSelected].isSelected.value = false;
+                    if (index != itemSelected) {
+                      data[index].isSelected.value = true;
+                      data[itemSelected].isSelected.value = false;
+                    }
                     itemSelected = index;
                     return widget.onCLick(item);
                   },
