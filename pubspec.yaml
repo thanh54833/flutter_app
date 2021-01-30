@@ -71,6 +71,7 @@ dependencies:
   bass_boost: ^0.1.1
   volume: ^1.0.1
   modal_bottom_sheet: ^1.0.0+1
+  rxdart: ^0.25.0
 
 
 

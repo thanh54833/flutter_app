@@ -17,21 +17,13 @@ import 'package:flutter_app/example/main/app/view/ItemView.dart';
 import 'package:flutter_app/example/main/common/DialogCommon.dart';
 import 'package:flutter_app/example/main/common/Gesture.dart';
 import 'package:flutter_app/example/main/common/LogCatUtils.dart';
-import 'package:flutter_app/example/main/common/NavigatorUtils.dart';
 import 'package:flutter_app/example/music/AudioService.dart';
-import 'package:flutter_app/example/view/AnimationDelayList.dart';
 import 'package:flutter_app/example/view/ScrollingText.dart';
-import 'package:flutter_app/example/view/WaveSlider.dart';
-import 'package:flutter_app/example/view/bass_boost.dart';
-import 'package:flutter_visualizers/Visualizers/BarVisualizer.dart';
-import 'package:flutter_visualizers/Visualizers/LineBarVisualizer.dart';
-import 'package:flutter_visualizers/visualizer.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:permission/permission.dart';
 import 'package:rxdart/rxdart.dart';
+
 import 'LocalColor.dart';
-import 'Player.dart';
 import 'bottom_page/ExpandPage1.dart';
 import 'bottom_page/ExpandPage2.dart';
 import 'data/MusicDatabase.dart';
@@ -43,7 +35,6 @@ class Home extends StatelessWidget {
     //Todo : Thanh check permission here...
     var handlePermission = HandlePermission.instance;
     handlePermission.requestPermissions([PermissionName.Storage]);
-
     return MaterialApp(
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -77,6 +68,7 @@ class _StateHome extends State<StateHome> {
   //MusicModel itemSelect;
   var isScan = false;
   var homeValueNotifier = HomeValueNotifier();
+  var _scrollController;
 
   _onCLickItemFavourite(MusicModel _musicModel) {
     "_onCLickItemFavourite :.. ".Log();
@@ -178,6 +170,7 @@ class _StateHome extends State<StateHome> {
   initState() {
     super.initState();
     _showDialogLoading();
+    _scrollController = ScrollController();
   }
 
   build(BuildContext context) {
@@ -268,135 +261,191 @@ class _StateHome extends State<StateHome> {
         elevation: 0,
       ),
       body: BottomSheetBar(
-          locked: false,
-          color: Colors.transparent,
-          backdropColor: Colors.transparent,
-          collapsed: Container(
-            child: ValueListenableBuilder(
-              valueListenable: itemSelect,
-              builder: (context, value, child) {
-                "itemSelect :.. ${value.url} ".Log();
-                return BottomBar(
-                  itemSelect: value,
-                );
-              },
-            ),
-            alignment: Alignment.topCenter,
-            height: 80,
+        locked: false,
+        color: Colors.transparent,
+        backdropColor: Colors.transparent,
+        collapsed: Container(
+          child: ValueListenableBuilder(
+            valueListenable: itemSelect,
+            builder: (context, value, child) {
+              "itemSelect :.. ${value.url} ".Log();
+              return BottomBar(
+                itemSelect: value,
+              );
+            },
           ),
-          height: isCollapsed ? 80 : 0,
-          controller: _bsbController,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(0),
-            topRight: Radius.circular(0),
-          ),
-          borderRadiusExpanded: BorderRadius.only(
-            topLeft: Radius.circular(0.0),
-            topRight: Radius.circular(0.0),
-          ),
-          expandedBuilder: (scrollController) {
-            //"expandedBuilder :...  ".Log();
-            //Todo : thanh check case expand finish ...
-            var list = [
-              Wrap(
-                children: [
-                  Container(
-                    color: Colors.transparent,
-                    child: expandPage1,
-                  ),
-                ],
-              ),
-              // Wrap(children: [
-              //   Container(
-              //     color: Colors.green,
-              //     child: expandPage2,
-              //   ),
-              // ])
-            ]; //[expand, expand];
-            var controller = new PageController(initialPage: 0);
-
-            // ValueListenableBuilder(
-            // valueListenable: itemSelect,
-            // builder: (context, value, child) {
-            //
-            // });
-
-            itemSelect.addListener(() {
-              expandPage1.onClickItem(itemSelect.value);
-            });
-
-            return Wrap(
+          alignment: Alignment.topCenter,
+          height: 80,
+        ),
+        height: 0,
+        //isCollapsed ? 80 : 0,
+        controller: _bsbController,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(0),
+          topRight: Radius.circular(0),
+        ),
+        borderRadiusExpanded: BorderRadius.only(
+          topLeft: Radius.circular(0.0),
+          topRight: Radius.circular(0.0),
+        ),
+        expandedBuilder: (scrollController) {
+          //"expandedBuilder :...  ".Log();
+          //Todo : thanh check case expand finish ...
+          var list = [
+            Wrap(
               children: [
                 Container(
-                  child: PageView(
-                    children: list,
-                    pageSnapping: true,
-                    controller: controller,
-                  ),
-                  height: 310,
                   color: Colors.transparent,
+                  child: expandPage1,
                 ),
               ],
-            );
-          },
-          body: Container(
-            color: LocalColor.Background,
-            child: Column(
-              children: [
-                Expanded(
-                    child: Container(
-                  child: Column(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              new BoxShadow(
-                                color: LocalColor.Primary_50,
-                                spreadRadius: 1,
-                                blurRadius: 5,
-                                // You can set this blurRadius as per your requirement
-                              ),
-                            ]),
-                        child: TextField(
-                          controller: myController,
-                          decoration: InputDecoration(
-                            hintStyle:
-                                TextStyle(color: Colors.black26, fontSize: 16),
-                            hintText: 'Search name',
-                            prefixIcon: Icon(
-                              Icons.search_sharp,
-                              size: 25,
-                              color: LocalColor.Primary,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding:
-                                EdgeInsets.only(top: 15, bottom: 15),
-                          ),
-                          style:
-                              TextStyle(color: LocalColor.Black, fontSize: 16),
-                        ),
-                        margin: EdgeInsets.only(
-                            left: 20, right: 20, top: 0, bottom: 3),
-                      ),
-                      Expanded(
-                          child: Container(
-                        color: Colors.transparent,
-                        child: Stack(
-                          children: [homeWidget],
-                          alignment: Alignment.bottomCenter,
-                        ),
-                      )),
-                      //Todo :bottom bar ...
-                    ],
-                  ),
-                  color: Colors.transparent,
-                )),
-              ],
             ),
-            margin: EdgeInsets.only(top: 20),
-          )),
+            // Wrap(children: [
+            //   Container(
+            //     color: Colors.green,
+            //     child: expandPage2,
+            //   ),
+            // ])
+          ]; //[expand, expand];
+          var controller = new PageController(initialPage: 0);
+
+          // ValueListenableBuilder(
+          // valueListenable: itemSelect,
+          // builder: (context, value, child) {
+          //
+          // });
+          itemSelect.addListener(() {
+            expandPage1.onClickItem(itemSelect.value);
+          });
+          return Wrap(
+            children: [
+              Container(
+                child: PageView(
+                  children: list,
+                  pageSnapping: true,
+                  controller: controller,
+                ),
+                height: 310,
+                color: Colors.transparent,
+              ),
+            ],
+          );
+        },
+        body: NestedScrollView(
+          controller: _scrollController,
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              SliverAppBar(
+                  title: Text("NestedScrollView :..."),
+                  pinned: true,
+                  floating: true,
+                  snap: false,
+                  forceElevated: innerBoxIsScrolled,
+                  bottom: ,
+                  // : Container(
+                  //   height: 50,
+                  // )),
+            ];
+          },
+        ),
+
+        // body: Container(
+        //   height: 100,
+        //   child: CustomScrollView(
+        //     slivers: [
+        //       SliverAppBar(
+        //         expandedHeight: 200,
+        //         pinned: true,
+        //         backgroundColor: Colors.blue,
+        //         flexibleSpace: FlexibleSpaceBar(
+        //           title: Text('Collapsing Header'),
+        //           background: Image.asset(
+        //             "assets/image/bg_5.jpg",
+        //             fit: BoxFit.cover,
+        //           ),
+        //         ),
+        //       ),
+        //       SliverToBoxAdapter(
+        //         child: Expanded(
+        //           child: Container(
+        //             color: Colors.red,
+        //             height: 500,
+        //             alignment: Alignment.topCenter,
+        //           ),
+        //         ),
+        //       )
+        //     ],
+        //   ),
+        //   color: Colors.blue,
+        // ),
+
+        //Container(
+        //             color: LocalColor.Background,
+        //             child: Column(
+        //               children: [
+        //                 Expanded(
+        //                     child: Container(
+        //                   child: Column(
+        //                     children: [
+        //                       Container(
+        //                         decoration: BoxDecoration(
+        //                             color: Colors.white,
+        //                             borderRadius: BorderRadius.circular(10),
+        //                             boxShadow: [
+        //                               new BoxShadow(
+        //                                 color: LocalColor.Primary_50,
+        //                                 spreadRadius: 1,
+        //                                 blurRadius: 5,
+        //                                 // You can set this blurRadius as per your requirement
+        //                               ),
+        //                             ]),
+        //                         child: TextField(
+        //                           controller: myController,
+        //                           decoration: InputDecoration(
+        //                             hintStyle:
+        //                                 TextStyle(color: Colors.black26, fontSize: 16),
+        //                             hintText: 'Search name',
+        //                             prefixIcon: Icon(
+        //                               Icons.search_sharp,
+        //                               size: 25,
+        //                               color: LocalColor.Primary,
+        //                             ),
+        //                             border: InputBorder.none,
+        //                             contentPadding:
+        //                                 EdgeInsets.only(top: 15, bottom: 15),
+        //                           ),
+        //                           style:
+        //                               TextStyle(color: LocalColor.Black, fontSize: 16),
+        //                         ),
+        //                         margin: EdgeInsets.only(
+        //                             left: 20, right: 20, top: 0, bottom: 3),
+        //                       ),
+        //
+        //                       Expanded(
+        //                           child: Container(
+        //                         alignment: Alignment.topLeft,
+        //                         color: Colors.red,
+        //                       ))
+        //
+        //                       /*Expanded(
+        //                           child: Container(
+        //                         color: Colors.transparent,
+        //                         child: Stack(
+        //                           children: [homeWidget],
+        //                           alignment: Alignment.bottomCenter,
+        //                         ),
+        //                       )),*/
+        //                       //Todo :bottom bar ...
+        //
+        //                     ],
+        //                   ),
+        //                   color: Colors.transparent,
+        //                 )),
+        //               ],
+        //             ),
+        //             margin: EdgeInsets.only(top: 20),
+        //           )
+      ),
     );
   }
 }

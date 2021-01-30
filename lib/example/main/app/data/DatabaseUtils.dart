@@ -1,3 +1,4 @@
+import 'package:flutter_app/example/main/app/data/TABLE_DATABASE.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'MusicDatabase.dart';
@@ -11,7 +12,7 @@ class DatabaseUtils {
 
   Future insert(music) async {
     MusicDatabaseHelper helper = MusicDatabaseHelper.instance;
-    await helper.insert(music).catchError((onError){
+    await helper.insert(music).catchError((onError) {
       "onError :.. ${onError} ".Log();
     }); //int id =
   }
@@ -19,7 +20,7 @@ class DatabaseUtils {
   Future getListFavourites() async {
     List<MusicModel> data = [];
     Database database = await MusicDatabaseHelper.instance.database;
-    var word = await database.query(tableMusic);
+    var word = await database.query(TABLE_DATABASE.table_favorite);
     word.forEach((element) {
       data.add(MusicModel.fromMap(element));
     });
@@ -29,7 +30,7 @@ class DatabaseUtils {
   Future getAll() async {
     List<MusicModel> data = [];
     Database database = await MusicDatabaseHelper.instance.database;
-    var word = await database.query(tableMusic);
+    var word = await database.query(TABLE_DATABASE.table_favorite);
     word.forEach((element) {
       data.add(MusicModel.fromMap(element));
     });
@@ -38,7 +39,7 @@ class DatabaseUtils {
 
   Future delete() async {
     Database helper = await MusicDatabaseHelper.instance.database;
-    await helper.delete(tableMusic);
+    await helper.delete(TABLE_DATABASE.table_favorite);
   }
 
   Future setData(List<MusicModel> listData) async {

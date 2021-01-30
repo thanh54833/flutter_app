@@ -3,11 +3,11 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_app/example/main/app/data/TABLE_DATABASE.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-final String tableMusic = '_tableMusic';
 final String columnId = '_id';
 final String columnUrl = 'url';
 final String columnName = 'name';
@@ -130,7 +130,7 @@ class MusicDatabaseHelper {
   // SQL string to create the database
   Future _onCreate(Database db, int version) async {
     await db.execute('''
-              CREATE TABLE $tableMusic (
+              CREATE TABLE ${AppConfig.table_music_name} (
                 $columnId INTEGER PRIMARY KEY,
                 $columnUrl TEXT,
                 $columnName TEXT,
@@ -150,39 +150,15 @@ class MusicDatabaseHelper {
             )''');
   }
 
-  //
-  // insertOrUpdateAll(List<Map<String, dynamic>> ticks) async {
-  //   Database db = await database;
-  //   if (ticks.length == 0) return null;
-  //   final columns = ticks.first.keys.join(",");
-  //   var valuesBuffer = new StringBuffer();
-  //   ticks.forEach((task) {
-  //     if (valuesBuffer.isNotEmpty) valuesBuffer.write(",\n");
-  //     valuesBuffer.write("(");
-  //     int ix = 0;
-  //     task.forEach((key, value) {
-  //       if (ix++ != 0) valuesBuffer.write(',');
-  //       final isString = columnsInfo.where((c) => c.name == key).first.type == RowType.text;
-  //       if (isString) valuesBuffer.write("'$value'");
-  //       valuesBuffer.write(value);
-  //     });
-  //     valuesBuffer.write(")");
-  //   });
-  //
-  //   return await db.rawInsert("INSERT Into Clients ($columns)"
-  //       " VALUES ${valuesBuffer.toString()}");
-  // }
-  // Database helper methods:
-
   Future<int> insert(MusicModel music) async {
     Database db = await database;
-    int id = await db.insert(tableMusic, music.toMap());
+    int id = await db.insert(AppConfig.table_music_name, music.toMap());
     return id;
   }
 
   Future<MusicModel> queryWord(int id) async {
     Database db = await database;
-    List<Map> maps = await db.query(tableMusic,
+    List<Map> maps = await db.query(AppConfig.table_music_name,
         columns: [
           columnId,
           columnUrl,
@@ -212,7 +188,7 @@ class MusicDatabaseHelper {
   Future<List<MusicModel>> getAll() async {
     List<MusicModel> data = [];
     Database database = await MusicDatabaseHelper.instance.database;
-    var word = await database.query(tableMusic);
+    var word = await database.query(AppConfig.table_music_name);
     word.forEach((element) {
       data.add(MusicModel.fromMap(element));
     });
@@ -221,7 +197,7 @@ class MusicDatabaseHelper {
 
   Future deleteAll() async {
     Database helper = await MusicDatabaseHelper.instance.database;
-    await helper.delete(tableMusic);
+    await helper.delete(AppConfig.table_music_name);
   }
 
 // TODO: queryAllWords()
