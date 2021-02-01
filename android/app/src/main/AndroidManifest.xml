@@ -17,7 +17,8 @@
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="flutter_app"
-        android:requestLegacyExternalStorage="true">
+        android:requestLegacyExternalStorage="true"
+        android:usesCleartextTraffic="true">
 
         <activity
             android:name=".MainActivity"

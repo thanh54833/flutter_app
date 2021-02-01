@@ -1,0 +1,6 @@
+- Link doc: https://viblo.asia/p/flutter-dependency-injection-di-that-don-gian-voi-get-it-va-injectable-naQZRLkP5vx
+
++ Factory : Mỗi khi bạn gọi đến để lấy object thì sẽ có một instance mới được tạo ra và trả về cho bạn.
+    Factory không nên dùng nếu như object của bạn có chứa các logic code quá phức tạp dẫn đến việc làm chậm quá trình khởi tạo và lãng phí tài nguyên do luôn phải tạo lại mới mỗi khi cần đến.
++ Singleton : trái ngược vớ i factory, chỉ tạo ra một instance duy nhất kể từ khi app khởi động, sau đó nếu bất kì chỗ nào có dùng dến thì sẽ chỉ trả về instance đã tạo trước đó
++ Lazy-singleton : thì giống như singleton, chỉ khác là nó sẽ được khởi tạo vào lần gọi lấy instance đầu tiên, chứ không phải khi app khởi động. Sử dụng nó nếu như việc tạo instance này mất thời gian, bạn không muốn app dừng ở màn hình splash quá lâu để chờ khởi tạo instance, dẫn đến việc UX của app không tốt

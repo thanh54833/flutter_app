@@ -81,7 +81,7 @@ class _Result {
 
   String get title => _title;
 
-  double get vote_average => _vote_average;
+  get vote_average => _vote_average;
 
   bool get video => _video;
 

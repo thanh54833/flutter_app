@@ -336,15 +336,16 @@ class _StateHome extends State<StateHome> {
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               SliverAppBar(
-                  title: Text("NestedScrollView :..."),
-                  pinned: true,
-                  floating: true,
-                  snap: false,
-                  forceElevated: innerBoxIsScrolled,
-                  bottom: ,
-                  // : Container(
-                  //   height: 50,
-                  // )),
+                title: Text("NestedScrollView :..."),
+                pinned: true,
+                floating: true,
+                snap: false,
+                forceElevated: innerBoxIsScrolled,
+                //bottom: ,
+                // : Container(
+                //   height: 50,
+                // )),
+              )
             ];
           },
         ),

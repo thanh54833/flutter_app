@@ -1,12 +1,12 @@
-import '../resources/repository.dart';
+import 'package:flutter_app/Complex/Bloc/demo_rest_api/models/item_model.dart';
+import 'package:flutter_app/Complex/Bloc/demo_rest_api/resources/repository.dart';
 import 'package:rxdart/rxdart.dart';
-import '../models/item_model.dart';
 
 class MoviesBloc {
   final _repository = Repository();
   final _moviesFetcher = PublishSubject<ItemModel>();
 
-  Observable<ItemModel> get allMovies => _moviesFetcher.stream;
+  Stream<ItemModel> get allMovies => _moviesFetcher.stream;
 
   fetchAllMovies() async {
     ItemModel itemModel = await _repository.fetchAllMovies();

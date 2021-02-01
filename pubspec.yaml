@@ -72,6 +72,8 @@ dependencies:
   volume: ^1.0.1
   modal_bottom_sheet: ^1.0.0+1
   rxdart: ^0.25.0
+  get_it: ^5.0.6
+  injectable: ^1.0.7
 
 
 
@@ -86,6 +88,9 @@ dev_dependencies:
 
   integration_test:
     sdk: flutter
+
+  injectable_generator: ^1.0.7
+  build_runner: ^1.10.2
 
 
 

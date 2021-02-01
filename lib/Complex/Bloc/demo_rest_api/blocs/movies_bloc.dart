@@ -10,8 +10,7 @@ class MoviesBloc {
   get allMovies => _moviesFetcher.stream;
 
   fetchAllMovies() async {
-    " _moviesFetcher.isClosed :.. ${_moviesFetcher.isClosed} ".Log();
-
+    //"_moviesFetcher.isClosed :.. ${_moviesFetcher.isClosed} ".Log();
     ItemModel itemModel = await _repository.fetchAllMovies();
     _moviesFetcher.sink.add(itemModel);
   }
