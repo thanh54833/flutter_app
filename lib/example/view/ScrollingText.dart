@@ -27,9 +27,9 @@ class Main extends StatelessWidget {
 }
 
 class MarqueeWidget extends StatefulWidget {
-  final Widget child;
-  final Axis direction;
-  final Duration animationDuration, backDuration, pauseDuration;
+  final Widget? child;
+  final Axis? direction;
+  final Duration? animationDuration, backDuration, pauseDuration;
 
   MarqueeWidget({
     @required this.child,
@@ -44,18 +44,18 @@ class MarqueeWidget extends StatefulWidget {
 }
 
 class _MarqueeWidgetState extends State<MarqueeWidget> {
-  ScrollController scrollController;
+  ScrollController? scrollController;
 
   @override
   void initState() {
     scrollController = ScrollController(initialScrollOffset: 50.0);
-    WidgetsBinding.instance.addPostFrameCallback(scroll);
+    WidgetsBinding.instance!.addPostFrameCallback(scroll);
     super.initState();
   }
 
   @override
   void dispose() {
-    scrollController.dispose();
+    scrollController?.dispose();
     super.dispose();
   }
 
@@ -63,35 +63,35 @@ class _MarqueeWidgetState extends State<MarqueeWidget> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: widget.child,
-      scrollDirection: widget.direction,
+      scrollDirection: widget.direction!,
       controller: scrollController,
     );
   }
 
   void scroll(_) async {
-    while (scrollController.hasClients) {
-      await Future.delayed(widget.pauseDuration);
-      if (scrollController.hasClients)
-        await scrollController.animateTo(
-            scrollController.position.maxScrollExtent,
-            duration: widget.animationDuration,
+    while (scrollController?.hasClients == true) {
+      await Future.delayed(widget.pauseDuration!);
+      if (scrollController?.hasClients == true)
+        await scrollController?.animateTo(
+            scrollController!.position.maxScrollExtent,
+            duration: widget.animationDuration!,
             curve: Curves.ease);
-      await Future.delayed(widget.pauseDuration);
-      if (scrollController.hasClients)
-        await scrollController.animateTo(0.0,
-            duration: widget.backDuration, curve: Curves.easeOut);
+      await Future.delayed(widget.pauseDuration!);
+      if (scrollController!.hasClients == true)
+        await scrollController!.animateTo(0.0,
+            duration: widget.backDuration!, curve: Curves.easeOut);
     }
   }
 }
 
 class ScrollingText extends StatefulWidget {
-  final String text;
-  final TextStyle textStyle;
-  final Axis scrollAxis;
-  final double ratioOfBlankToScreen;
+  final String? text;
+  final TextStyle? textStyle;
+  final Axis? scrollAxis;
+  final double? ratioOfBlankToScreen;
 
   ScrollingText({
-    @required this.text,
+    required this.text,
     this.textStyle,
     this.scrollAxis: Axis.horizontal,
     this.ratioOfBlankToScreen: 0.25,
@@ -107,11 +107,11 @@ class ScrollingText extends StatefulWidget {
 
 class ScrollingTextState extends State<ScrollingText>
     with SingleTickerProviderStateMixin {
-  ScrollController scrollController;
-  double screenWidth;
-  double screenHeight;
-  double position = 0.0;
-  Timer timer;
+  ScrollController? scrollController;
+  double? screenWidth;
+  double? screenHeight;
+  double? position = 0.0;
+  Timer? timer;
   final double _moveDistance = 3.0;
   final int _timerRest = 100;
   GlobalKey _key = GlobalKey();
@@ -120,7 +120,7 @@ class ScrollingTextState extends State<ScrollingText>
   void initState() {
     super.initState();
     scrollController = ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback((callback) {
+    WidgetsBinding.instance?.addPostFrameCallback((callback) {
       startTimer();
     });
   }
@@ -128,17 +128,17 @@ class ScrollingTextState extends State<ScrollingText>
   void startTimer() {
     if (_key.currentContext != null) {
       double widgetWidth =
-          _key.currentContext.findRenderObject().paintBounds.size.width;
+          _key.currentContext!.findRenderObject()!.paintBounds.size.width;
       double widgetHeight =
-          _key.currentContext.findRenderObject().paintBounds.size.height;
+          _key.currentContext!.findRenderObject()!.paintBounds.size.height;
 
       timer = Timer.periodic(Duration(milliseconds: _timerRest), (timer) {
-        double maxScrollExtent = scrollController.position.maxScrollExtent;
-        double pixels = scrollController.position.pixels;
+        double maxScrollExtent = scrollController!.position.maxScrollExtent;
+        double pixels = scrollController!.position.pixels;
         if (pixels + _moveDistance >= maxScrollExtent) {
           if (widget.scrollAxis == Axis.horizontal) {
             position = (maxScrollExtent -
-                        screenWidth * widget.ratioOfBlankToScreen +
+                        screenWidth! * widget.ratioOfBlankToScreen! +
                         widgetWidth) /
                     2 -
                 widgetWidth +
@@ -146,17 +146,17 @@ class ScrollingTextState extends State<ScrollingText>
                 maxScrollExtent;
           } else {
             position = (maxScrollExtent -
-                        screenHeight * widget.ratioOfBlankToScreen +
+                        screenHeight! * widget.ratioOfBlankToScreen! +
                         widgetHeight) /
                     2 -
                 widgetHeight +
                 pixels -
                 maxScrollExtent;
           }
-          scrollController.jumpTo(position);
+          scrollController?.jumpTo(position!);
         }
-        position += _moveDistance;
-        scrollController.animateTo(position,
+        position =  position! + _moveDistance;
+        scrollController?.animateTo(position!,
             duration: Duration(milliseconds: _timerRest), curve: Curves.linear);
       });
     }
@@ -171,7 +171,7 @@ class ScrollingTextState extends State<ScrollingText>
 
   Widget getBothEndsChild() {
     if (widget.scrollAxis == Axis.vertical) {
-      String newString = widget.text.split("").join("\n");
+      String newString = widget.text!.split("").join("\n");
       return Center(
         child: Text(
           newString,
@@ -182,16 +182,16 @@ class ScrollingTextState extends State<ScrollingText>
     }
     return Center(
         child: Text(
-      widget.text,
+      widget.text ?? "",
       style: widget.textStyle,
     ));
   }
 
   Widget getCenterChild() {
     if (widget.scrollAxis == Axis.horizontal) {
-      return Container(width: screenWidth * widget.ratioOfBlankToScreen);
+      return Container(width: screenWidth! * widget.ratioOfBlankToScreen!);
     } else {
-      return Container(height: screenHeight * widget.ratioOfBlankToScreen);
+      return Container(height: screenHeight! * widget.ratioOfBlankToScreen!);
     }
   }
 
@@ -199,7 +199,7 @@ class ScrollingTextState extends State<ScrollingText>
   void dispose() {
     super.dispose();
     if (timer != null) {
-      timer.cancel();
+      timer?.cancel();
     }
   }
 
@@ -207,7 +207,7 @@ class ScrollingTextState extends State<ScrollingText>
   Widget build(BuildContext context) {
     return ListView(
       key: _key,
-      scrollDirection: widget.scrollAxis,
+      scrollDirection: widget.scrollAxis!,
       controller: scrollController,
       physics: NeverScrollableScrollPhysics(),
       children: <Widget>[

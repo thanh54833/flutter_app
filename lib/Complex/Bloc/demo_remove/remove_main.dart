@@ -62,8 +62,8 @@ class App extends StatelessWidget {
                           child: StreamBuilder(
                             stream: bloc.stateController.stream,
                             builder: (context, snapshot) {
-                              RemoteState volumn = snapshot.data;
-                              "volumn :.. ${volumn?.volume ?? 0}".Log();
+                              RemoteState volumn = snapshot.data as RemoteState;
+                              "volumn :.. ${volumn.volume}".Log();
                               if (volumn == null) {
                                 volumn = RemoteState(0);
                               }

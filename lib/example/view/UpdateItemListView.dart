@@ -20,13 +20,11 @@ class StateApp extends StatefulWidget {
 }
 
 class Item {
-  String name;
-  ValueNotifier<bool> value = ValueNotifier(false);
-
+  String? name;
+  ValueNotifier<bool>? value = ValueNotifier(false);
   Item(this.name);
-
   Item.setValue(bool _value) {
-    this.value.value = _value;
+    this.value?.value = _value;
   }
 }
 
@@ -43,26 +41,26 @@ class _StateApp extends State<StateApp> {
   var itemSelected = 0;
 
   build(BuildContext context) {
-    listData[itemSelected].value.value = true;
+    listData[itemSelected].value!.value = true;
 
     return Container(
       child: ListView.builder(
         itemCount: listData.length,
         itemBuilder: (context, index) {
           return ValueListenableBuilder(
-            valueListenable: listData[index].value,
+            valueListenable: listData[index].value!,
             builder: (context, value, child) {
               //var item =listData[index];
               return Container(
                 child: Center(child: Text("${listData[index].name}")),
                 height: 100,
-                color: listData[index].value.value ? Colors.red : Colors.grey,
+                color: listData[index].value!.value ? Colors.red : Colors.grey,
                 margin: EdgeInsets.only(top: 5),
               ).setOnClick(() {
                 "setOnClick :.. ".Log();
 
-                listData[index].value.value = true;
-                listData[itemSelected].value.value = false;
+                listData[index].value!.value = true;
+                listData[itemSelected].value!.value = false;
                 itemSelected = index;
 
               });

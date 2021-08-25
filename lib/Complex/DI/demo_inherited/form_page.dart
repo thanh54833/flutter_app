@@ -10,8 +10,8 @@ class UpdateUserScreen extends StatelessWidget {
   static final GlobalKey<FormFieldState<String>> emailKey =
   new GlobalKey<FormFieldState<String>>();
 
-  final User user;
-  const UpdateUserScreen({Key key, this.user}) : super(key: key);
+  final User? user;
+  const UpdateUserScreen({Key? key, this.user}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -56,10 +56,10 @@ class UpdateUserScreen extends StatelessWidget {
         child: new Icon(Icons.add),
         onPressed: () {
           final form = formKey.currentState;
-          if (form.validate()) {
-            var firstName = firstNameKey.currentState.value;
-            var lastName = lastNameKey.currentState.value;
-            var email = emailKey.currentState.value;
+          if (form?.validate()==true) {
+            String? firstName = firstNameKey.currentState?.value ?? "";
+            String? lastName = lastNameKey.currentState?.value ??"";
+            String? email = emailKey.currentState?.value ?? "";
 
             if (firstName == '') {
               firstName = null;

@@ -1,10 +1,10 @@
 import 'params.dart';
 
 class PostModel {
-  String jsonrpc;
-  String id;
-  String method;
-  Params params;
+  String? jsonrpc;
+  String? id;
+  String? method;
+  Params? params;
 
   PostModel({this.jsonrpc, this.id, this.method, this.params});
 
@@ -21,7 +21,7 @@ class PostModel {
     map["id"] = id;
     map["method"] = method;
     if (params != null) {
-      map["params"] = params.toJson();
+      map["params"] = params?.toJson();
     }
     return map;
   }

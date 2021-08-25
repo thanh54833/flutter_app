@@ -7,8 +7,8 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 import '../LocalColor.dart';
 
 class ExpandPage2 extends StatefulWidget {
-  var isStartAnimation = false;
-  final ScrollController scrollController;
+  bool? isStartAnimation = false;
+  final ScrollController? scrollController;
 
   ExpandPage2({this.isStartAnimation, this.scrollController});
 

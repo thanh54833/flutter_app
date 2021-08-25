@@ -5,13 +5,13 @@ import 'package:flutter_app/example/main/common/Gesture.dart';
 main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  Function() onCLick;
+  Function()? onCLick;
 
   @override
   Widget build(BuildContext context) {
     var view = StateApp();
 
-    view.setOnClick(onCLick);
+    view.setOnClick(onCLick!);
 
     return MaterialApp(
       home: Scaffold(
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
                   color: Colors.blue,
                   child: Center(
                     child: Text("on Click screen 1 :...").setOnClick(() {
-                      onCLick();
+                      onCLick!();
                     }),
                   ),
                 ),
@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
 }
 
 class StateApp extends StatefulWidget {
-  Function() onCLick;
+  Function()? onCLick;
 
   // Function setOnClick(Function() _onCLick) {
   //   onCLick = _onCLick;
@@ -66,7 +66,7 @@ class _StateApp extends State<StateApp> {
         height: 60,
         child: Center(
           child: Text("on Click screen 2 :...").setOnClick(() {
-            widget.onCLick();
+            widget.onCLick!();
           }),
         ),
         color: Colors.red,

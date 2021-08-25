@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'MovieDetailBloc.dart';
 
 class MovieDetailBlocProvider extends InheritedWidget {
-  final MovieDetailBloc bloc;
+  final MovieDetailBloc? bloc;
 
-  MovieDetailBlocProvider({Key key, Widget child})
+  MovieDetailBlocProvider({Key? key, Widget? child})
       : bloc = MovieDetailBloc(),
-        super(key: key, child: child);
+        super(key: key, child: child!);
 
   @override
   bool updateShouldNotify(_) {
@@ -14,8 +14,6 @@ class MovieDetailBlocProvider extends InheritedWidget {
   }
 
   static MovieDetailBloc of(BuildContext context) {
-    return (context.inheritFromWidgetOfExactType(MovieDetailBlocProvider)
-            as MovieDetailBlocProvider)
-        .bloc;
+    return (context.dependOnInheritedWidgetOfExactType<MovieDetailBlocProvider>() as MovieDetailBlocProvider).bloc!;
   }
 }

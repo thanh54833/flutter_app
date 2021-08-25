@@ -11,17 +11,17 @@ import 'BrowseScreen.dart';
 //main(MusicModel musicModel) => runApp(MaterialApp(home: PlaylistsScreen(musicModel)));
 
 class PlaylistsScreen extends StatelessWidget {
-  MusicModel musicModel = null;
+  MusicModel? musicModel = null;
 
-  PlaylistsScreen({Key key, musicModel}) : super(key: key) {
+  PlaylistsScreen({Key? key, musicModel}) : super(key: key) {
     this.musicModel = musicModel;
   }
 
   //({Key key,MusicModel musicModel}) : super(Key: key);
   build(BuildContext context) {
-    musicModel.url.toString().Logs("musicModel :...");
+    musicModel?.url.toString().Logs("musicModel :...");
     return Scaffold(
-        resizeToAvoidBottomPadding: false,
+        //resizeToAvoidBottomPadding: false,
         body: Container(
           child: RefreshIndicator(
             onRefresh: () async {
@@ -43,11 +43,11 @@ class PlaylistsScreen extends StatelessWidget {
 }
 
 class _Button extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onPressed;
-  final double size;
+  final IconData? icon;
+  final VoidCallback? onPressed;
+  final double? size;
 
-  _Button({Key key, this.icon, this.onPressed, this.size}) : super(key: key);
+  _Button({Key? key, this.icon, this.onPressed, this.size}) : super(key: key);
 
   build(BuildContext context) {
     return InkWell(

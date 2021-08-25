@@ -26,10 +26,10 @@ class MovieList2 extends StatelessWidget {
           child: StreamBuilder(
             stream: bloc.allMovies,
             builder: (context, snapshot) {
-              ItemModel itemModel = snapshot.data;
+              ItemModel itemModel = snapshot.data as ItemModel;
               if (snapshot.hasData) {
                 return Center(
-                  child: Text("On Click :...${itemModel.results.length}"),
+                  child: Text("On Click :...${itemModel.results?.length}"),
                 );
               } else {
                 return Text("Loading :...");

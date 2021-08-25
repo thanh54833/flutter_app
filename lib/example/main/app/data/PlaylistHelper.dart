@@ -16,15 +16,15 @@ class PlaylistHelper {
   // Make this a singleton class.
   PlaylistHelper._privateConstructor();
 
-  static final PlaylistHelper instance = PlaylistHelper._privateConstructor();
+  static final PlaylistHelper? instance = PlaylistHelper._privateConstructor();
 
   // Only allow a single open connection to the database.
-  static Database _database;
+  static Database? _database;
 
   Future<Database> get database async {
-    if (_database != null) return _database;
+    if (_database != null) return _database!;
     _database = await _initDatabase();
-    return _database;
+    return _database!;
   }
 
   // open the database
@@ -53,9 +53,9 @@ class PlaylistHelper {
 
   Future<List<PlaylistModel>> getAll() async {
     List<PlaylistModel> data = [];
-    Database database = await PlaylistHelper.instance.database;
-    var word = await database.query(TABLE_DATABASE.table_playlist);
-    word.forEach((element) {
+    Database? database = await PlaylistHelper.instance?.database;
+    var word = await database?.query(TABLE_DATABASE.table_playlist);
+    word?.forEach((element) {
       data.add(PlaylistModel.fromMap(element));
     });
     return data;
@@ -66,7 +66,7 @@ class PlaylistHelper {
     await db.insert(TABLE_DATABASE.table_playlist, music.toMap());
   }
 
-  Future<int> setPlaylist(List<PlaylistModel> musics) async {
+  Future<int?> setPlaylist(List<PlaylistModel> musics) async {
     Database db = await database;
     List<Future<void>> listInsert = [];
     musics.forEach((music) {
@@ -76,7 +76,7 @@ class PlaylistHelper {
   }
 
   Future deleteAll() async {
-    Database helper = await PlaylistHelper.instance.database;
-    await helper.delete(TABLE_DATABASE.table_playlist);
+    Database? helper = await PlaylistHelper.instance?.database;
+    await helper?.delete(TABLE_DATABASE.table_playlist);
   }
 }

@@ -40,7 +40,7 @@ class _StateMovieList extends State<StateMovieList> {
       body: StreamBuilder(
         stream: bloc.allMovies,
         builder: (context, AsyncSnapshot<ItemModel> snapshot) {
-          "snapshot data :... ${snapshot?.data?.results?.length ?? 0} ".Log();
+          "snapshot data :... ${snapshot.data?.results?.length ?? 0} ".Log();
           if (snapshot.hasData) {
             return buildList(snapshot);
           } else if (snapshot.hasError) {
@@ -54,7 +54,7 @@ class _StateMovieList extends State<StateMovieList> {
 
   Widget buildList(AsyncSnapshot<ItemModel> snapshot) {
     return GridView.builder(
-        itemCount: snapshot.data.results.length,
+        itemCount: snapshot.data?.results?.length ?? 0,
         gridDelegate:
             new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
         itemBuilder: (BuildContext context, int index) {
@@ -67,10 +67,10 @@ class _StateMovieList extends State<StateMovieList> {
             child: InkResponse(
               enableFeedback: true,
               child: Image.network(
-                'https://image.tmdb.org/t/p/w185${snapshot.data.results[index].poster_path}',
+                'https://image.tmdb.org/t/p/w185${snapshot.data?.results?[index].poster_path}',
                 fit: BoxFit.cover,
               ),
-              onTap: () => openDetailPage(snapshot.data, index),
+              onTap: () => openDetailPage(snapshot.data!, index),
             ),
           );
         });
@@ -81,12 +81,12 @@ class _StateMovieList extends State<StateMovieList> {
       context,
       MaterialPageRoute(builder: (context) {
         return MovieDetail(
-          title: data.results[index].title,
-          posterUrl: data.results[index].backdrop_path,
-          description: data.results[index].overview,
-          releaseDate: data.results[index].release_date,
-          voteAverage: data.results[index].vote_average.toString(),
-          movieId: data.results[index].id,
+          title: data.results![index].title,
+          posterUrl: data.results![index].backdrop_path,
+          description: data.results![index].overview,
+          releaseDate: data.results![index].release_date,
+          voteAverage: data.results![index].vote_average.toString(),
+          movieId: data.results![index].id,
         );
       }),
     );

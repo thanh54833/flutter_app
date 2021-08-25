@@ -49,7 +49,7 @@ class App extends StatelessWidget {
 class ExampleButton extends StatelessWidget {
   final String route;
 
-  ExampleButton({this.route});
+  ExampleButton({required this.route});
 
   @override
   Widget build(BuildContext context) {
@@ -221,7 +221,7 @@ class Example6 extends StatelessWidget {
                       height: 16,
                       decoration: BoxDecoration(
                           color: Colors.transparent,
-                          border: Border.all(color: Colors.grey[600]),
+                          border: Border.all(color: Colors.grey[600] ?? Colors.grey),
                           borderRadius: BorderRadius.all(Radius.circular(4.0))),
                     ),
                   )
@@ -268,7 +268,7 @@ class Example7 extends StatelessWidget {
       body: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         RaisedButton(
           child: Icon(Icons.arrow_back_ios),
-          onPressed: () => _key.currentState.previous(),
+          onPressed: () => _key.currentState!.previous(),
         ),
         Center(
             child: Container(
@@ -280,7 +280,7 @@ class Example7 extends StatelessWidget {
         )),
         RaisedButton(
           child: Icon(Icons.arrow_forward_ios),
-          onPressed: () => _key.currentState.next(),
+          onPressed: () => _key.currentState!.next(),
         ),
       ]),
     );
@@ -358,7 +358,7 @@ class Example9 extends StatelessWidget {
                         height: 16,
                         decoration: BoxDecoration(
                             color: Colors.transparent,
-                            border: Border.all(color: Colors.grey[600]),
+                            border: Border.all(color: Colors.grey[600] ?? Colors.grey),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(8.0))),
                       ))

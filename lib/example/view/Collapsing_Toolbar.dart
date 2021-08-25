@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 
 /// https://www.developerlibs.com/2018/08/flutter-collapsing-toolbar-layout.html
 
-main() => runApp(
-    Home()
+main() => runApp(Home()
     //Collapsing()
     //MyApp()
     //
@@ -74,7 +73,7 @@ class CollapsingTab extends StatefulWidget {
 }
 
 class _CollapsingTabState extends State<CollapsingTab> {
-  ScrollController scrollController;
+  ScrollController? scrollController;
 
   Widget _buildActions() {
     Widget profile = new GestureDetector(
@@ -95,8 +94,8 @@ class _CollapsingTabState extends State<CollapsingTab> {
     );
 
     double scale;
-    if (scrollController.hasClients) {
-      scale = scrollController.offset / 300;
+    if (scrollController?.hasClients == true) {
+      scale = (scrollController?.offset ?? 1.0) / 300;
       scale = scale * 2;
       if (scale > 1) {
         scale = 1.0;
@@ -114,7 +113,7 @@ class _CollapsingTabState extends State<CollapsingTab> {
 
   @override
   void dispose() {
-    scrollController.dispose();
+    scrollController?.dispose();
     super.dispose();
   }
 
@@ -122,7 +121,7 @@ class _CollapsingTabState extends State<CollapsingTab> {
   void initState() {
     super.initState();
     scrollController = new ScrollController();
-    scrollController.addListener(() => setState(() {}));
+    scrollController?.addListener(() => setState(() {}));
   }
 
   @override
@@ -233,9 +232,9 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 }
 
 class CollapsingProfile extends StatefulWidget {
-  CollapsingProfile({Key key, this.title}) : super(key: key);
+  CollapsingProfile({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   _CollapsingProfileState createState() => new _CollapsingProfileState();
@@ -299,8 +298,8 @@ class SliverContainer extends StatefulWidget {
   final double topScalingEdge;
 
   SliverContainer(
-      {@required this.slivers,
-      @required this.floatingActionButton,
+      {required this.slivers,
+      required this.floatingActionButton,
       this.expandedHeight = 256.0,
       this.marginRight = 16.0,
       this.topScalingEdge = 96.0});
@@ -312,18 +311,18 @@ class SliverContainer extends StatefulWidget {
 }
 
 class SliverFabState extends State<SliverContainer> {
-  ScrollController scrollController;
+  ScrollController? scrollController;
 
   @override
   void initState() {
     super.initState();
     scrollController = new ScrollController();
-    scrollController.addListener(() => setState(() {}));
+    scrollController?.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
-    scrollController.dispose();
+    scrollController?.dispose();
     super.dispose();
   }
 
@@ -347,8 +346,8 @@ class SliverFabState extends State<SliverContainer> {
 
     double top = defaultTopMargin;
     double scale = 1.0;
-    if (scrollController.hasClients) {
-      double offset = scrollController.offset;
+    if (scrollController?.hasClients==true) {
+      double offset = scrollController?.offset ?? 1.0;
       top -= offset > 0 ? offset : 0;
       if (offset < defaultTopMargin - widget.topScalingEdge) {
         scale = 1.0;

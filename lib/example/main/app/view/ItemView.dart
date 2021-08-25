@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/example/main/common/Gesture.dart';
 
 class ItemView extends StatefulWidget {
-  Function onClick;
-  Icon icon = Icon(Icons.play_circle_filled_rounded);
-  String content = "";
+  Function? onClick;
+  Icon? icon = Icon(Icons.play_circle_filled_rounded);
+  String? content = "";
   ItemView({this.icon, this.content, this.onClick});
   createState() => _ItemView();
 }
@@ -26,7 +26,7 @@ class _ItemView extends State<ItemView> {
                 Expanded(
                     child: Container(
                   child: Text(
-                    widget.content,
+                    widget.content ?? "",
                     style: TextStyle(
                         fontFamily: 'GafataRegular',
                         fontSize: 18,
@@ -39,7 +39,7 @@ class _ItemView extends State<ItemView> {
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(left: 15, top: 5, bottom: 5),
           ).setOnClick((){
-            widget.onClick();
+            widget.onClick!();
           }),
           Container(
             child: Divider(),

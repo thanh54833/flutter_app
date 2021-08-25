@@ -31,9 +31,9 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
-  final String title;
+  final String? title;
 
-  HomePage({Key key, this.title}) : super(key: key);
+  HomePage({Key? key, this.title}) : super(key: key);
 
   createState() => _HomePage();
 }
@@ -45,7 +45,7 @@ class MainPage extends StatefulWidget {
 class _MainPage extends State<MainPage> {
   build(BuildContext context) {
     return Scaffold(
-        resizeToAvoidBottomPadding: false,
+        //resizeToAvoidBottomPadding: false,
         body: SingleChildScrollView(
           child: HomePage(title: "HomePage"),
           scrollDirection: Axis.vertical,
@@ -111,7 +111,7 @@ class _BottomBar extends State<BottomBar> {
 }
 
 class _HomePage extends State<HomePage> {
-  final void Function(String) onTextChange;
+  final void Function(String)? onTextChange;
 
   _HomePage({this.onTextChange});
 
@@ -290,7 +290,7 @@ class _HomePage extends State<HomePage> {
               Expanded(
                 child: Text(
                   "Top of the week",
-                  style: Theme.of(context).textTheme.headline6.copyWith(
+                  style: Theme.of(context).textTheme.headline6?.copyWith(
                         color: Colors.black,
                         fontSize: 16,
                       ),
@@ -298,7 +298,7 @@ class _HomePage extends State<HomePage> {
               ),
               Text(
                 "See all",
-                style: Theme.of(context).textTheme.headline6.copyWith(
+                style: Theme.of(context).textTheme.headline6?.copyWith(
                       color: Colors.red,
                       fontSize: 16,
                     ),
@@ -521,7 +521,7 @@ class _HomePage extends State<HomePage> {
               Expanded(
                 child: Text(
                   "All time hits",
-                  style: Theme.of(context).textTheme.headline6.copyWith(
+                  style: Theme.of(context).textTheme.headline6?.copyWith(
                         color: Colors.black,
                         fontSize: 16,
                       ),
@@ -529,7 +529,7 @@ class _HomePage extends State<HomePage> {
               ),
               Text(
                 "See all",
-                style: Theme.of(context).textTheme.headline6.copyWith(
+                style: Theme.of(context).textTheme.headline6?.copyWith(
                       color: Colors.red,
                       fontSize: 16,
                     ),

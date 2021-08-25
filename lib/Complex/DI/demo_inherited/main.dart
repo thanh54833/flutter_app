@@ -22,7 +22,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  User user;
+  User? user;
 
   Widget get _userInfo {
     return new Center(
@@ -30,9 +30,9 @@ class HomeScreenState extends State<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          new Text("${user.firstName} ${user.lastName}",
+          new Text("${user?.firstName} ${user?.lastName}",
               style: new TextStyle(fontSize: 24.0)),
-          new Text(user.email, style: new TextStyle(fontSize: 24.0)),
+          new Text(user?.email ?? "", style: new TextStyle(fontSize: 24.0)),
         ],
       ),
     );

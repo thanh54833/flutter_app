@@ -11,9 +11,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  BassBoost bassBoost;
-  bool enabled = false;
-  double strength = 0;
+  BassBoost? bassBoost;
+  bool? enabled = false;
+  double? strength = 0;
 
   @override
   void initState() {
@@ -27,21 +27,21 @@ class _MyAppState extends State<MyApp> {
     updateBassStrength();
   }
 
-  initAudioSessionId({@required int id}) {
+  initAudioSessionId({required int id}) {
     bassBoost = new BassBoost(
       audioSessionId: id,
     );
   }
 
   updateBassEnabled() {
-    bassBoost.getEnabled().then((bool b) {
+    bassBoost?.getEnabled().then((bool b) {
       enabled = b;
       setState(() {});
     });
   }
 
   updateBassStrength() {
-    bassBoost.getStrength().then((int i) {
+    bassBoost?.getStrength().then((int i) {
       strength = i.toDouble();
       setState(() {});
     });
@@ -74,23 +74,23 @@ class _MyAppState extends State<MyApp> {
                 ),
                 Switch(
                   onChanged: (bool b) {
-                    bassBoost.setEnabled(enabled: b);
+                    bassBoost?.setEnabled(enabled: b);
                     updateBassEnabled();
                   },
-                  value: enabled,
+                  value: enabled==true,
                 ),
               ],
             ),
             Slider(
-              value: strength,
+              value: strength ?? 0.0,
               onChanged: (d) {
-                bassBoost.setStrength(strength: d.toInt());
+                bassBoost?.setStrength(strength: d.toInt());
                 updateBassStrength();
               },
               min: 0,
               max: 1000,
               divisions: 1000,
-              label: strength.toInt().toString(),
+              label: strength?.toInt().toString(),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 100),

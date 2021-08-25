@@ -20,7 +20,7 @@ class BassBoost {
   /// pass the `audioSessionId` of the playing song to this constructor
   /// while initializing the object for this class.
   /// Use the same object to call all other methods.
-  BassBoost({@required int audioSessionId}) {
+  BassBoost({required int audioSessionId}) {
     _initAudioSessionId(audioSessionId);
   }
 
@@ -34,7 +34,7 @@ class BassBoost {
   ///
   /// setEnabled(enabled: b); will turn on the bass but
   /// the initial setrength will be set to zero
-  setEnabled({@required bool enabled}) async {
+  setEnabled({required bool enabled}) async {
     Map<String, bool> map = <String, bool>{};
     map.putIfAbsent("enable", () => enabled);
     await _channel.invokeMethod('setEnabled', map);
@@ -48,7 +48,7 @@ class BassBoost {
 
   /// pass an `integer` value ranging `[0,1000]` to change the strenght of the bass.
   /// Values less then 0 and greater than 1000 wil be neglected.
-  setStrength({@required int strength}) async {
+  setStrength({required int strength}) async {
     if (strength >= 0 && strength <= 1000) {
       Map<String, int> map = <String, int>{};
       map.putIfAbsent("strength", () => strength);

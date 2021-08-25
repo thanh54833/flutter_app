@@ -63,7 +63,7 @@ class _MyAppState extends State<EqualizerWidget> {
           future: Equalizer.getBandLevelRange(),
           builder: (context, snapshot) {
             return snapshot.connectionState == ConnectionState.done
-                ? CustomEQ(enableCustomEQ, snapshot.data)
+                ? CustomEQ(enableCustomEQ, snapshot.data as List<int>)
                 : CircularProgressIndicator();
           },
         ),
@@ -83,10 +83,10 @@ class CustomEQ extends StatefulWidget {
 }
 
 class _CustomEQState extends State<CustomEQ> {
-  Future<List<String>> fetchPresets;
+  Future<List<String>>? fetchPresets;
   var itemSelected = 0;
   ValueNotifier<String> _selectedValue = ValueNotifier('');
-  double min, max;
+  double? min, max;
 
   //SlideBan slideBan;
 
@@ -118,7 +118,7 @@ class _CustomEQState extends State<CustomEQ> {
                 ? Container(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: snapshot.data
+                      children: snapshot.data!
                           .map((freq) => _buildSliderBand(freq, bandId++))
                           .toList(),
                     ),
@@ -151,7 +151,7 @@ class _CustomEQState extends State<CustomEQ> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final presets = snapshot.data;
-            if (presets.isEmpty) return Text('No presets available!');
+            if (presets!.isEmpty == true) return Text('No presets available!');
 
             List<Widget> list = [];
             List<ValueNotifier<bool>> listNotifier =
@@ -203,7 +203,7 @@ class _CustomEQState extends State<CustomEQ> {
               color: Colors.transparent,
             );
           } else if (snapshot.hasError)
-            return Text(snapshot.error);
+            return Text(snapshot.error.toString());
           else
             return CircularProgressIndicator();
         });
@@ -223,7 +223,7 @@ class _CustomEQState extends State<CustomEQ> {
                 rtl: true,
                 min: min,
                 max: max,
-                values: [snapshot.hasData ? snapshot.data.toDouble() : 0],
+                values: [snapshot.hasData ? snapshot.data?.toDouble() ?? 0.0 : 0.0],
                 onDragCompleted: (handlerIndex, lowerValue, upperValue) {
                   Equalizer.setBandLevel(bandId, lowerValue.toInt());
                 },
@@ -238,9 +238,9 @@ class _CustomEQState extends State<CustomEQ> {
 }
 
 class SlideBan extends StatefulWidget {
-  final bool enabled;
-  final List<int> bandLevelRange;
-  Function(String value) setPreset;
+  final bool? enabled;
+  final List<int>? bandLevelRange;
+  Function(String value)? setPreset;
 
   SlideBan({this.enabled, this.bandLevelRange});
 
@@ -248,19 +248,19 @@ class SlideBan extends StatefulWidget {
 }
 
 class StateSlideBan extends State<SlideBan> {
-  int bandId = 0;
-  double min, max;
+  int? bandId = 0;
+  double? min, max;
 
   @override
   void initState() {
     super.initState();
-    min = widget.bandLevelRange[0].toDouble();
-    max = widget.bandLevelRange[1].toDouble();
+    min = widget.bandLevelRange![0].toDouble();
+    max = widget.bandLevelRange![1].toDouble();
   }
 
   build(BuildContext context) {
     widget.setPreset = (value) {
-      " widget.setPreset :.. ${value} ".Log();
+      " widget.setPreset :.. $value ".Log();
       Equalizer.setPreset(value);
       setState(() {});
     };

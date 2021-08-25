@@ -4,9 +4,9 @@ class MovieDetail extends StatefulWidget {
   final posterUrl;
   final description;
   final releaseDate;
-  final String title;
-  final String voteAverage;
-  final int movieId;
+  final String? title;
+  final String? voteAverage;
+  final int? movieId;
 
   MovieDetail({
     this.title,
@@ -34,9 +34,9 @@ class MovieDetailState extends State<MovieDetail> {
   final posterUrl;
   final description;
   final releaseDate;
-  final String title;
-  final String voteAverage;
-  final int movieId;
+  final String? title;
+  final String? voteAverage;
+  final int? movieId;
 
   MovieDetailState({
     this.title,
@@ -76,7 +76,7 @@ class MovieDetailState extends State<MovieDetail> {
               children: <Widget>[
                 Container(margin: EdgeInsets.only(top: 5.0)),
                 Text(
-                  title,
+                  title ?? "",
                   style: TextStyle(
                     fontSize: 25.0,
                     fontWeight: FontWeight.bold,
@@ -93,7 +93,7 @@ class MovieDetailState extends State<MovieDetail> {
                       margin: EdgeInsets.only(left: 1.0, right: 1.0),
                     ),
                     Text(
-                      voteAverage,
+                      voteAverage ?? "",
                       style: TextStyle(
                         fontSize: 18.0,
                       ),

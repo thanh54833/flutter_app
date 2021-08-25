@@ -4,10 +4,10 @@ import 'package:flutter_app/example/main/common/Gesture.dart';
 import 'package:flutter_app/example/main/common/LogCatUtils.dart';
 
 class WidgetBase extends StatefulWidget {
-  String title;
-  Widget child;
-  Color background;
-  Function()  onBack;
+  String? title;
+  Widget? child;
+  Color? background;
+  Function()?  onBack;
 
   WidgetBase({Key key, this.title, this.child, this.background, this.onBack})
       : super(key: key);

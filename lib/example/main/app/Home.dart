@@ -159,12 +159,12 @@ class _StateHome extends State<StateHome> {
         barrierColor: Colors.transparent);
   }
 
-  DialogCommon dialogLoading;
+  DialogCommon? dialogLoading;
 
   _showDialogLoading() async {
     dialogLoading = DialogCommon.internal();
     await Future.delayed(Duration(microseconds: 50), () {});
-    dialogLoading.showLoading(context);
+    dialogLoading?.showLoading(context);
   }
 
   initState() {
@@ -196,7 +196,7 @@ class _StateHome extends State<StateHome> {
       "dialogLoading.dismiss(); :... ".Log();
       if (Navigator.canPop(context)) {
         "dialogLoading.dismiss()111 :... ".Log();
-        dialogLoading.dismiss();
+        dialogLoading?.dismiss();
       }
     });
     var homeWidget = HomeWidget(
@@ -268,9 +268,8 @@ class _StateHome extends State<StateHome> {
           child: ValueListenableBuilder(
             valueListenable: itemSelect,
             builder: (context, value, child) {
-              "itemSelect :.. ${value.url} ".Log();
               return BottomBar(
-                itemSelect: value,
+                itemSelect: value as MusicModel,
               );
             },
           ),
@@ -315,7 +314,7 @@ class _StateHome extends State<StateHome> {
           //
           // });
           itemSelect.addListener(() {
-            expandPage1.onClickItem(itemSelect.value);
+            expandPage1.onClickItem!(itemSelect.value);
           });
           return Wrap(
             children: [
@@ -348,6 +347,7 @@ class _StateHome extends State<StateHome> {
               )
             ];
           },
+          body: Container(),
         ),
 
         // body: Container(
@@ -452,7 +452,7 @@ class _StateHome extends State<StateHome> {
 }
 
 class BottomBar extends StatefulWidget {
-  MusicModel itemSelect;
+  MusicModel? itemSelect;
 
   BottomBar({this.itemSelect});
 
@@ -461,7 +461,7 @@ class BottomBar extends StatefulWidget {
 
 // NOTE: Your entrypoint MUST be a top-level function.
 void _audioPlayerTaskEntrypoint() async {
-  AudioServiceBackground.run(() => AudioPlayerTask());
+  //AudioServiceBackground.run(() => AudioPlayerTask());
 }
 
 class _BottomBar extends State<BottomBar> {
@@ -513,11 +513,11 @@ class _BottomBar extends State<BottomBar> {
                             borderRadius: BorderRadius.circular(8.0),
                             child: Container(
                               child: ((widget.itemSelect != null) &&
-                                      (widget.itemSelect.logoMemory != null) &&
-                                      (widget.itemSelect.logoMemory != ""))
+                                      (widget.itemSelect!.logoMemory != null) &&
+                                      (widget.itemSelect!.logoMemory != ""))
                                   ? Image.memory(
                                       new Uint8List.fromList(widget
-                                          .itemSelect.logoMemory.codeUnits),
+                                          .itemSelect!.logoMemory.codeUnits),
                                       height: 60,
                                       width: 60,
                                       fit: BoxFit.cover,
@@ -540,10 +540,10 @@ class _BottomBar extends State<BottomBar> {
                                     direction: Axis.horizontal,
                                     child: Text(
                                       ((widget.itemSelect != null) &&
-                                              (widget.itemSelect.artist !=
+                                              (widget.itemSelect!.artist !=
                                                   null))
                                           ? " Song:" +
-                                              widget.itemSelect.artist +
+                                              widget.itemSelect!.artist +
                                               " "
                                           : "",
                                       style: Themes.TextStyle_Small_Bold,
@@ -558,9 +558,11 @@ class _BottomBar extends State<BottomBar> {
                                     direction: Axis.horizontal,
                                     child: Text(
                                       ((widget.itemSelect != null) &&
-                                              (widget.itemSelect.artist !=
+                                              (widget.itemSelect!.artist !=
                                                   null))
-                                          ? " " + widget.itemSelect.artist + " "
+                                          ? " " +
+                                              widget.itemSelect!.artist +
+                                              " "
                                           : "",
                                       style: Themes.TextStyle_Small,
                                     ),
@@ -591,11 +593,11 @@ class _BottomBar extends State<BottomBar> {
                                 // each case.
                                 return SizedBox();
                               } else {
-                                "widget.itemSelect.url :.. ${widget.itemSelect.url} ___ "
+                                "widget.itemSelect.url :.. ${widget.itemSelect!.url} ___ "
                                     .Log();
                                 try {
                                   AudioService.playFromMediaId(
-                                      widget.itemSelect.url);
+                                      widget.itemSelect!.url);
                                   AudioService.play();
                                 } catch (e) {
                                   "error message :... ${e} ".Log();
@@ -646,6 +648,7 @@ class _BottomBar extends State<BottomBar> {
                                                     color: LocalColor.Gray,
                                                   ),
                                                   iconSize: 25.0,
+                                                  onPressed: () {},
                                                   //onPressed: mediaItem == queue.first ? null : AudioService.skipToPrevious,
                                                 ),
                                               ],
@@ -714,6 +717,7 @@ class _BottomBar extends State<BottomBar> {
                                                     color: LocalColor.Gray_20,
                                                   ),
                                                   iconSize: 25.0,
+                                                  onPressed: () {},
                                                 ),
                                               ],
                                             ),
@@ -760,12 +764,11 @@ class _BottomBar extends State<BottomBar> {
                     //"mediaState?.mediaItem?.duration :.. ${mediaState?.position}"
                     //   .Log();
                     var value = 0.0;
-                    if ((mediaState?.mediaItem?.duration != Duration.zero) &&
-                        (mediaState?.mediaItem?.duration != null)) {
-                      value = (mediaState?.position ?? Duration.zero)
-                              .inMilliseconds /
-                          (mediaState?.mediaItem?.duration ?? Duration.zero)
-                              .inMilliseconds;
+                    if ((mediaState?.mediaItem.duration != Duration.zero) &&
+                        (mediaState?.mediaItem.duration != null)) {
+                      value = (mediaStateposition ?? Duration.zero)(
+                              mediaState?.mediaItem.duration ?? Duration.zero)
+                          .inMilliseconds;
                     }
 
                     return (value != null)

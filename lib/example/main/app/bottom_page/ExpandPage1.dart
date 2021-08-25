@@ -15,9 +15,9 @@ import '../LocalColor.dart';
 // Todo : thanh ddang lamf  : https://stackoverflow.com/questions/50160362/blur-portion-of-background-flutter
 
 class ExpandPage1 extends StatefulWidget {
-  var isStartAnimation = false;
-  final ScrollController scrollController;
-  Function(MusicModel) onClickItem;
+  bool? isStartAnimation = false;
+  final ScrollController? scrollController;
+  Function(MusicModel)? onClickItem;
 
   ExpandPage1({this.isStartAnimation, this.scrollController});
 
@@ -156,7 +156,7 @@ class StateExpandPage1 extends State<ExpandPage1> {
                                               gradient: LinearGradient(
                                                 begin: Alignment.topCenter,
                                                 end: Alignment.bottomCenter,
-                                                colors: [Colors.white10, value],
+                                                colors: [Colors.white10, value as Color],
                                               ),
                                             ),
                                           );
@@ -182,7 +182,7 @@ class StateExpandPage1 extends State<ExpandPage1> {
                                   color: Colors.transparent,
                                   child: Container(
                                     child: MoreItem(
-                                      isStart: widget.isStartAnimation,
+                                      isStart: widget.isStartAnimation ==true,
                                     ),
                                     //margin: EdgeInsets.only(top: 20, bottom: 10),
                                     alignment: Alignment.topRight,

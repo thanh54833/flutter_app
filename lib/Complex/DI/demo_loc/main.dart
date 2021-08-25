@@ -4,7 +4,7 @@ main() {
   "main :...".LogP();
   Truck truck1 = Truck();
   Truck truck2 = Truck()..setDivider = Driver("name1", "start1");
-  "truck2 :... ${truck2.driver.name}".LogP();
+  "truck2 :... ${truck2.driver?.name}".LogP();
 }
 
 class Driver {
@@ -15,7 +15,7 @@ class Driver {
 }
 
 class Truck {
-  Driver driver;
+  Driver? driver;
 
   Truck() {
     driver = Driver("truck", "truck");

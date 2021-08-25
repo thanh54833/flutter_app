@@ -26,9 +26,9 @@ import 'package:media_store/media_store.dart';
 import 'package:intl/intl.dart';
 
 class FavouritesPage extends StatefulWidget {
-  Function(MusicModel) onCLick;
-  Function onClickScan;
-  Function(int, MusicModel) onClickMoreItem;
+  Function(MusicModel)? onCLick;
+  Function? onClickScan;
+  Function(int, MusicModel)? onClickMoreItem;
 
   FavouritesPage({@required this.onCLick, @required this.onClickMoreItem});
 
@@ -46,7 +46,7 @@ class _FavouritesPage extends State<FavouritesPage> {
     //return true;
   }
 
-  AppConfig appConfig;
+  AppConfig? appConfig;
 
   initState() {
     super.initState();
@@ -110,17 +110,17 @@ class _FavouritesPage extends State<FavouritesPage> {
               valueListenable: item.isSelected,
               builder: (context, value, child) {
                 return ItemSong(
-                  appConfig: appConfig,
+                  appConfig: appConfig!,
                   onCLick: (music) {
                     if (index != itemSelected) {
                       data[index].isSelected.value = true;
                       data[itemSelected].isSelected.value = false;
                     }
                     itemSelected = index;
-                    widget.onCLick(item);
+                    widget.onCLick!(item);
                   },
                   onClickMoreItem: (index, music) {
-                    widget.onClickMoreItem(index, music);
+                    widget.onClickMoreItem!(index, music);
                   },
                   item: item,
                   index: index,
@@ -137,12 +137,12 @@ class _FavouritesPage extends State<FavouritesPage> {
 }
 
 class ItemSong extends StatefulWidget {
-  AppConfig appConfig;
-  Function(MusicModel) onCLick;
-  Function(int, MusicModel) onClickMoreItem;
-  MusicModel item;
-  int index;
-  bool isSelected = false;
+  AppConfig? appConfig;
+  Function(MusicModel)? onCLick;
+  Function(int, MusicModel)? onClickMoreItem;
+  MusicModel? item;
+  int? index;
+  bool? isSelected = false;
 
   ItemSong(
       {this.appConfig,
@@ -175,12 +175,12 @@ class StateItemSong extends State<ItemSong> {
                     child: Stack(
                       children: [
                         Image.memory(
-                          _getUnit8List(widget.item.logoMemory),
+                          _getUnit8List(widget.item?.logoMemory ?? ""),
                           height: 50,
                           width: 50,
                           fit: BoxFit.cover,
                         ),
-                        if (widget.isSelected) ...[
+                        if (widget.isSelected == true) ...[
                           Container(
                             height: 50,
                             width: 50,
@@ -216,12 +216,14 @@ class StateItemSong extends State<ItemSong> {
                   direction: Axis.vertical,
                   children: [
                     Text(
-                      (widget.item.artist != null) ? widget.item.artist : "",
+                      (widget.item?.artist != null) ? widget.item!.artist : "",
                       style: Themes.TextStyle_Small_Bold,
                     ),
                     Container(
                       child: Text(
-                        (widget.item.artist != null) ? widget.item.artist : "",
+                        (widget.item?.artist != null)
+                            ? widget.item!.artist
+                            : "",
                         style: TextStyle(fontSize: 14, color: Colors.black54),
                       ),
                       margin: EdgeInsets.only(top: 2),
@@ -243,7 +245,7 @@ class StateItemSong extends State<ItemSong> {
                       alignment: Alignment.centerRight,
                     ),
                     Container(
-                      child: Text(widget.item.trackDuration,
+                      child: Text(widget.item?.trackDuration ?? "",
                           style:
                               TextStyle(fontSize: 12, color: Colors.black26)),
                       alignment: Alignment.centerRight,
@@ -260,7 +262,7 @@ class StateItemSong extends State<ItemSong> {
                     child: IconButton(
                       icon: Icon(Icons.more_horiz),
                       onPressed: () {
-                        widget.onClickMoreItem(widget.index, widget.item);
+                        widget.onClickMoreItem!(widget.index!, widget.item!);
                       },
                       padding: EdgeInsets.all(0),
                     ),
@@ -278,37 +280,37 @@ class StateItemSong extends State<ItemSong> {
       ),
       margin: EdgeInsets.only(top: 8.0, bottom: 8.0, left: 10, right: 10),
     ).setOnClick(() {
-      widget.appConfig.setIndexCurrentPlay(widget.index);
-      widget.onCLick(widget.item);
+      widget.appConfig?.setIndexCurrentPlay(widget.index!);
+      widget.onCLick!(widget.item!);
       //
     });
   }
 }
 
 class Pair {
-  final int first = null;
-  final int second = null;
+  final int? first = null;
+  final int? second = null;
 }
 
 class AnimatedListItem extends StatefulWidget {
-  final int index;
+  final int? index;
 
-  AnimatedListItem(this.index, {Key key}) : super(key: key);
+  AnimatedListItem(this.index, {Key? key}) : super(key: key);
 
   @override
   _AnimatedListItemState createState() => _AnimatedListItemState();
 }
 
 class _AnimatedListItemState extends State<AnimatedListItem> {
-  bool _animate = false;
+  bool? _animate = false;
 
-  static bool _isStart = true;
+  static bool? _isStart = true;
 
   @override
   void initState() {
     super.initState();
-    _isStart
-        ? Future.delayed(Duration(milliseconds: widget.index * 100), () {
+    (_isStart == true)
+        ? Future.delayed(Duration(milliseconds: (widget.index ?? 1) * 100), () {
             setState(() {
               _animate = true;
               _isStart = false;
@@ -326,11 +328,11 @@ class _AnimatedListItemState extends State<AnimatedListItem> {
   Widget build(BuildContext context) {
     return AnimatedOpacity(
       duration: Duration(milliseconds: 1000),
-      opacity: _animate ? 1 : 0,
+      opacity: _animate == true ? 1 : 0,
       curve: Curves.easeInOutQuart,
       child: AnimatedPadding(
         duration: Duration(milliseconds: 1000),
-        padding: _animate
+        padding: _animate == true
             ? const EdgeInsets.all(4.0)
             : const EdgeInsets.only(top: 10),
         child: Container(

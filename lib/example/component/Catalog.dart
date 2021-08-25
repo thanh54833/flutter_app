@@ -20,7 +20,7 @@ class Catalog extends StatelessWidget {
 }
 
 class StateCatalog extends StatefulWidget {
-  Function(int index, String data) onClick;
+  Function(int index, String data)? onClick;
 
   createState() => _StateCatalog();
 }
@@ -63,9 +63,9 @@ class _StateCatalog extends State<StateCatalog> {
               },
               children: _data.map((CatalogItem item) {
                 //_BottomSheet();
-                item._setOnClick((index, data) => context.push((context) {
-                      Home();
-                    }));
+                item._setOnClick(
+                  (index, data) => context.push((context) => Home()),
+                );
                 return ExpansionPanel(
                   isExpanded: item.isExpanded,
                   headerBuilder: (BuildContext context, bool isExpanded) =>
@@ -86,7 +86,7 @@ class _StateCatalog extends State<StateCatalog> {
 }
 
 class CatalogItem {
-  static Function(int index, String data) onClick;
+  static Function(int index, String data)? onClick;
 
   CatalogItem(this.title, this.body, this.isExpanded);
 
@@ -149,7 +149,7 @@ class CatalogItem {
             ),
           ),
           onTap: () {
-            onClick(index, body[index]);
+            onClick!(index, body[index]);
           },
         );
       },

@@ -36,10 +36,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-
-    requestPermissionsStorage().then((){
-
-    });
+    requestPermissionsStorage().then(() {});
 
     return MaterialApp(
       home: Scaffold(
@@ -57,7 +54,7 @@ class _MyAppState extends State<MyApp> {
                       value: a0,
                       onChanged: (v) {
                         setState(() {
-                          a0 = v;
+                          a0 = v == true;
                         });
                       },
                     ),
@@ -66,7 +63,7 @@ class _MyAppState extends State<MyApp> {
                       value: a1,
                       onChanged: (v) {
                         setState(() {
-                          a1 = v;
+                          a1 = v == true;
                         });
                       },
                     ),
@@ -75,7 +72,7 @@ class _MyAppState extends State<MyApp> {
                       value: a2,
                       onChanged: (v) {
                         setState(() {
-                          a2 = v;
+                          a2 = v == true;
                         });
                       },
                     ),
@@ -91,7 +88,7 @@ class _MyAppState extends State<MyApp> {
                       value: a3,
                       onChanged: (v) {
                         setState(() {
-                          a3 = v;
+                          a3 = v == true;
                         });
                       },
                     ),
@@ -100,7 +97,7 @@ class _MyAppState extends State<MyApp> {
                       value: a4,
                       onChanged: (v) {
                         setState(() {
-                          a4 = v;
+                          a4 = v == true;
                         });
                       },
                     ),
@@ -109,7 +106,7 @@ class _MyAppState extends State<MyApp> {
                       value: a5,
                       onChanged: (v) {
                         setState(() {
-                          a5 = v;
+                          a5 = v == true;
                         });
                       },
                     ),
@@ -125,7 +122,7 @@ class _MyAppState extends State<MyApp> {
                       value: a6,
                       onChanged: (v) {
                         setState(() {
-                          a6 = v;
+                          a6 = v == true;
                         });
                       },
                     ),
@@ -134,7 +131,7 @@ class _MyAppState extends State<MyApp> {
                       value: a7,
                       onChanged: (v) {
                         setState(() {
-                          a7 = v;
+                          a7 = v == true;
                         });
                       },
                     ),
@@ -143,7 +140,7 @@ class _MyAppState extends State<MyApp> {
                       value: a8,
                       onChanged: (v) {
                         setState(() {
-                          a8 = v;
+                          a8 = v == true;
                         });
                       },
                     ),
@@ -159,7 +156,7 @@ class _MyAppState extends State<MyApp> {
                       value: a9,
                       onChanged: (v) {
                         setState(() {
-                          a9 = v;
+                          a9 = v == true;
                         });
                       },
                     ),
@@ -175,7 +172,7 @@ class _MyAppState extends State<MyApp> {
                       value: i0,
                       onChanged: (v) {
                         setState(() {
-                          i0 = v;
+                          i0 = v == true;
                         });
                       },
                     ),
@@ -184,7 +181,7 @@ class _MyAppState extends State<MyApp> {
                       value: i1,
                       onChanged: (v) {
                         setState(() {
-                          i1 = v;
+                          i1 = v == true;
                         });
                       },
                     ),
@@ -193,7 +190,7 @@ class _MyAppState extends State<MyApp> {
                       value: i2,
                       onChanged: (v) {
                         setState(() {
-                          i2 = v;
+                          i2 = v == true;
                         });
                       },
                     ),
@@ -209,7 +206,7 @@ class _MyAppState extends State<MyApp> {
                       value: i3,
                       onChanged: (v) {
                         setState(() {
-                          i3 = v;
+                          i3 = v == true;
                         });
                       },
                     ),
@@ -218,7 +215,7 @@ class _MyAppState extends State<MyApp> {
                       value: i4,
                       onChanged: (v) {
                         setState(() {
-                          i4 = v;
+                          i4 = v == true;
                         });
                       },
                     ),
@@ -227,7 +224,7 @@ class _MyAppState extends State<MyApp> {
                       value: i5,
                       onChanged: (v) {
                         setState(() {
-                          i5 = v;
+                          i5 = v == true;
                         });
                       },
                     ),
@@ -243,7 +240,7 @@ class _MyAppState extends State<MyApp> {
                       value: i6,
                       onChanged: (v) {
                         setState(() {
-                          i6 = v;
+                          i6 = v == true;
                         });
                       },
                     ),
@@ -288,10 +285,10 @@ class _MyAppState extends State<MyApp> {
     if (i6) permissionNames.add(PermissionName.Storage);
     message = '';
     List<Permissions> permissions =
-    await Permission.getPermissionsStatus(permissionNames);
+        await Permission.getPermissionsStatus(permissionNames);
     permissions.forEach((permission) {
       message +=
-      '${permission.permissionName}: ${permission.permissionStatus}\n';
+          '${permission.permissionName}: ${permission.permissionStatus}\n';
     });
     setState(() {
       message;
@@ -300,7 +297,7 @@ class _MyAppState extends State<MyApp> {
 
   getSinglePermissionStatus() async {
     var permissionStatus =
-    await Permission.getSinglePermissionStatus(permissionName);
+        await Permission.getSinglePermissionStatus(permissionName);
     setState(() {
       message = permissionStatus.toString();
     });
@@ -330,16 +327,18 @@ class _MyAppState extends State<MyApp> {
     var permissions = await Permission.requestPermissions(permissionNames);
     permissions.forEach((permission) {
       message +=
-      '${permission.permissionName}: ${permission.permissionStatus}\n';
+          '${permission.permissionName}: ${permission.permissionStatus}\n';
     });
     setState(() {});
   }
+
   requestPermissionsStorage() async {
     message = '';
     List<PermissionName> permissionNames = [PermissionName.Storage];
     var permissions = await Permission.requestPermissions(permissionNames);
     permissions.forEach((permission) {
-      message += '${permission.permissionName}: ${permission.permissionStatus}\n';
+      message +=
+          '${permission.permissionName}: ${permission.permissionStatus}\n';
     });
   }
 }

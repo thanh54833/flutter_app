@@ -74,7 +74,7 @@ final listData = [
 ];
 
 class MoreItem extends StatefulWidget {
-  bool isStart = false;
+  bool? isStart = false;
 
   MoreItem({this.isStart});
 
@@ -82,10 +82,10 @@ class MoreItem extends StatefulWidget {
 }
 
 class _MoreItem extends State<MoreItem> with TickerProviderStateMixin {
-  AnimationController _animationController;
-  double animationDuration = 0.0;
-  int totalItems = 5;
-  bool isExpand = false;
+  AnimationController? _animationController;
+  double? animationDuration = 0.0;
+  int? totalItems = 5;
+  bool? isExpand = false;
 
   @override
   void initState() {
@@ -93,22 +93,23 @@ class _MoreItem extends State<MoreItem> with TickerProviderStateMixin {
     final int totalDuration = 2000;
     _animationController = AnimationController(
         vsync: this, duration: new Duration(milliseconds: totalDuration));
-    animationDuration = totalDuration / (100 * (totalDuration / totalItems));
+    animationDuration =
+        totalDuration / (100 * (totalDuration / (totalItems ?? 1)));
     //_animationController.forward();
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _animationController?.dispose();
     super.dispose();
   }
 
   build(BuildContext context) {
-    _animationController.stop(canceled: false);
-    _animationController.forward(from: 0.0);
+    _animationController?.stop(canceled: false);
+    _animationController?.forward(from: 0.0);
     isExpand = true;
 
-    return isExpand
+    return isExpand == true
         ? Container(
             child: ListView.separated(
               itemCount: listData.length,
@@ -117,8 +118,8 @@ class _MoreItem extends State<MoreItem> with TickerProviderStateMixin {
               itemBuilder: (BuildContext context, int index) {
                 return Item(
                   index: index,
-                  animationController: _animationController,
-                  duration: animationDuration,
+                  animationController: _animationController!,
+                  duration: animationDuration!,
                   item: listData[index],
                 );
               },
@@ -137,10 +138,10 @@ class _MoreItem extends State<MoreItem> with TickerProviderStateMixin {
 }
 
 class Item extends StatefulWidget {
-  final int index;
-  final AnimationController animationController;
-  final double duration;
-  final Widget item;
+  final int? index;
+  final AnimationController? animationController;
+  final double? duration;
+  final Widget? item;
 
   //Item({this.index, this.animationController, this.duration, this.item});
   Item({this.index, this.animationController, this.duration, this.item});
@@ -150,25 +151,25 @@ class Item extends StatefulWidget {
 }
 
 class _ItemState extends State<Item> {
-  Animation _animation;
-  double start;
-  double end;
+  Animation? _animation;
+  double? start;
+  double? end;
 
   @override
   void initState() {
     super.initState();
-    start = (widget.duration * widget.index).toDouble();
-    end = start + widget.duration;
+    start = ((widget.duration ?? 1.0) * (widget.index ?? 1.0)).toDouble();
+    end = (start ?? 1.0) + (widget.duration ?? 1.0);
     print("START $start , end $end");
     _animation = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(
       CurvedAnimation(
-        parent: widget.animationController,
+        parent: widget.animationController!,
         curve: Interval(
-          start,
-          end,
+          start!,
+          end!,
           curve: Curves.easeIn,
         ),
       ),
@@ -181,7 +182,7 @@ class _ItemState extends State<Item> {
   Widget build(BuildContext context) {
     return Container(
       child: Opacity(
-        opacity: _animation.value,
+        opacity: _animation!.value,
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(50.0),

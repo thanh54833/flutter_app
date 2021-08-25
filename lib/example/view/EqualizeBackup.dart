@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:equalizer/equalizer.dart';
@@ -87,7 +86,7 @@ class _MyAppState extends State<MyApp> {
               future: Equalizer.getBandLevelRange(),
               builder: (context, snapshot) {
                 return snapshot.connectionState == ConnectionState.done
-                    ? CustomEQ(enableCustomEQ, snapshot.data)
+                    ? CustomEQ(enableCustomEQ, snapshot.data as List<int>)
                     : CircularProgressIndicator();
               },
             ),
@@ -109,9 +108,9 @@ class CustomEQ extends StatefulWidget {
 }
 
 class _CustomEQState extends State<CustomEQ> {
-  double min, max;
-  String _selectedValue;
-  Future<List<String>> fetchPresets;
+  double? min, max;
+  String? _selectedValue;
+  Future<List<String>>? fetchPresets;
 
   @override
   void initState() {
@@ -130,20 +129,20 @@ class _CustomEQState extends State<CustomEQ> {
       builder: (context, snapshot) {
         return snapshot.connectionState == ConnectionState.done
             ? Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: snapshot.data
-                  .map((freq) => _buildSliderBand(freq, bandId++))
-                  .toList(),
-            ),
-            Divider(),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _buildPresets(),
-            ),
-          ],
-        )
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: snapshot.data!
+                        .map((freq) => _buildSliderBand(freq, bandId++))
+                        .toList(),
+                  ),
+                  Divider(),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: _buildPresets(),
+                  ),
+                ],
+              )
             : CircularProgressIndicator();
       },
     );
@@ -163,7 +162,7 @@ class _CustomEQState extends State<CustomEQ> {
                 rtl: true,
                 min: min,
                 max: max,
-                values: [snapshot.hasData ? snapshot.data.toDouble() : 0],
+                values: [snapshot.hasData ? snapshot.data!.toDouble() : 0],
                 onDragCompleted: (handlerIndex, lowerValue, upperValue) {
                   Equalizer.setBandLevel(bandId, lowerValue.toInt());
                 },
@@ -182,22 +181,20 @@ class _CustomEQState extends State<CustomEQ> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final presets = snapshot.data;
-          if (presets.isEmpty) return Text('No presets available!');
+          if (presets?.isEmpty == true) return Text('No presets available!');
           return DropdownButtonFormField(
             decoration: InputDecoration(
               labelText: 'Available Presets',
               border: OutlineInputBorder(),
             ),
             value: _selectedValue,
-            onChanged: widget.enabled
-                ? (String value) {
-              Equalizer.setPreset(value);
+            onChanged: (value) {
+              Equalizer.setPreset(value.toString());
               setState(() {
-                _selectedValue = value;
+                _selectedValue = value.toString();
               });
-            }
-                : null,
-            items: presets.map((String value) {
+            },
+            items: presets?.map((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Text(value),
@@ -205,7 +202,7 @@ class _CustomEQState extends State<CustomEQ> {
             }).toList(),
           );
         } else if (snapshot.hasError)
-          return Text(snapshot.error);
+          return Text(snapshot.error.toString());
         else
           return CircularProgressIndicator();
       },

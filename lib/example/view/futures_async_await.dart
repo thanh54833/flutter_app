@@ -17,7 +17,7 @@ class App extends StatelessWidget {
 // Running multiple futures
     Future runMultipleFutures() async {
       // Create list of multiple futures
-      var futures = List<Future>();
+      var futures = <Future>[];
       for (int i = 0; i < 10; i++) {
         futures.add(myTypedFuture(i, Random(i).nextInt(10)));
       }

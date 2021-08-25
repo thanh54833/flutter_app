@@ -1,4 +1,4 @@
 class MocModel {
-  String value;
+  String? value;
   MocModel({this.value});
 }

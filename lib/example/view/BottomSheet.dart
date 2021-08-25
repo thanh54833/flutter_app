@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter/material.dart';
 
-void main() => runApp(BottomSheet());
+void main() => runApp(_BottomSheet());
 
 /// This is the main application widget.
 class _BottomSheet extends StatelessWidget {
@@ -19,7 +19,7 @@ class _BottomSheet extends StatelessWidget {
 
 /// This is the stateful widget that the main application instantiates.
 class MyStatefulWidget extends StatefulWidget {
-  MyStatefulWidget({Key key}) : super(key: key);
+  MyStatefulWidget({Key? key}) : super(key: key);
 
   @override
   _MyStatefulWidgetState createState() => _MyStatefulWidgetState();

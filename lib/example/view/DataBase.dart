@@ -75,11 +75,11 @@ class _StateApp extends State<StateApp> {
       list.add(playList);
     });
     var playlistHelper = PlaylistHelper.instance;
-    playlistHelper.deleteAll().then((value) {});
-    playlistHelper.setPlaylist(list).then((value) {
+    playlistHelper?.deleteAll().then((value) {});
+    playlistHelper?.setPlaylist(list).then((value) {
       "saveData :... ".Log();
     });
-    playlistHelper.getAll().then((value) {
+    playlistHelper?.getAll().then((value) {
       "playlistHelper.getAll():.. ${value.length} ".Log();
     });
     return Container();

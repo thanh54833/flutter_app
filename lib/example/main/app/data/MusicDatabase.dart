@@ -109,12 +109,12 @@ class MusicDatabaseHelper {
       MusicDatabaseHelper._privateConstructor();
 
   // Only allow a single open connection to the database.
-  static Database _database;
+  static Database? _database;
 
   Future<Database> get database async {
-    if (_database != null) return _database;
+    if (_database != null) return _database!;
     _database = await _initDatabase();
-    return _database;
+    return _database!;
   }
 
   // open the database
@@ -156,7 +156,7 @@ class MusicDatabaseHelper {
     return id;
   }
 
-  Future<MusicModel> queryWord(int id) async {
+  Future<MusicModel?> queryWord(int id) async {
     Database db = await database;
     List<Map> maps = await db.query(AppConfig.table_music_name,
         columns: [
@@ -180,7 +180,7 @@ class MusicDatabaseHelper {
         where: '$columnId = ?',
         whereArgs: [id]);
     if (maps.length > 0) {
-      return MusicModel.fromMap(maps.first);
+      return MusicModel.fromMap(maps.first as Map<String, dynamic>);
     }
     return null;
   }

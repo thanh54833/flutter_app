@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'file:///C:/Users/admin/AndroidStudioProjects/flutter_app/lib/Complex/DI/demo_basic/injection.dart';
+
 import 'package:injectable/injectable.dart';
 
 main() async {
@@ -8,7 +8,7 @@ main() async {
 }
 
 class App extends StatelessWidget {
-  build(BuildContext context) {}
+  build(BuildContext context) async {}
 }
 
 @injectable

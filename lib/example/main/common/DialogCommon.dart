@@ -13,10 +13,10 @@ class DialogCommon {
   }
 
   DialogCommon.internal();
-  BuildContext _buildContext;
+  BuildContext? _buildContext;
 
   dismiss() {
-    Navigator.pop(_buildContext);
+    Navigator.pop(_buildContext!);
   }
 
   showMaterialDialog(context) async {

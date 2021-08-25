@@ -9,18 +9,16 @@ class User {
 }
 
 class StateContainer extends StatefulWidget {
-  final Widget child;
-  final User user;
+  final Widget? child;
+  final User? user;
 
   StateContainer({
-    @required this.child,
+    required this.child,
     this.user,
   });
 
   static StateContainerState of(BuildContext context) {
-    return (context.inheritFromWidgetOfExactType(_InheritedStateContainer)
-            as _InheritedStateContainer)
-        .data;
+    return (context.dependOnInheritedWidgetOfExactType<_InheritedStateContainer>() as _InheritedStateContainer).data;
   }
 
   @override
@@ -28,7 +26,7 @@ class StateContainer extends StatefulWidget {
 }
 
 class StateContainerState extends State<StateContainer> {
-  User user;
+  User? user;
 
   void updateUserInfo({firstName, lastName, email}) {
     if (user == null) {
@@ -38,9 +36,9 @@ class StateContainerState extends State<StateContainer> {
       });
     } else {
       setState(() {
-        user.firstName = firstName ?? user.firstName;
-        user.lastName = lastName ?? user.lastName;
-        user.email = email ?? user.email;
+        user?.firstName = firstName ?? user?.firstName;
+        user?.lastName = lastName ?? user?.lastName;
+        user?.email = email ?? user?.email;
       });
     }
   }
@@ -49,7 +47,7 @@ class StateContainerState extends State<StateContainer> {
   Widget build(BuildContext context) {
     return new _InheritedStateContainer(
       data: this,
-      child: widget.child,
+      child: widget.child!,
     );
   }
 }
@@ -58,9 +56,9 @@ class _InheritedStateContainer extends InheritedWidget {
   final StateContainerState data;
 
   _InheritedStateContainer({
-    Key key,
-    @required this.data,
-    @required Widget child,
+    Key? key,
+    required this.data,
+    required Widget child,
   }) : super(key: key, child: child);
 
   @override

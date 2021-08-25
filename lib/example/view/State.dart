@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/example/main/common/Gesture.dart';
@@ -53,7 +55,7 @@ class AppValueNotifiier {
 
 class StateApp1 extends StatefulWidget {
   int count = 0;
-  Function onClickPlusCount;
+  Function? onClickPlusCount;
   var appValueNotifiier = AppValueNotifiier();
 
   createState() => _StateApp1();
@@ -92,7 +94,7 @@ class _StateApp1 extends State<StateApp1> {
             builder: (context, value, child) {
               return Container(
                 child: Text("Text"),
-                height: value,
+                height: 0.0,
                 width: double.infinity,
                 color: Colors.teal,
                 alignment: Alignment.center,
@@ -107,7 +109,7 @@ class _StateApp1 extends State<StateApp1> {
 }
 
 class StateApp2 extends StatefulWidget {
-  Function onCLick;
+  Function? onCLick;
 
   createState() => _StateApp2();
 }
@@ -136,7 +138,7 @@ class _StateApp2 extends State<StateApp2> {
             margin: EdgeInsets.only(top: 20),
           ).setOnClick(() {
             "setOnClick :...".Log();
-            widget.onCLick();
+            widget.onCLick!();
           })
         ],
       ),

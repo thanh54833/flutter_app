@@ -18,7 +18,7 @@ class StatePlaylistPage extends StatefulWidget {
 
 class _StatePlaylistPage extends State<StatePlaylistPage> {
   List<PlaylistModel> playlist = [];
-  PlaylistHelper playlistHelper;
+  PlaylistHelper? playlistHelper;
 
   initState() {
     super.initState();
@@ -61,6 +61,7 @@ class _StatePlaylistPage extends State<StatePlaylistPage> {
                         size: 30,
                       ),
                       padding: EdgeInsets.zero,
+                      onPressed: (){},
                     ),
                     margin: EdgeInsets.only(right: 5),
                     color: Colors.transparent,
@@ -72,9 +73,9 @@ class _StatePlaylistPage extends State<StatePlaylistPage> {
             SizedBox(
               height: 200,
               child: FutureBuilder(
-                future: playlistHelper.getAll(),
+                future: playlistHelper?.getAll(),
                 builder: (context, snapshot) {
-                  playlist = snapshot.data;
+                  playlist = snapshot.data as List<PlaylistModel>;
                   //"playlist :... ${playlist.length} ".Log();
                   return ((playlist != null) && playlist.isNotEmpty)
                       ? ListView.builder(

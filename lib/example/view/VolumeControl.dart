@@ -11,8 +11,8 @@ class VolumeControl extends StatefulWidget {
 }
 
 class _VolumeControl extends State<VolumeControl> {
-  AudioManager audioManager;
-  int maxVol;
+  AudioManager? audioManager;
+  int? maxVol;
   ValueNotifier<int> currentVol = ValueNotifier(0);
   ShowVolumeUI showVolumeUI = ShowVolumeUI.SHOW;
 
@@ -97,7 +97,7 @@ class _VolumeControl extends State<VolumeControl> {
                       builder: (context, value, child) {
                         return Container(
                           child: LinearProgressIndicator(
-                            value: value / maxVol,
+                            value: (value as int)  / maxVol!,
                             minHeight: 20,
                             valueColor: AlwaysStoppedAnimation<Color>(
                                 LocalColor.Primary),
@@ -124,7 +124,7 @@ class _VolumeControl extends State<VolumeControl> {
                       ),
                       onPressed: () {
                         "onPressed add :. ".Log();
-                        if (currentVol.value < maxVol) {
+                        if (currentVol.value < maxVol!) {
                           currentVol.value += 1;
                           setVol(currentVol.value);
                           updateVolumes();

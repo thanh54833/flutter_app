@@ -6,10 +6,10 @@ class DialogUtils {
   factory DialogUtils() => _instance;
 
   static void showCustomDialog(BuildContext context,
-      {@required String title,
+      {required String title,
       String okBtnText = "Ok",
       String cancelBtnText = "Cancel",
-      @required Function okBtnFunction}) {
+      required Function okBtnFunction}) {
     showDialog(
         context: context,
         builder: (_) {
@@ -19,7 +19,7 @@ class DialogUtils {
             actions: <Widget>[
               FlatButton(
                 child: Text(okBtnText),
-                onPressed: okBtnFunction,
+                onPressed: okBtnFunction.call(),
               ),
               FlatButton(
                   child: Text(cancelBtnText),

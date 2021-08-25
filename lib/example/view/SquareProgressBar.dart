@@ -53,21 +53,21 @@ class ArcPainter extends CustomPainter {
       this.stepValue,
       this.rotationValue})
       : arcStart = _startAngle + // -pi / 2
-            tailValue * 3 / 2 * pi +
-            rotationValue * pi * 1.7 -
-            stepValue * 0.8 * pi,
+            tailValue! * 3 / 2 * pi +
+            rotationValue! * pi * 1.7 -
+            stepValue! * 0.8 * pi,
         arcSweep =
-            max(headValue * 3 / 2 * pi - tailValue * 3 / 2 * pi, _epsilon);
+            max(headValue! * 3 / 2 * pi - tailValue * 3 / 2 * pi, _epsilon);
 
-  final Color backgroundColor;
-  final Color color;
-  final double headValue;
-  final double tailValue;
-  final int stepValue;
-  final double rotationValue;
-  final double strokeWidth;
-  final double arcStart;
-  final double arcSweep;
+  final Color? backgroundColor;
+  final Color? color;
+  final double? headValue;
+  final double? tailValue;
+  final int? stepValue;
+  final double? rotationValue;
+  final double? strokeWidth;
+  final double? arcStart;
+  final double? arcSweep;
 
   static const double _twoPi = pi * 2.0;
   static const double _epsilon = .001;
@@ -80,12 +80,12 @@ class ArcPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (backgroundColor != null) {
       final Paint backgroundPaint = Paint()
-        ..color = backgroundColor
-        ..strokeWidth = strokeWidth
+        ..color = backgroundColor!
+        ..strokeWidth = strokeWidth!
         ..style = PaintingStyle.stroke;
       canvas.drawArc(
-          Offset(-strokeWidth / 2, -strokeWidth / 2) &
-              Size(size.width + strokeWidth, size.height + strokeWidth),
+          Offset(-strokeWidth! / 2, -strokeWidth! / 2) &
+              Size(size.width + strokeWidth!, size.height + strokeWidth!),
           0,
           _completeCircumference,
           false,
@@ -93,8 +93,8 @@ class ArcPainter extends CustomPainter {
     }
 
     final Paint paint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth
+      ..color = color!
+      ..strokeWidth = strokeWidth!
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.square;
 
@@ -128,13 +128,13 @@ class FabLoader extends StatefulWidget {
   final Color color;
   final Color backgroundColor;
   final double strokeWidth;
-  final Widget child;
+  final Widget? child;
 
   FabLoader({
     this.color = Colors.orange,
     this.backgroundColor = Colors.transparent,
     this.strokeWidth = 4,
-    @required this.child,
+    required this.child,
   })  : assert(color != null),
         assert(backgroundColor != null),
         assert(strokeWidth != null),
@@ -169,12 +169,12 @@ final Animatable<double> _kRotationTween = CurveTween(curve: const SawTooth(5));
 
 class _FabLoadingWidget extends State<FabLoader>
     with SingleTickerProviderStateMixin {
-  final Widget child;
-  final double strokeWidth;
+  final Widget? child;
+  final double? strokeWidth;
 
-  AnimationController _controller;
+  AnimationController? _controller;
 
-  _FabLoadingWidget({@required this.strokeWidth, @required this.child});
+  _FabLoadingWidget({required this.strokeWidth, required this.child});
 
   @override
   void initState() {
@@ -183,21 +183,21 @@ class _FabLoadingWidget extends State<FabLoader>
       duration: const Duration(seconds: 5),
       vsync: this,
     );
-    _controller.repeat(); // we want it to repeat over and over (indeterminate)
+    _controller?.repeat(); // we want it to repeat over and over (indeterminate)
   }
 
   @override
   void didUpdateWidget(FabLoader oldWidget) {
     super.didUpdateWidget(oldWidget);
     // We want to start animation again if the widget is updated.
-    if (!_controller.isAnimating) {
-      _controller.repeat();
+    if (!_controller!.isAnimating) {
+      _controller?.repeat();
     }
   }
 
   @override
   void dispose() {
-    _controller.dispose(); // avoid leaks
+    _controller?.dispose(); // avoid leaks
     super.dispose();
   }
 
@@ -219,13 +219,13 @@ class _FabLoadingWidget extends State<FabLoader>
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _controller,
-      builder: (BuildContext context, Widget child) {
+      animation: _controller!,
+      builder: (BuildContext? context, Widget? child) {
         return _buildIndicator(
-          _kStrokeHeadTween.evaluate(_controller),
-          _kStrokeTailTween.evaluate(_controller),
-          _kStepTween.evaluate(_controller),
-          _kRotationTween.evaluate(_controller),
+          _kStrokeHeadTween.evaluate(_controller!),
+          _kStrokeTailTween.evaluate(_controller!),
+          _kStepTween.evaluate(_controller!),
+          _kRotationTween.evaluate(_controller!),
         );
       },
     );

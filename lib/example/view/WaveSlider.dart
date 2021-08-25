@@ -22,10 +22,10 @@ class App extends StatelessWidget {
 
 ////////////////////////////////////////////////////////////////////////
 class Animation extends StatefulWidget {
-  double height = 40;
-  double maxHeight = 40;
-  double minHeight = 10;
-  Widget child = Container(height: 40, width: 10, color: Colors.blue);
+  double? height = 40;
+  double? maxHeight = 40;
+  double? minHeight = 10;
+  Widget? child = Container(height: 40, width: 10, color: Colors.blue);
 
   Animation({this.child, this.maxHeight, this.minHeight});
 
@@ -58,7 +58,7 @@ class _Animation extends State<Animation> {
                 setState(() {
                   //"onEnd :.. ${widget.height} __  ${widget.minHeight} ".Log();
                   if (widget.height == widget.maxHeight) {
-                    var _minHeight = rng.nextInt(widget.minHeight.toInt());
+                    var _minHeight = rng.nextInt(widget.minHeight!.toInt());
                     widget.height = _minHeight.toDouble();
                   } else {
                     widget.height = widget.maxHeight;
@@ -105,14 +105,14 @@ class _AppState extends State<AppState> {
             height: 22,
             child: ValueListenableBuilder(
               valueListenable: barPosition,
-              builder: (BuildContext context, int value, Widget child) {
+              builder: (context, value, child) {
                 return WaveSlider(
                   initialBarPosition: maxBar.toDouble(),
                   barWidth: 5.0,
                   maxBarHight: 20,
                   width: 200,
                   //MediaQuery.of(context).size.width,
-                  barPosition: value.toDouble(),
+                  barPosition: value as double,
                 );
               },
             ),
@@ -162,14 +162,14 @@ class WaveSlider extends StatefulWidget {
 
 class WaveSliderState extends State<WaveSlider> {
   List<int> bars = [];
-  double barWidth;
-  int maxBarHight;
-  int numberOfBars;
+  double? barWidth;
+  int? maxBarHight;
+  int? numberOfBars;
 
   void randomNumberGenerator() {
     Random r = Random();
-    for (var i = 0; i < numberOfBars; i++) {
-      bars.add(r.nextInt(maxBarHight - 5) + 5); //+ 10);
+    for (var i = 0; i < (numberOfBars ?? 0); i++) {
+      bars.add(r.nextInt(maxBarHight! - 5) + 5); //+ 10);
     }
   }
 
@@ -188,7 +188,7 @@ class WaveSliderState extends State<WaveSlider> {
     barWidth = widget.barWidth;
     maxBarHight = widget.maxBarHight.toInt();
     if (bars.isNotEmpty) bars = [];
-    numberOfBars = widget.width ~/ barWidth;
+    numberOfBars = widget.width ~/ barWidth!;
     randomNumberGenerator();
   }
 
@@ -217,7 +217,7 @@ class WaveSliderState extends State<WaveSlider> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: bars.map((int height) {
-                    Color color = barItem + 1 < widget.barPosition / barWidth
+                    Color color = barItem + 1 < widget.barPosition / barWidth!
                         ? LocalColor.Primary
                         : Colors.grey;
                     barItem++;

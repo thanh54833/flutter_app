@@ -1,8 +1,7 @@
 class Params {
-  String isolateId;
+  String? isolateId;
 
-  Params({
-      this.isolateId});
+  Params({this.isolateId});
 
   Params.fromJson(dynamic json) {
     isolateId = json["isolateId"];

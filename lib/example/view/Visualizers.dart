@@ -62,8 +62,8 @@ class PlaySong extends StatefulWidget {
 }
 
 class _VisState extends State<PlaySong> {
-  int playerID;
-  String selected = 'LineBarVisualizers';
+  int? playerID;
+  String? selected = 'LineBarVisualizers';
   final List<String> _dropdownValues = [
     "MultiWaveVisualizer",
     "LineVisualizer",
@@ -87,14 +87,13 @@ class _VisState extends State<PlaySong> {
     audioPlayer.setFilePath(
         "/storage/emulated/0/NCT/DiDuDuaDi-BichPhuong-6059493.mp3");
     //audioPlayer.
-
     // var mediaPlayer =
     //     MediaPlayerPlugin.create(isBackground: true, showNotification: true);
     // mediaPlayer.setSource(
     //     MediaFile(source: "https://luan.xyz/files/audio/ambient_c_motion.mp3"));
     // mediaPlayer.play();
 
-    int sessionId;
+    int? sessionId;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       sessionId = await methodCalls.getSessionId();
@@ -110,19 +109,19 @@ class _VisState extends State<PlaySong> {
       //     .Log();
       // playerID = audioPlayer.androidAudioSessionId;
 
-      var ss = audioPlayer.androidAudioSessionId;
-      audioPlayer.androidAudioSessionIdStream.forEach((element) {
-        "element :... ${element} ".Log();
-      }); //then((id){});
+      // var ss = audioPlayer.androidAudioSessionId;
+      // audioPlayer.androidAudioSessionIdStream.forEach((element) {
+      //   "element :... ${element} ".Log();
+      // }); //then((id){});
 
-      "sessionId :.. ${sessionId} __ ${ss} ".Log();
+      //"sessionId :.. ${sessionId} __ ${ss} ".Log();
 
       audioPlayer.play();
       playerID = sessionId;
     });
   }
 
-  String newValue;
+  String? newValue;
 
   Widget dropdownWidget() {
     return DropdownButton(
@@ -133,10 +132,10 @@ class _VisState extends State<PlaySong> {
                 value: value,
               ))
           .toList(),
-      onChanged: (String value) {
-        newValue = value;
+      onChanged: (value) {
+        newValue = value.toString();
         setState(() {
-          selected = value;
+          selected = value.toString();
         });
       },
       //this wont make dropdown expanded and fill the horizontal space
@@ -262,8 +261,8 @@ class _VisState extends State<PlaySong> {
 class methodCalls {
   static const MethodChannel _channel = const MethodChannel('calls');
 
-  static Future<int> getSessionId() async {
-    int session;
+  static Future<int?> getSessionId() async {
+    int? session;
     try {
       final int result = await _channel.invokeMethod('getSessionID');
       session = result;

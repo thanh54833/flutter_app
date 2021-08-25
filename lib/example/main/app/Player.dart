@@ -206,12 +206,12 @@ class _WidgetGradient extends State<WidgetGradient> {
                           if (!snapshot.hasError &&
                               (snapshot.connectionState ==
                                   ConnectionState.done)) {
-                            color_gradient = snapshot.data.dominantColor.color;
+                            color_gradient = snapshot.data!.dominantColor.color;
                             getColor(alpha) async {
                               await Future.delayed(Duration(milliseconds: 100),
                                   () {
                                 "getColor :.. ".Log();
-                                color.value = snapshot.data.dominantColor.color
+                                color.value = snapshot.data!.dominantColor.color
                                     .withOpacity(alpha);
                               });
                             }
@@ -232,7 +232,7 @@ class _WidgetGradient extends State<WidgetGradient> {
                                 width: double.infinity,
                                 decoration: new BoxDecoration(
                                   gradient: LinearGradient(
-                                    colors: [value, Colors.transparent],
+                                    colors: [value as Color, Colors.transparent],
                                     begin: Alignment.topCenter, //bottomCenter,
                                     end: Alignment.bottomCenter, //topCenter,
                                   ),

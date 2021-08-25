@@ -45,7 +45,6 @@ class MyApp extends StatelessWidget {
                           child: Text("Nothing!"),
                         );
               }
-              return null; // unreachable
             },
           )),
     );
@@ -65,6 +64,7 @@ class MyApp extends StatelessWidget {
       });
       return isContains;
     }
+
     List<File> data = files;
     List<File> listMp3 =
         data.where((element) => isContain(element.absolute.path)).toList();

@@ -33,7 +33,7 @@ class _StateApp extends State<StateApp> {
         /* waveform */ Waveform.Triangle,
         /* volume */ 0.5);
     var file = new File('output.wav');
-    List<int> bytes = List<int>();
+    List<int> bytes = <int>[];
     await for (int byte in generator.generate(note)) {
       bytes.add(byte);
     }
